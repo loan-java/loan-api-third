@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-	<property name="PROJECT"  value="loan-third"/>
+	<property name="PROJECT"  value="loan-rongze-third"/>
 	<property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/" />  <!-- 日志路径 -->
 	<property name="LOG_PATH_INFO" value="${LOG_PATH}/info_${PROJECT}.log" />
 	<property name="LOG_PATH_ERROR" value="${LOG_PATH}/error_${PROJECT}.log" />
