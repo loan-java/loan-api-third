@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.mod.loan.model.User">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_phone" jdbcType="VARCHAR" property="userPhone"/>
+        <result column="user_pwd" jdbcType="VARCHAR" property="userPwd"/>
+        <result column="user_origin" jdbcType="VARCHAR" property="userOrigin"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="user_cert_no" jdbcType="VARCHAR" property="userCertNo"/>
+        <result column="img_face" jdbcType="VARCHAR" property="imgFace"/>
+        <result column="img_cert_front" jdbcType="VARCHAR" property="imgCertFront"/>
+        <result column="img_cert_back" jdbcType="VARCHAR" property="imgCertBack"/>
+        <result column="ia" jdbcType="VARCHAR" property="ia"/>
+        <result column="indate" jdbcType="VARCHAR" property="indate"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="nation" jdbcType="VARCHAR" property="nation"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="merchant" jdbcType="VARCHAR" property="merchant"/>
+        <result column="user_nick" jdbcType="VARCHAR" property="userNick"/>
+        <result column="user_qq" jdbcType="VARCHAR" property="userQq"/>
+        <result column="user_email" jdbcType="VARCHAR" property="userEmail"/>
+        <result column="img_head" jdbcType="VARCHAR" property="imgHead"/>
+        <result column="user_wechat" jdbcType="VARCHAR" property="userWechat"/>
+        <result column="common_info" jdbcType="VARCHAR" property="commonInfo"/>
+    </resultMap>
+</mapper>

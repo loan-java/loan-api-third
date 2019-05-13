@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.BankMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.Bank">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="code" jdbcType="VARCHAR" property="code" />
+    <result column="bank_name" jdbcType="VARCHAR" property="bankName" />
+    <result column="bank_imgurl" jdbcType="VARCHAR" property="bankImgurl" />
+    <result column="money_unit_limit" jdbcType="DECIMAL" property="moneyUnitLimit" />
+    <result column="money_day_limit" jdbcType="DECIMAL" property="moneyDayLimit" />
+    <result column="idx" jdbcType="TINYINT" property="idx" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="bank_status" jdbcType="TINYINT" property="bankStatus" />
+    <result column="code_helipay" jdbcType="VARCHAR" property="codeHelipay" />
+  </resultMap>
+</mapper>

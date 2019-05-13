@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.UserAddressMapper">
+	<resultMap id="BaseResultMap" type="com.mod.loan.model.UserAddress">
+		<!-- WARNING - @mbg.generated -->
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="uid" jdbcType="BIGINT" property="uid" />
+		<result column="name" jdbcType="VARCHAR" property="name" />
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+		<result column="province" jdbcType="VARCHAR" property="province" />
+		<result column="city" jdbcType="VARCHAR" property="city" />
+		<result column="district" jdbcType="VARCHAR" property="district" />
+		<result column="detail" jdbcType="VARCHAR" property="detail" />
+		<result column="master" jdbcType="INTEGER" property="master" />
+		<result column="status" jdbcType="INTEGER" property="status" />
+		<result column="tag" jdbcType="VARCHAR" property="tag" />
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+	</resultMap>
+
+	<select id="getByUid" resultMap="BaseResultMap">
+		select id,name,phone,province,city,district,detail,master,tag from tb_user_address where status=1 and uid=#{uid} order by id desc
+	</select>
+
+	<update id="updateMasterByUid">
+		update tb_user_address set master=0 where uid=#{uid}
+	</update>
+
+	<select id="selectDefaultUserAddress" resultMap="BaseResultMap">
+		select id,name,phone,province,city,district,detail,tag from tb_user_address where uid = #{uid} and status = 1 order by master desc limit 1
+	</select>
+</mapper>

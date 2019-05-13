@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.BlacklistMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.Blacklist">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="BIGINT" property="uid" />
+    <result column="merchant" jdbcType="VARCHAR" property="merchant" />
+    <result column="tel" jdbcType="VARCHAR" property="tel" />
+    <result column="cert_no" jdbcType="VARCHAR" property="certNo" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="type" jdbcType="TINYINT" property="type" />
+    <result column="tag" jdbcType="TINYINT" property="tag" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+
+  <select id="getByUid"  resultMap="BaseResultMap">
+    select * from tb_blacklist where uid=#{uid} ORDER BY create_time desc limit 1;
+  </select>
+
+
+
+</mapper>

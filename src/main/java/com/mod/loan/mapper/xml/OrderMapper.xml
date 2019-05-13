@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.OrderMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.Order">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="uid" jdbcType="BIGINT" property="uid" />
+    <result column="borrow_day" jdbcType="INTEGER" property="borrowDay" />
+    <result column="borrow_money" jdbcType="DECIMAL" property="borrowMoney" />
+    <result column="actual_money" jdbcType="DECIMAL" property="actualMoney" />
+    <result column="total_rate" jdbcType="DECIMAL" property="totalRate" />
+    <result column="total_fee" jdbcType="DECIMAL" property="totalFee" />
+    <result column="interest_rate" jdbcType="DECIMAL" property="interestRate" />
+    <result column="interest_fee" jdbcType="DECIMAL" property="interestFee" />
+    <result column="overdue_rate" jdbcType="DECIMAL" property="overdueRate" />
+    <result column="overdue_day" jdbcType="INTEGER" property="overdueDay" />
+    <result column="overdue_fee" jdbcType="DECIMAL" property="overdueFee" />
+    <result column="should_repay" jdbcType="DECIMAL" property="shouldRepay" />
+    <result column="had_repay" jdbcType="DECIMAL" property="hadRepay" />
+    <result column="reduce_money" jdbcType="DECIMAL" property="reduceMoney" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="audit_time" jdbcType="TIMESTAMP" property="auditTime" />
+    <result column="arrive_time" jdbcType="TIMESTAMP" property="arriveTime" />
+    <result column="repay_time" jdbcType="TIMESTAMP" property="repayTime" />
+    <result column="real_repay_time" jdbcType="TIMESTAMP" property="realRepayTime" />
+    <result column="order_version" jdbcType="INTEGER" property="orderVersion" />
+    <result column="merchant" jdbcType="VARCHAR" property="merchant" />
+    <result column="follow_user_id" jdbcType="BIGINT" property="followUserId" />
+    <result column="payment_type" jdbcType="VARCHAR" property="paymentType"/>
+  </resultMap>
+
+  <select id="findUserLatestOrder" resultMap="BaseResultMap">
+    select * from tb_order where uid=#{uid} order by id desc limit 1
+  </select>
+  <select id="getByUid" resultMap="BaseResultMap">
+    select id,borrow_money,actual_money,create_time,status from tb_order where uid=#{uid} order by id desc
+  </select>
+  <select id="judgeUserTypeByUid" resultType="int">
+    SELECT
+    CASE
+    WHEN NOT EXISTS ( SELECT 1 FROM tb_order WHERE uid=#{uid} ) THEN 1
+    WHEN EXISTS ( SELECT 1 FROM tb_order WHERE uid=#{uid} AND STATUS IN ( 41, 42 ) ) THEN 3 ELSE 2
+    END AS user_type
+  </select>
+  <select id="countPaySuccessByUid" resultType="int">
+    SELECT count(1) FROM tb_order WHERE uid=#{uid} AND STATUS IN (41,42)
+  </select>
+
+  <select id="findByOrderNoAndUid" resultMap="BaseResultMap">
+    select * from tb_order where order_no = #{orderNo} and uid = #{uid}
+  </select>
+</mapper>

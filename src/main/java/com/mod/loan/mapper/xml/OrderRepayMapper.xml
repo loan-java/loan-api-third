@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.OrderRepayMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.OrderRepay">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="repay_no" jdbcType="VARCHAR" property="repayNo" />
+    <result column="uid" jdbcType="BIGINT" property="uid" />
+    <result column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="repay_type" jdbcType="TINYINT" property="repayType" />
+    <result column="repay_status" jdbcType="INTEGER" property="repayStatus" />
+    <result column="repay_money" jdbcType="DECIMAL" property="repayMoney" />
+    <result column="repay_cert" jdbcType="VARCHAR" property="repayCert" />
+    <result column="bank" jdbcType="VARCHAR" property="bank" />
+    <result column="bank_no" jdbcType="VARCHAR" property="bankNo" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <select id="countRepaySuccess" resultType="int">
+		select count(0) from tb_order_repay where order_id = #{orderId} and repay_status=1
+  </select>
+</mapper>

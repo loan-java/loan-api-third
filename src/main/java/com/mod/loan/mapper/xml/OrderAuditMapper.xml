@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.OrderAuditMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.OrderAudit">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="audit_id" jdbcType="BIGINT" property="auditId" />
+    <result column="audit_name" jdbcType="VARCHAR" property="auditName" />
+    <result column="fail_reason" jdbcType="VARCHAR" property="failReason" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="crete_time" jdbcType="TIMESTAMP" property="creteTime" />
+  </resultMap>
+</mapper>

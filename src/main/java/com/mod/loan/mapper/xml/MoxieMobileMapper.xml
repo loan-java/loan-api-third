@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.MoxieMobileMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.MoxieMobile">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="BIGINT" property="uid" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="message" jdbcType="VARCHAR" property="message" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+</mapper>

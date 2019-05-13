@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.OrderPhoneMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.OrderPhone">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="order_id" jdbcType="BIGINT" property="orderId" />
+    <result column="phone_type" jdbcType="VARCHAR" property="phoneType" />
+    <result column="param_value" jdbcType="VARCHAR" property="paramValue" />
+    <result column="phone_model" jdbcType="VARCHAR" property="phoneModel" />
+  </resultMap>
+</mapper>
