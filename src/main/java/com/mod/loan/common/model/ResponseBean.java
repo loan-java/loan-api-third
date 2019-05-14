@@ -1,6 +1,8 @@
 package com.mod.loan.common.model;
 
 
+import com.mod.loan.common.enums.ResponseEnum;
+
 public class ResponseBean<T> {
 
     private int code;
@@ -20,12 +22,17 @@ public class ResponseBean<T> {
         return new ResponseBean<>(200, "成功", data);
     }
 
+
     public static <T> ResponseBean<T> fail(String msg) {
-        return new ResponseBean<>(-1, msg, null);
+        return new ResponseBean<>(ResponseEnum.M4000.getCodeInt(), msg, null);
     }
 
-    public static <T> ResponseBean<T> fail(String msg, T data) {
-        return new ResponseBean<>(-1, msg, data);
+    public static <T> ResponseBean<T> fail(int code, String msg) {
+        return new ResponseBean<>(code, msg, null);
+    }
+
+    public static <T> ResponseBean<T> fail(int code, String msg, T data) {
+        return new ResponseBean<>(code, msg, data);
     }
 
     public int getCode() {
