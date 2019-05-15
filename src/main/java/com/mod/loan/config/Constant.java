@@ -44,8 +44,27 @@ public class Constant {
     public static String kuaiQianVersion;
     public static String merchant;
 
+    public static String rongZeRequestAppId;
+    public static String rongZeCallbackUrl;
+    public static String rongZeQueryUrl;
     public static String rongZePublicKey;
+
     public static String orgPrivateKey;
+
+    @Value("${rongze.request.app.id}")
+    public static void setRongZeRequestAppId(String rongZeRequestAppId) {
+        Constant.rongZeRequestAppId = rongZeRequestAppId;
+    }
+
+    @Value("${rongze.callback.url}")
+    public static void setRongZeCallbackUrl(String rongZeCallbackUrl) {
+        Constant.rongZeCallbackUrl = rongZeCallbackUrl;
+    }
+
+    @Value("${rongze.query.url}")
+    public static void setRongZeQueryUrl(String rongZeQueryUrl) {
+        Constant.rongZeQueryUrl = rongZeQueryUrl;
+    }
 
     @Value("${org.rsa.private.key}")
     public void setOrgPrivateKey(String orgPrivateKey) {

@@ -45,7 +45,7 @@ public class RequestUtil {
         vo.setBiz_data(encryptBizData(bizData, despwd));
         vo.setBiz_enc("1");
         vo.setDes_key(encryptDescKey(despwd));
-        vo.setApp_id("appid1000000");
+        vo.setApp_id(Constant.rongZeRequestAppId);
         vo.setVersion("1.0");
         vo.setFormat("json");
         vo.setTimestamp(System.currentTimeMillis() + "");
