@@ -1,5 +1,5 @@
 import com.mod.loan.config.Constant;
-import com.mod.loan.util.rongze.RequestUtil;
+import com.mod.loan.util.rongze.RongZeRequestUtil;
 import org.junit.Test;
 
 /**
@@ -10,10 +10,10 @@ public class CommonTest extends BaseSpringBootJunitTest {
 
     @Test
     public void m() throws Exception {
-        String param = RequestUtil.buildRequestParams("api.charge.data", "{'order_no':'111'}");
+        String param = RongZeRequestUtil.buildRequestParams("api.charge.data", "{'order_no':'111'}");
         System.out.println(param);
 
-        String result = RequestUtil.doPost(Constant.rongZeQueryUrl, param);
+        String result = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, param);
         System.out.println(result);
     }
 }

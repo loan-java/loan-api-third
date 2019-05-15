@@ -14,7 +14,7 @@ import java.util.Map;
  * @ author liujianjian
  * @ date 2019/5/15 9:03
  */
-public class RequestUtil {
+public class RongZeRequestUtil {
 
     public static String doPost(String url, String reqParamsStr) {
         //大王贷款回调服务API接口URL
