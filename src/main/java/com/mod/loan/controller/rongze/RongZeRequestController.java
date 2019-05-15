@@ -50,7 +50,7 @@ public class RongZeRequestController {
                     return rongZeRequestHandler.handleOrderSubmit(param);
 
                 default:
-                    return ResponseBean.success();
+                    return ResponseBean.fail(ResponseEnum.M5000.getCodeInt(), "method not found");
             }
         } catch (Exception e) {
             return ResponseBean.fail("失败: " + e.getMessage());
