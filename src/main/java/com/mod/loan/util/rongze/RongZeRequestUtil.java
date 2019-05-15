@@ -41,9 +41,9 @@ public class RongZeRequestUtil {
         RequestRongZeBean vo = new RequestRongZeBean();
         vo.setMethod(method);
         vo.setSign_type("RSA");
-        vo.setBiz_data(encryptBizData(bizData, despwd));
+        vo.setBiz_data(BizDataUtil.encryptBizData(bizData, despwd));
         vo.setBiz_enc("1");
-        vo.setDes_key(encryptDescKey(despwd));
+        vo.setDes_key(genDescKey(despwd));
         vo.setApp_id(Constant.rongZeRequestAppId);
         vo.setVersion("1.0");
         vo.setFormat("json");
@@ -75,49 +75,12 @@ public class RongZeRequestUtil {
         return buildRequestParams(method, bizData, "");
     }
 
-    //加密业务数据
-    private static String encryptBizData(String bizData, String despwd) throws Exception {
-        //业务参数
-//        String biz_data = "{'order_no':'1584827442684559360','bank_card':'6228480550690077718','bind_status':1,'reason':''}";
-        //生成des秘钥
-//        String despwd = StandardDesUtils.generateDesKey();
-        String encrypt = StandardDesUtils.encrypt(bizData, despwd);
-
-        System.out.println("decrypt bizData:" + decryptBizData(encrypt, despwd));
-
-        return encrypt;
-        //biz_data加解密
-//        System.out.println("despwd:"+despwd);
-//        System.out.println("encrypt bizdata作为biz_data值:"+encryptStr);
-//        System.out.println("decrypt bizdata:"+StandardDesUtils.decrypt(encryptStr, despwd));
-//        System.out.println();
-
-        //大王贷款平台RSA公钥
-//        String financePublicKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCIcI7USujX9g5J1ZxVMFl+Yq/u/i2JbGt8SM/Ds7Z4nU/895C+dL9MGnSqTAMXCsp5eFhoIhyHPUxiO0GaGLXBAvoq1TpTFGVA0mYty3yeDwNA/Aia5tnQe2mFamdRBQqrU/xMleR6rtEWxs/cze+ZU5eO441b/fcKCgel1kjPBQIDAQAB";
-        //des_key加解密
-        //对despwd进行RSA加密并base64转成String
-//        String content = RSAUtils.encrypt(despwd, financePublicKey);
-//        System.out.println("RSA加密并base64作为des_key值:"+content);
-
-        //大王贷款平台RSA私钥
-//        String financePrivateKey="MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIhwjtRK6Nf2DknVnFUwWX5ir+7+LYlsa3xIz8OztnidT/z3kL50v0wadKpMAxcKynl4WGgiHIc9TGI7QZoYtcEC+irVOlMUZUDSZi3LfJ4PA0D8CJrm2dB7aYVqZ1EFCqtT/EyV5Hqu0RbGz9zN75lTl47jjVv99woKB6XWSM8FAgMBAAECgYBtc0XQnUsOO2+Y4UfousF/9nDF2pby/8t1xv8MMfU16pRJDNvLPOJcjXh7SEDOUjS8nsLkvkB+aLkGsBxfHmVmACc5yj9+L/wHhzsI9Lvqg0q9AjdrC2a35OZexggWikKjH8HT/oerNCyKQ7RUs4k7P3ECz9WWhY28DR90ABtvHQJBAOCwXZHcspykVGqQH/S4a59TnP0rDJuSvG6e1q+fpGknDvriA1QYTLxriLvgvI5kY2Ry+ct5LbKzZ5JZUgPtSK8CQQCbc/TnHPpxTjFMATI6rsF5dnFkjSzQY6aQG+Q1X4d5GeIndYzPCWdr4Bd3Xkh5ouRHy1bdFrdQXHm4jIX4GSiLAkEApl/x6WASogrMt1uhTgSBLKktRgnqfAhbn03eio0boQFbBkr1S//yUlMOHJB9DrMnJeo9LX29aOWPe77IDEBX4QJAUIH0QsEyPv4E79zqu5OH5bTesvmeTOpe9+FKBg5MZf5urorles/e/PJYlNyCYmRnH3uCqAu8smTCMT6tnzjAUwJAYEjnoy8pBJmwcgSEZ4hgXjSCtAZHmSnnxQW9gJnmiyM/nJzGq9B3ZrBbY/zQ54Ws1HuX7dDlOQYRAnznFfZOQw==";
-        //对des_key进行解密
-//        System.out.println("解密的despwd:"+RSAUtils.decrypt(content , financePrivateKey));
-    }
-
     //生成 RSA 加密后的密钥
-    private static String encryptDescKey(String despwd) throws Exception {
-        String encrypt = RSAUtils.encrypt(despwd, Constant.rongZePublicKey);
-//        System.out.println("decrypt descKey:" + RSAUtils.decrypt(encrypt, Constant.rongZePublicKey));
-        return encrypt;
+    public static String genDescKey(String despwd) throws Exception {
+        return RSAUtils.encrypt(despwd, Constant.rongZePublicKey);
     }
 
-    //解密业务数据
-    public static String decryptBizData(String encryptStr, String despwd) throws Exception {
-        return StandardDesUtils.decrypt(encryptStr, despwd);
-    }
-
-    static class RequestRongZeBean {
+    public static class RequestRongZeBean {
         /**
          * 要请求的 API 方法名称
          */
