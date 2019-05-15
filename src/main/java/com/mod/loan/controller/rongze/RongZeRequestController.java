@@ -3,7 +3,11 @@ package com.mod.loan.controller.rongze;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.exception.BizException;
+import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.model.User;
+import com.mod.loan.service.UserService;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +27,8 @@ import javax.annotation.Resource;
 @RequestMapping("/rongze")
 public class RongZeRequestController {
 
+    @Resource
+    private UserService userService;
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
 
@@ -60,8 +66,29 @@ public class RongZeRequestController {
                     return ResponseBean.fail(ResponseEnum.M5000.getCodeInt(), "method not found");
             }
         } catch (Exception e) {
-            log.error("融泽请求失败: " + e.getMessage(), e);
+            logFail(e);
             return ResponseBean.fail(e.getMessage());
         }
+    }
+
+    private void logFail(Exception e) {
+        if (e instanceof BizException)
+            log.info(getPreLog() + e.getMessage());
+        else
+            log.error(getPreLog() + ": " + e.getMessage(), e);
+    }
+
+    private String getPreLog() {
+        String pre = "userId: %s, username: %s, phone: %s, ", username = "", phone = "";
+        Long uid = RequestThread.getUid();
+        if (uid != null) {
+            User user = userService.selectByPrimaryKey(uid);
+
+            if (user != null) {
+                username = user.getUserName();
+                phone = user.getUserPhone();
+            }
+        }
+        return String.format(pre, uid, username, phone);
     }
 }

@@ -24,32 +24,22 @@ import java.util.Map;
 public class RongZeRequestHandler {
 
     @Resource
-    private UserService userService;
-    @Resource
     private OrderService orderService;
 
     //推送用户确认收款信息
-    ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) {
-        try {
-            JSONObject data = JSONObject.parseObject(param.getString("biz_data"));
+    ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) throws Exception {
+        JSONObject data = JSONObject.parseObject(param.getString("biz_data"));
 
-            String orderNo = data.getString("order_no");
-            String loanAmount = data.getString("loan_amount");
-            int loanTerm = data.getIntValue("loan_term");
+        String orderNo = data.getString("order_no");
+        String loanAmount = data.getString("loan_amount");
+        int loanTerm = data.getIntValue("loan_term");
 
-            orderService.submitOrder(orderNo, loanAmount, loanTerm);
+        orderService.submitOrder(orderNo, loanAmount, loanTerm);
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("deal_result", "1");
-            map.put("need_confirm", "0");
-            return ResponseBean.success(map);
-        } catch (BizException e) {
-            logFail(e, "");
-            return ResponseBean.fail(e);
-        } catch (Exception e) {
-            logFail(e, "提交贷款申请订单失败");
-            return ResponseBean.fail(e.getMessage());
-        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("deal_result", "1");
+        map.put("need_confirm", "0");
+        return ResponseBean.success(map);
     }
 
     //查询借款合同
@@ -84,27 +74,5 @@ public class RongZeRequestHandler {
         map.put("update_time", "");
         map.put("remark", "");
         return ResponseBean.success(map);
-    }
-
-
-    private void logFail(Exception e, String pre) {
-        if (e instanceof BizException)
-            log.info(getPreLog() + e.getMessage());
-        else
-            log.error(getPreLog() + pre + ": " + e.getMessage(), e);
-    }
-
-    private String getPreLog() {
-        String pre = "userId: %s, username: %s, phone: %s, ", username = "", phone = "";
-        Long uid = RequestThread.getUid();
-        if (uid != null) {
-            User user = userService.selectByPrimaryKey(uid);
-
-            if (user != null) {
-                username = user.getUserName();
-                phone = user.getUserPhone();
-            }
-        }
-        return String.format(pre, uid, username, phone);
     }
 }
