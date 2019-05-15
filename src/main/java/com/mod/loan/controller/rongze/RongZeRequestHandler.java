@@ -16,6 +16,7 @@ public class RongZeRequestHandler {
     @Resource
     private OrderService orderService;
 
+    //推送用户确认收款信息
     Object handleOrderSubmit(JSONObject param) {
 
         JSONObject data = JSONObject.parseObject(param.getString("biz_data"));
@@ -25,5 +26,10 @@ public class RongZeRequestHandler {
         int loanTerm = data.getIntValue("loan_term");
 
         return orderService.submitOrder(orderNo, loanAmount, loanTerm);
+    }
+
+    //查询借款合同
+    Object handleQueryContract(JSONObject param) {
+        return null;
     }
 }

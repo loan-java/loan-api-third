@@ -7,6 +7,7 @@ import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,7 @@ public class RongZeRequestController {
     public Object dispatcherRequest(@RequestBody JSONObject param) {
 
         log.info("收到融泽请求, param: " + JSON.toJSONString(param));
+        if (param == null) return ResponseBean.fail(ResponseEnum.M5000);
 
         try {//校验 sig
             String sign = param.getString("sign");
@@ -43,10 +45,13 @@ public class RongZeRequestController {
             }
 
             String method = param.getString("method");
+            if (StringUtils.isBlank(method)) return ResponseBean.fail(ResponseEnum.M5000);
 
             switch (method) {
-                case "fund.withdraw.req":
+                case "fund.withdraw.req": //推送用户确认收款信息
                     return rongZeRequestHandler.handleOrderSubmit(param);
+                case "fund.deal.contract": //查询借款合同
+                    return rongZeRequestHandler.handleQueryContract(param);
 
                 // TODO: 2019/5/15 其它 method
                 default:
