@@ -52,17 +52,17 @@ public class Constant {
     public static String orgPrivateKey;
 
     @Value("${rongze.request.app.id}")
-    public static void setRongZeRequestAppId(String rongZeRequestAppId) {
+    public void setRongZeRequestAppId(String rongZeRequestAppId) {
         Constant.rongZeRequestAppId = rongZeRequestAppId;
     }
 
     @Value("${rongze.callback.url}")
-    public static void setRongZeCallbackUrl(String rongZeCallbackUrl) {
+    public void setRongZeCallbackUrl(String rongZeCallbackUrl) {
         Constant.rongZeCallbackUrl = rongZeCallbackUrl;
     }
 
     @Value("${rongze.query.url}")
-    public static void setRongZeQueryUrl(String rongZeQueryUrl) {
+    public void setRongZeQueryUrl(String rongZeQueryUrl) {
         Constant.rongZeQueryUrl = rongZeQueryUrl;
     }
 
