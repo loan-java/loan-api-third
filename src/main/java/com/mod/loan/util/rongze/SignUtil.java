@@ -16,6 +16,7 @@ import java.util.Map;
 public class SignUtil {
 
     public static String genSign(String json) throws Exception {
+        if (StringUtils.isBlank(json)) return "";
 
         String pendVertContent = bindPreSignStr(json);
         System.out.println("待生成签名的字符串：" + pendVertContent);

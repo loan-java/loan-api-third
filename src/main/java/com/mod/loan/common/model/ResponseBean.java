@@ -18,6 +18,10 @@ public class ResponseBean<T> {
         this.data = data;
     }
 
+    public static <T> ResponseBean<T> success() {
+        return new ResponseBean<>(200, "成功", null);
+    }
+
     public static <T> ResponseBean<T> success(T data) {
         return new ResponseBean<>(200, "成功", data);
     }
@@ -29,6 +33,10 @@ public class ResponseBean<T> {
 
     public static <T> ResponseBean<T> fail(int code, String msg) {
         return new ResponseBean<>(code, msg, null);
+    }
+
+    public static <T> ResponseBean<T> fail(ResponseEnum r) {
+        return new ResponseBean<>(r.getCodeInt(), r.getMessage(), null);
     }
 
     public static <T> ResponseBean<T> fail(int code, String msg, T data) {
