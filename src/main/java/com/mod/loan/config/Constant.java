@@ -44,6 +44,19 @@ public class Constant {
     public static String kuaiQianVersion;
     public static String merchant;
 
+    public static String rongZePublicKey;
+    public static String orgPrivateKey;
+
+    @Value("${org.rsa.private.key}")
+    public void setOrgPrivateKey(String orgPrivateKey) {
+        Constant.orgPrivateKey = orgPrivateKey;
+    }
+
+    @Value("${rongze.rsa.public.key}")
+    public void setRongZePublicKey(String rongZePublicKey) {
+        Constant.rongZePublicKey = rongZePublicKey;
+    }
+
     @Value("${merchant}")
     public void setMerchant(String merchant) {
         Constant.merchant = merchant;

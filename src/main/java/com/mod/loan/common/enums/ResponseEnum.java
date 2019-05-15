@@ -47,6 +47,10 @@ public enum ResponseEnum {
         return code;
     }
 
+    public int getCodeInt() {
+        return Integer.parseInt(getCode());
+    }
+
     public void setCode(String code) {
         this.code = code;
     }
