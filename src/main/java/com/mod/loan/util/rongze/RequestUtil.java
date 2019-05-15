@@ -109,7 +109,7 @@ public class RequestUtil {
     //生成 RSA 加密后的密钥
     private static String encryptDescKey(String despwd) throws Exception {
         String encrypt = RSAUtils.encrypt(despwd, Constant.rongZePublicKey);
-        System.out.println("decrypt descKey:" + RSAUtils.decrypt(encrypt, Constant.rongZePublicKey));
+//        System.out.println("decrypt descKey:" + RSAUtils.decrypt(encrypt, Constant.rongZePublicKey));
         return encrypt;
     }
 
