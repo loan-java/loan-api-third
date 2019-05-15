@@ -75,19 +75,18 @@ public class RongZeRequestController {
         if (e instanceof BizException)
             log.info(getPreLog() + e.getMessage());
         else
-            log.error(getPreLog() + ": " + e.getMessage(), e);
+            log.error(getPreLog() + e.getMessage(), e);
     }
 
     private String getPreLog() {
-        String pre = "userId: %s, username: %s, phone: %s, ", username = "", phone = "";
         Long uid = RequestThread.getUid();
-        if (uid != null) {
-            User user = userService.selectByPrimaryKey(uid);
+        if (uid == null) return "";
 
-            if (user != null) {
-                username = user.getUserName();
-                phone = user.getUserPhone();
-            }
+        String pre = "userId: %s, username: %s, phone: %s, ", username = "", phone = "";
+        User user = userService.selectByPrimaryKey(uid);
+        if (user != null) {
+            username = user.getUserName();
+            phone = user.getUserPhone();
         }
         return String.format(pre, uid, username, phone);
     }
