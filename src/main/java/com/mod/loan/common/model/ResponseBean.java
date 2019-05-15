@@ -2,6 +2,7 @@ package com.mod.loan.common.model;
 
 
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.exception.BizException;
 
 public class ResponseBean<T> {
 
@@ -33,6 +34,10 @@ public class ResponseBean<T> {
 
     public static <T> ResponseBean<T> fail(int code, String msg) {
         return new ResponseBean<>(code, msg, null);
+    }
+
+    public static <T> ResponseBean<T> fail(BizException e) {
+        return new ResponseBean<>(e.getCodeInt(), e.getMessage(), null);
     }
 
     public static <T> ResponseBean<T> fail(ResponseEnum r) {

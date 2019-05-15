@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
@@ -21,6 +22,7 @@ import com.mod.loan.util.MoneyUtil;
 import com.mod.loan.util.StringUtil;
 import com.mod.loan.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -62,13 +64,17 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     @Resource
     private RabbitTemplate rabbitTemplate;
 
+    @Override
+    public Order findOrderByOrderNo(String orderNo) {
+        return orderMapper.findByOrderNo(orderNo);
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public ResponseBean<Map<String, Object>> submitOrder(String orderNo, String loanAmount, int loanTerm) {
+    public Order submitOrder(String orderNo, String loanAmount, int loanTerm) throws Exception {
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         if (merchant == null) {
-            log.info("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
-            return ResponseBean.fail("商户不存在");
+            throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
 
         MerchantRate record = merchantRateService.findByMerchant(RequestThread.getClientAlias());
@@ -76,13 +82,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
         Long uid = RequestThread.getUid();
         if (!redisMapper.lock(RedisConst.lock_user_order + uid, 5)) {
-            return ResponseBean.fail("操作过于频繁");
+            throw new BizException("操作过于频繁");
         }
         UserIdent userIdent = userIdentService.selectByPrimaryKey(uid);
         if (2 != userIdent.getRealName() || 2 != userIdent.getUserDetails() || 2 != userIdent.getBindbank()
                 || 2 != userIdent.getMobile() || 2 != userIdent.getLiveness()) {
             // 提示认证未完成
-            return ResponseBean.fail("认证未完成");
+            throw new BizException("认证未完成");
         }
         Blacklist blacklist = blacklistService.getByUid(uid);
         if (null != blacklist) {
@@ -91,18 +97,18 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                 DateTime d1 = new DateTime(new Date());
                 DateTime d2 = new DateTime(blacklist.getInvalidTime());
                 Integer remainDays = Days.daysBetween(d1, d2).getDays() + 1;
-                return ResponseBean.fail(ResponseEnum.M4000.getCodeInt(), "暂时无法下单，请于" + remainDays + "天后再尝试");
+                throw new BizException("暂时无法下单，请于" + remainDays + "天后再尝试");
             }
             // 黑名单
             if (2 == blacklist.getType()) {
-                return ResponseBean.fail(ResponseEnum.M4000.getCodeInt(), "您不符合下单条件");
+                throw new BizException("您不符合下单条件");
             }
         }
         // 是否有正在借款中的订单
         Order orderIng = findUserLatestOrder(uid);
         if (null != orderIng) {
             if (orderIng.getStatus() < 40) {
-                return ResponseBean.fail(ResponseEnum.M4000.getCodeInt(), "已有订单进行中，无法提单");
+                throw new BizException("已有订单进行中，无法提单");
             }
             // 审核拒绝的订单7天内无法再下单
             if (orderIng.getStatus() == 51 || orderIng.getStatus() == 52) {
@@ -111,18 +117,18 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                 Integer remainDays = Days.daysBetween(nowTime.withMillisOfDay(0), applyTime.withMillisOfDay(0))
                         .getDays();
                 if (0 < remainDays && remainDays <= 7) {
-                    return ResponseBean.fail(ResponseEnum.M4000.getCodeInt(), "请" + remainDays + "天后重试提单");
+                    throw new BizException("请" + remainDays + "天后重试提单");
                 }
             }
         }
         Order order = new Order();
         MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(productId);
         if (null == merchantRate) {
-            return ResponseBean.fail(ResponseEnum.M4000.getCodeInt(), "未查到规则");
+            throw new BizException("未查到规则");
         }
         if (merchantRate.getProductMoney().compareTo(new BigDecimal(loanAmount)) != 0
                 || merchantRate.getProductDay() != loanTerm) {
-            return ResponseBean.fail(ResponseEnum.M4000.getCodeInt(), "规则不匹配");
+            throw new BizException("规则不匹配");
         }
         // 综合费用
         BigDecimal totalFee = MoneyUtil.totalFee(merchantRate.getProductMoney(), merchantRate.getTotalRate());
@@ -137,7 +143,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         // 判断客群
         Integer userType = judgeUserTypeByUid(uid);
 
-        order.setOrderNo(StringUtil.getOrderNumber("b"));
+        order.setOrderNo(StringUtils.isNotBlank(orderNo) ? orderNo : StringUtil.getOrderNumber("b"));
         order.setUid(uid);
         order.setBorrowDay(merchantRate.getProductDay());
         order.setBorrowMoney(merchantRate.getProductMoney());
@@ -177,10 +183,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
             log.error("通知风控消息发送异常：" + e.getMessage(), e);
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("deal_result", "1");
-        map.put("need_confirm", "0");
-        return ResponseBean.success(map);
+        return order;
     }
 
     @Override

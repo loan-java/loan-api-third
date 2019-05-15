@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface OrderMapper extends MyBaseMapper<Order> {
 
+    Order findByOrderNo(String orderNo);
+
     Order findUserLatestOrder(Long uid);
 
     List<Order> getByUid(Long uid);

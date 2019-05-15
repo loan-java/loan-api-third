@@ -12,13 +12,20 @@ import java.util.Map;
 public interface OrderService extends BaseService<Order,Long> {
 
     /**
+     * 根据订单编号查订单
+     * @param orderNo
+     * @return
+     */
+    Order findOrderByOrderNo(String orderNo);
+
+    /**
      * 提交借款申请的订单
      * @param orderNo
      * @param loanAmount
      * @param loanTerm
      * @return
      */
-    ResponseBean<Map<String, Object>> submitOrder(String orderNo, String loanAmount, int loanTerm);
+    Order submitOrder(String orderNo, String loanAmount, int loanTerm) throws Exception;
 
 	/**
 	 * 查找用户最近一张订单
@@ -31,11 +38,11 @@ public interface OrderService extends BaseService<Order,Long> {
      */
 
     List<Order> getByUid(Long uid);
-    
-    
+
+
     int addOrder(Order order ,OrderPhone orderPhone);
-    
-    
+
+
     OrderPhone findOrderPhoneByOrderId(Long orderId);
     /**
      * 查找用户收款成功记录

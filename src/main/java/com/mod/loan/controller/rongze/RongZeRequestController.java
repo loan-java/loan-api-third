@@ -52,6 +52,8 @@ public class RongZeRequestController {
                     return rongZeRequestHandler.handleOrderSubmit(param);
                 case "fund.deal.contract": //查询借款合同
                     return rongZeRequestHandler.handleQueryContract(param);
+                case "fund.order.status": //查询订单状态
+                    return rongZeRequestHandler.handleQueryOrderStatus(param);
 
                 // TODO: 2019/5/15 其它 method
                 default:
@@ -59,7 +61,7 @@ public class RongZeRequestController {
             }
         } catch (Exception e) {
             log.error("融泽请求失败: " + e.getMessage(), e);
-            return ResponseBean.fail("失败: " + e.getMessage());
+            return ResponseBean.fail(e.getMessage());
         }
     }
 }
