@@ -53,6 +53,7 @@ public class RongZeRequestController {
                     return ResponseBean.fail(ResponseEnum.M5000.getCodeInt(), "method not found");
             }
         } catch (Exception e) {
+            log.error("融泽请求失败: " + e.getMessage(), e);
             return ResponseBean.fail("失败: " + e.getMessage());
         }
     }
