@@ -6,6 +6,7 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.model.Order;
 import com.mod.loan.service.OrderService;
+import com.mod.loan.util.rongze.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -107,7 +108,7 @@ public class RongZeRequestHandler {
         JSONObject data = parseAndCheckBizData(param);
         String orderNo = data.getString("order_no");
         if (StringUtils.isBlank(orderNo)) throw new BizException("order_no 未传");
-        return orderNo;
+        return BizDataUtil.bindRZOrderNo(orderNo);
     }
 
     private JSONObject parseAndCheckBizData(JSONObject param) throws BizException {
