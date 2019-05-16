@@ -80,6 +80,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     @Resource
     private OrderRepayService orderRepayService;
 
+    @Transactional(rollbackFor = Throwable.class)
     @Override
     public Order repayOrder(String orderNo) throws BizException {
 
