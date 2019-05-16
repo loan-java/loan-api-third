@@ -31,7 +31,7 @@ public class RongZeRequestUtil {
         //说明：秘钥格式PKCS8，秘钥长度1024，签名方式RSA，字符集UTF-8
 
         //机构RSA私钥
-        String privatekey = Constant.orgPrivateKey;
+//        String privatekey = Constant.orgPrivateKey;
 //        String privatekey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAKEsWzW9BCMya+fTZ9ikE5PLglVG3eMhIG6ajF4NsmfjL/jBgWylbmPxvWnuzO1nnI+UVDDmJrxHuB39NIu2H1bJcjZ5o8WF7tEpnMYQ8GFQANCyOSiEQuV7A79vexGKDfyT7D+VjJLVlMhsS9Zv2bdHLi9n1UsNdgeimBO/NvQzAgMBAAECgYBD0wGzFI64LRDBpvItdaaTbHG1ZzQaz6bxRHJLZiIsm6tlWDEZwmg5ANK/0HFGenKk7TuctE2ar+eoHxTMsmBvGzctn8KSU+c5MqLiwMko4tkzoSJkaRAIO2f9Uv2rqLMHaOehzxHVgB39wIBv1HL5I1BmRjETHMR4cxmmb9w56QJBAPv2z246LDHe6ndCujcubkxYcNusGIWttSocwS3uCCGDLnrqEQ72zCmUevuSrYZFfnAT0LbA1fveP06J6Oa5pbUCQQCjwUEW3X08P2E8O2uCUWclianmQbZELaP68evNgumyOD8E3YJxDZtcTDcjrWoanE+UW31rm2ShihIEJrujMWNHAkBLIptSnGhHatjyPWS4RdFAVPM6noQlgNpQN4jnwF6OV8cJgjkaBEB3eb5+vIugSaLdmxsXFEP7OpgYPInGG8AtAkAni90/O2AqM5g05pixER2a2CMaw1XUIz2NtezfZbUwYBr//sqoqMOTR6itSgzsvkENsAaa/R0RUfnF3ODFqYCzAkEA7hH2HCE47Jy6q8tNGptbKy3Rj18KhcrLyQ4aq5KgX2wX2hNY0A5ZWJ+csYkWNgmPfbeOHj6gDwawg+ce0lZMng==";
         //机构RSA公钥
 //        String publickey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQChLFs1vQQjMmvn02fYpBOTy4JVRt3jISBumoxeDbJn4y/4wYFspW5j8b1p7sztZ5yPlFQw5ia8R7gd/TSLth9WyXI2eaPFhe7RKZzGEPBhUADQsjkohELlewO/b3sRig38k+w/lYyS1ZTIbEvWb9m3Ry4vZ9VLDXYHopgTvzb0MwIDAQAB";
@@ -51,23 +51,23 @@ public class RongZeRequestUtil {
         vo.setReturn_url(returnUrl);
 
         String reqContent = JSONObject.toJSONString(vo);
-        Map<String, String> paramMap = JSONObject.parseObject(reqContent, Map.class);
-
-        StringBuffer sbfStr = new StringBuffer();
-        List<String> list = new ArrayList<String>(paramMap.keySet());
-        Collections.sort(list); //参数名ASCII码从小到大排序（字典序）
-        for (String key : list) {
-            if (StringUtils.isNotBlank(paramMap.get(key))) {
-                sbfStr.append(key + "=" + paramMap.get(key) + "&");
-            }
-        }
-        String pendVertContent = sbfStr.toString().substring(0, sbfStr.length() - 1);
-        System.out.println("待生成签名的字符串：" + pendVertContent);
-        String sign = RSAUtils.sign(pendVertContent, privatekey);
-        System.out.println("签名sign:" + sign);
+//        Map<String, String> paramMap = JSONObject.parseObject(reqContent, Map.class);
+//
+//        StringBuffer sbfStr = new StringBuffer();
+//        List<String> list = new ArrayList<String>(paramMap.keySet());
+//        Collections.sort(list); //参数名ASCII码从小到大排序（字典序）
+//        for (String key : list) {
+//            if (StringUtils.isNotBlank(paramMap.get(key))) {
+//                sbfStr.append(key + "=" + paramMap.get(key) + "&");
+//            }
+//        }
+//        String pendVertContent = sbfStr.toString().substring(0, sbfStr.length() - 1);
+//        System.out.println("待生成签名的字符串：" + pendVertContent);
+//        String sign = RSAUtils.sign(pendVertContent, privatekey);
+//        System.out.println("签名sign:" + sign);
 
         //设置签名
-        vo.setSign(sign);
+        vo.setSign(SignUtil.genSign(reqContent));
         return JSONObject.toJSONString(vo);
     }
 

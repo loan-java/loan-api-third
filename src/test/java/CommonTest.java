@@ -24,7 +24,7 @@ public class CommonTest extends BaseSpringBootJunitTest {
     @Test
     public void sign() throws Exception {
 
-        String con="{'order_no':'111'}";
+        String con= RongZeRequestUtil.buildRequestParams("api.charge.data", "{'order_no':'111'}");
 
         String s = SignUtil.genSign(con);
         System.out.println(s);

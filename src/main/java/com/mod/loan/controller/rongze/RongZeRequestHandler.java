@@ -67,11 +67,24 @@ public class RongZeRequestHandler {
         已结清中40+；41-正常还款;42-逾期还款;
         订单结束50+；51-自动审核失败 ;52-复审失败;53-取消*/
 
-        int status = -1;
+        int status;
+        if (order.getStatus() == 23) status = 169; //放款失败
+        else if (order.getStatus() == 31) status = 170; //放款成功
+        else if (order.getStatus() == 21 || order.getStatus() == 22 || order.getStatus() == 11 || order.getStatus() == 12)
+            status = 171; //放款处理中
+        else if (order.getStatus() == 33) status = 180; //贷款逾期
+        else if (order.getStatus() == 41 || order.getStatus() == 42) status = 200; //贷款结清
+        else status = 169;
+
+        long updateTime = order.getCreateTime().getTime();
+        switch (status){
+            case 170 : updateTime = order.getArriveTime().getTime();break;
+            case 200 : updateTime = order.getRealRepayTime().getTime();
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
         map.put("order_status", status);
-        map.put("update_time", "");
+        map.put("update_time", updateTime);
         map.put("remark", "");
         return ResponseBean.success(map);
     }

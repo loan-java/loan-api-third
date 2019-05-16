@@ -35,8 +35,7 @@ public class RongZeRequestController {
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(@RequestBody JSONObject param) {
 
-        log.info("收到融泽请求, param: " + JSON.toJSONString(param));
-        if (param == null) return ResponseBean.fail(ResponseEnum.M5000);
+        log.info("收到融泽请求, param: " + param.toJSONString());
 
         try {//校验 sig
             String sign = param.getString("sign");

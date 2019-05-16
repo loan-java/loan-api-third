@@ -19,9 +19,9 @@ public class SignUtil {
         if (StringUtils.isBlank(json)) return "";
 
         String pendVertContent = bindPreSignStr(json);
-        System.out.println("待生成签名的字符串：" + pendVertContent);
+//        System.out.println("待生成签名的字符串：" + pendVertContent);
         String sign = RSAUtils.sign(pendVertContent, Constant.orgPrivateKey);
-        System.out.println("签名sign:" + sign);
+//        System.out.println("签名sign:" + sign);
         return sign;
     }
 
@@ -37,6 +37,7 @@ public class SignUtil {
         Collections.sort(list); //参数名ASCII码从小到大排序（字典序）
         for (String key : list) {
             if (StringUtils.isNotBlank(paramMap.get(key))) {
+                if (key.equalsIgnoreCase("sign")) continue;
                 sbfStr.append(key + "=" + paramMap.get(key) + "&");
             }
         }
