@@ -237,12 +237,6 @@
 				<profiles.active>mofu</profiles.active>
 			</properties>
 		</profile>
-		<profile>
-			<id>rongze</id>
-			<properties>
-				<profiles.active>rongze</profiles.active>
-			</properties>
-		</profile>
 	</profiles>
 	<build>
 		<finalName>${project.name}</finalName>
