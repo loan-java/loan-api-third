@@ -13,10 +13,7 @@ public class CommonTest extends BaseSpringBootJunitTest {
 
     @Test
     public void req() throws Exception {
-        String param = RongZeRequestUtil.buildRequestParams("api.charge.data", "{'order_no':'111'}");
-        System.out.println(param);
-
-        String result = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, param);
+        String result = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", "{'order_no':'111'}");
         System.out.println(result);
     }
 

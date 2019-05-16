@@ -2,12 +2,6 @@ package com.mod.loan.util.rongze;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.config.Constant;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @ author liujianjian
@@ -15,7 +9,15 @@ import java.util.Map;
  */
 public class RongZeRequestUtil {
 
-    public static String doPost(String url, String reqParamsStr) {
+    public static String doPost(String url, String method, String bizData) throws Exception {
+        return doPost(url, method, bizData, "");
+    }
+
+    public static String doPost(String url, String method, String bizData, String returnUrl) throws Exception {
+        return doPost(url, buildRequestParams(method, bizData, returnUrl));
+    }
+
+    private static String doPost(String url, String reqParamsStr) {
         //大王贷款回调服务API接口URL
 //        String kingplatformUrl = "http://king-platform-callback.king-test.svc.cluster.local:9090/platform/callback";
 
