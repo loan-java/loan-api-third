@@ -26,7 +26,7 @@ public class HttpClientUtils {
 	 * @param datas
 	 * @return
 	 */
-	public static String sendPost(String urlAddress, byte[] datas) {
+	public static String sendPost(String urlAddress, byte[] datas) throws Exception {
 		URL url = null;
 		HttpURLConnection con = null;
 		StringBuffer result = new StringBuffer();
@@ -51,8 +51,8 @@ public class HttpClientUtils {
 			}
 
 			result.append(getContent(con.getInputStream(), "UTF-8"));
-		} catch (IOException e) {
-			e.getMessage();
+		} catch (Exception e) {
+			throw e;
 		} finally {
 			try {
 				if (con != null) {
