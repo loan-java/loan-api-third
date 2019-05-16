@@ -170,6 +170,8 @@ public class Order {
     @Column(name = "payment_type")
     private String paymentType;
 
+    private String repayOrderNo; //还款流水号
+
     public String getPaymentType() { return paymentType; }
 
     public void setPaymentType(String paymentType) { this.paymentType = paymentType; }
@@ -590,5 +592,13 @@ public class Order {
 
     public void setUserType(Integer userType) {
         this.userType = userType;
+    }
+
+    public String getRepayOrderNo() {
+        return repayOrderNo;
+    }
+
+    public void setRepayOrderNo(String repayOrderNo) {
+        this.repayOrderNo = repayOrderNo;
     }
 }

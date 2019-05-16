@@ -59,6 +59,8 @@ public class RongZeRequestController {
                     return rongZeRequestHandler.handleQueryContract(param);
                 case "fund.order.status": //查询订单状态
                     return rongZeRequestHandler.handleQueryOrderStatus(param);
+                case "fund.payment.req": //推送用户还款信息
+                    return rongZeRequestHandler.handleRepayment(param);
 
                 // TODO: 2019/5/15 其它 method
                 default:

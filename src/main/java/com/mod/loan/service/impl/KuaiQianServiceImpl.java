@@ -28,6 +28,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
 
     @Autowired
     private UserBankService userBankService;
-    @Autowired
+    @Resource
     private OrderMapper orderMapper;
     @Autowired
     private UserService userService;
@@ -246,8 +247,19 @@ public class KuaiQianServiceImpl implements KuaiQianService {
      */
     @Override
     public ResultMessage repay(String orderNo) {
-        long uid = RequestThread.getUid();
-        Order order = orderMapper.findByOrderNoAndUid(orderNo, uid);
+        Long uid = RequestThread.getUid();
+        Order order = uid != null && uid > 0 ? orderMapper.findByOrderNoAndUid(orderNo, uid) :
+                orderMapper.findByOrderNo(orderNo);
+        return repay(order);
+    }
+
+    @Override
+    public ResultMessage repay(Order order) {
+
+        String orderNo = order.getOrderNo();
+
+        long uid = order.getUid();
+
         UserBank userBank = userBankService.selectUserCurrentBankCard(uid);
 
         TransInfo transInfo = new TransInfo();

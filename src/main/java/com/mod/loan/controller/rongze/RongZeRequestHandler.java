@@ -1,6 +1,7 @@
 package com.mod.loan.controller.rongze;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
@@ -9,6 +10,7 @@ import com.mod.loan.model.User;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,8 +29,8 @@ public class RongZeRequestHandler {
     private OrderService orderService;
 
     //推送用户确认收款信息
-    ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) throws Exception {
-        JSONObject data = JSONObject.parseObject(param.getString("biz_data"));
+    ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) throws BizException {
+        JSONObject data = parseAndCheckBizData(param);
 
         String orderNo = data.getString("order_no");
         String loanAmount = data.getString("loan_amount");
@@ -43,10 +45,9 @@ public class RongZeRequestHandler {
     }
 
     //查询借款合同
-    Object handleQueryContract(JSONObject param) {
-        JSONObject data = JSONObject.parseObject(param.getString("biz_data"));
+    ResponseBean<Map<String, Object>> handleQueryContract(JSONObject param) throws BizException {
 
-        String orderNo = data.getString("order_no");
+        String orderNo = getOrderNo(param);
 
         Map<String, Object> map = new HashMap<>();
         map.put("contract_url", "url");
@@ -54,10 +55,9 @@ public class RongZeRequestHandler {
     }
 
     //查询订单状态
-    Object handleQueryOrderStatus(JSONObject param) {
-        JSONObject data = JSONObject.parseObject(param.getString("biz_data"));
+    ResponseBean<Map<String, Object>> handleQueryOrderStatus(JSONObject param) throws BizException {
 
-        String orderNo = data.getString("order_no");
+        String orderNo = getOrderNo(param);
         Order order = orderService.findOrderByOrderNo(orderNo);
         if (order == null) return ResponseBean.fail("订单不存在");
 
@@ -77,9 +77,12 @@ public class RongZeRequestHandler {
         else status = 169;
 
         long updateTime = order.getCreateTime().getTime();
-        switch (status){
-            case 170 : updateTime = order.getArriveTime().getTime();break;
-            case 200 : updateTime = order.getRealRepayTime().getTime();
+        switch (status) {
+            case 170:
+                updateTime = order.getArriveTime().getTime();
+                break;
+            case 200:
+                updateTime = order.getRealRepayTime().getTime();
         }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
@@ -87,5 +90,37 @@ public class RongZeRequestHandler {
         map.put("update_time", updateTime);
         map.put("remark", "");
         return ResponseBean.success(map);
+    }
+
+    //用户还款
+    ResponseBean<Map<String, Object>> handleRepayment(JSONObject param) throws BizException {
+        String orderNo = getOrderNo(param);
+
+        Order order = orderService.repayOrder(orderNo);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("need_confirm", "0");
+        map.put("deal_result", "1");
+        map.put("transactionid", order.getRepayOrderNo());
+        map.put("reason", "");
+        return ResponseBean.success(map);
+    }
+
+    private String getOrderNo(JSONObject param) throws BizException {
+        JSONObject data = parseAndCheckBizData(param);
+        String orderNo = data.getString("order_no");
+        if (StringUtils.isBlank(orderNo)) throw new BizException("order_no 未传");
+        return orderNo;
+    }
+
+    private JSONObject parseAndCheckBizData(JSONObject param) throws BizException {
+        JSONObject data = parseBizData(param);
+        if (data == null) throw new BizException(ResponseEnum.M5000);
+        return data;
+    }
+
+    private JSONObject parseBizData(JSONObject param) {
+        String bizData = param.getString("biz_data");
+        return StringUtils.isNotBlank(bizData) ? JSONObject.parseObject(bizData) : null;
     }
 }

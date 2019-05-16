@@ -22,4 +22,8 @@ public class BizDataUtil {
         String despwd = RSAUtils.decrypt(desKey, Constant.orgPrivateKey);
         return StandardDesUtils.decrypt(encryptStr, despwd);
     }
+
+    public static String bindRZOrderNo(String orderNo) {
+        return StringUtils.isBlank(orderNo) ? "" : "RZ" + orderNo;
+    }
 }

@@ -1,6 +1,7 @@
 package com.mod.loan.service;
 
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.model.Order;
 
 /**
  * @author kk
@@ -13,4 +14,6 @@ public interface KuaiQianService {
                                 String cardPhone, String bankCode, String bankName);
 
     ResultMessage repay(String orderNo);
+
+    ResultMessage repay(Order order);
 }
