@@ -36,7 +36,7 @@ public class RongZeRequestController {
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
 
-    private static String logPre = "融泽请求, ";
+    private static String logPre = "融泽入口请求, ";
 
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
