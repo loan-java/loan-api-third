@@ -113,6 +113,9 @@ public class RongZeRequestController {
         RequestThread.setToken(token);
         RequestThread.setSign(sign);
         RequestThread.setSourceId(sourceId);
+
+        // TODO: 2019/5/17 根据订单号获取用户id
+        RequestThread.setUid(null);
     }
 
     private void logFail(Exception e) {
