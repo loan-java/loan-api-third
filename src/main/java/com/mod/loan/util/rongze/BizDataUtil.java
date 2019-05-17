@@ -1,6 +1,7 @@
 package com.mod.loan.util.rongze;
 
 import com.mod.loan.config.Constant;
+import com.mod.loan.util.StringUtil;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -23,7 +24,18 @@ public class BizDataUtil {
         return StandardDesUtils.decrypt(encryptStr, despwd);
     }
 
+    //处理融泽订单号，如果融泽没传订单号，则系统生成
+    public static String getRZOrderNo(String orderNo) {
+        return StringUtils.isBlank(orderNo) ? bindRZOrderNo(StringUtil.getOrderNumber("")) : bindRZOrderNo(orderNo);
+    }
+
     public static String bindRZOrderNo(String orderNo) {
         return StringUtils.isBlank(orderNo) ? "" : "RZ" + orderNo;
     }
+
+    public static String unBindRZOrderNo(String orderNo) {
+        //获取融泽那边的订单号，系统存的是加了 RZ 前缀的
+        return StringUtils.isBlank(orderNo) ? "" : orderNo.substring(2);
+    }
+
 }

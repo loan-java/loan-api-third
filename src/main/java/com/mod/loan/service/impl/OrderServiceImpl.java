@@ -193,7 +193,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         // 判断客群
         Integer userType = judgeUserTypeByUid(uid);
 
-        order.setOrderNo(StringUtils.isNotBlank(orderNo) ? BizDataUtil.bindRZOrderNo(orderNo) : StringUtil.getOrderNumber("RZ"));
+        order.setOrderNo(BizDataUtil.getRZOrderNo(orderNo));
         order.setUid(uid);
         order.setBorrowDay(merchantRate.getProductDay());
         order.setBorrowMoney(merchantRate.getProductMoney());
