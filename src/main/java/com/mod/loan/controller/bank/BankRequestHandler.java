@@ -68,8 +68,6 @@ public class BankRequestHandler extends BaseRequestHandler {
         String bankCard = data.getString("bank_card");
         //预留手机号 可能为空
         String userMobile = data.getString("user_mobile");
-        //开户行地址（省市） 可能为空
-        String bankAddres = data.getString("bank_addres");
 
         if (!GetBankUtil.checkBankCard(bankCard)) {
             throw new BizException("银行卡号不正确");
@@ -94,6 +92,10 @@ public class BankRequestHandler extends BaseRequestHandler {
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (StringUtils.isBlank(user.getUserName()) || StringUtils.isBlank(user.getUserCertNo())) {
             throw new BizException("实名认证未完成");
+        }
+
+        if (StringUtils.isBlank(userMobile)) {
+            userMobile = user.getUserPhone();
         }
 
         ResultMessage message;
