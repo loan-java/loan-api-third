@@ -6,8 +6,11 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.model.User;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @ author liujianjian
@@ -32,44 +36,86 @@ public class RongZeRequestController {
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
 
-    @RequestMapping("/dispatcherRequest")
-    public Object dispatcherRequest(@RequestBody JSONObject param) {
+    private static String logPre = "融泽请求, ";
 
-        log.info("收到融泽请求, param: " + param.toJSONString());
+    @RequestMapping("/dispatcherRequest")
+    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
+
+        log.info(logPre + "收到, param: " + param.toJSONString());
+
+        Object result;
 
         try {//校验 sig
             String sign = param.getString("sign");
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
-            if (!check) return ResponseBean.fail(ResponseEnum.M4006);
+            if (!check) throw new BizException(ResponseEnum.M4006);
+
+            //绑定线程变量
+            binRequestThread(request, param);
 
             //解密 bizData
             if ("1".equals(param.getString("biz_enc"))) {
                 String bizDataStr = param.getString("biz_data");
                 String bizData = BizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
                 param.put("biz_data", bizData);
+                log.info(logPre + "解密后 biz_data: " + bizData);
             }
 
             String method = param.getString("method");
-            if (StringUtils.isBlank(method)) return ResponseBean.fail(ResponseEnum.M5000);
+            if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
             switch (method) {
                 case "fund.withdraw.req": //推送用户确认收款信息
-                    return rongZeRequestHandler.handleOrderSubmit(param);
+                    result = rongZeRequestHandler.handleOrderSubmit(param);
+                    break;
                 case "fund.deal.contract": //查询借款合同
-                    return rongZeRequestHandler.handleQueryContract(param);
+                    result = rongZeRequestHandler.handleQueryContract(param);
+                    break;
                 case "fund.order.status": //查询订单状态
-                    return rongZeRequestHandler.handleQueryOrderStatus(param);
+                    result = rongZeRequestHandler.handleQueryOrderStatus(param);
+                    break;
                 case "fund.payment.req": //推送用户还款信息
-                    return rongZeRequestHandler.handleRepayment(param);
+                    result = rongZeRequestHandler.handleRepayment(param);
+                    break;
 
                 // TODO: 2019/5/15 其它 method
                 default:
-                    return ResponseBean.fail(ResponseEnum.M5000.getCodeInt(), "method not found");
+                    throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
         } catch (Exception e) {
             logFail(e);
-            return ResponseBean.fail(e.getMessage());
+            result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
+
+        log.info(logPre + "返回, result: " + JSON.toJSONString(result));
+        return result;
+    }
+
+    private void binRequestThread(HttpServletRequest request, JSONObject param) {
+        RequestThread.remove();// 移除本地线程变量
+        String sourceId = param.getString("source_id"); //标志用户来源的app
+        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
+
+        String ip = HttpUtils.getIpAddr(request, ".");
+//        String clientVersion = obj.getString("version");
+//        String clientType = obj.getString("terminalId");
+        String clientAlias = Constant.merchant;
+        String sign = param.getString("sign");
+        String deviceCode = param.getString("deviceCode");
+        String token = param.getString("token");
+
+//        RequestThread.setClientVersion(clientVersion);
+//        RequestThread.setClientType(clientType);
+        RequestThread.setClientAlias(clientAlias);
+        RequestThread.setIp(ip);
+        RequestThread.setRequestTime(System.currentTimeMillis());
+        RequestThread.setDeviceCode(deviceCode);
+        RequestThread.setToken(token);
+        RequestThread.setSign(sign);
+        RequestThread.setSourceId(sourceId);
+
+        // TODO: 2019/5/17 根据订单号获取用户id
+        RequestThread.setUid(null);
     }
 
     private void logFail(Exception e) {

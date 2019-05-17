@@ -18,23 +18,24 @@ public interface OrderService extends BaseService<Order,Long> {
      * @return
      * @throws BizException
      */
-    Order repayOrder(String orderNo) throws BizException;
+    Order repayOrder(String orderNo, int source) throws BizException;
 
     /**
      * 根据订单编号查订单
      * @param orderNo
      * @return
      */
-    Order findOrderByOrderNo(String orderNo);
+    Order findOrderByOrderNoAndSource(String orderNo, int source);
 
     /**
      * 提交借款申请的订单
      * @param orderNo
      * @param loanAmount
      * @param loanTerm
+     * @param source 订单来源
      * @return
      */
-    Order submitOrder(String orderNo, String loanAmount, int loanTerm) throws BizException;
+    Order submitOrder(String orderNo, String loanAmount, int loanTerm, int source) throws BizException;
 
 	/**
 	 * 查找用户最近一张订单
@@ -50,6 +51,8 @@ public interface OrderService extends BaseService<Order,Long> {
 
 
     int addOrder(Order order ,OrderPhone orderPhone);
+
+    void addOrUpdateOrder(Order order ,OrderPhone orderPhone);
 
 
     OrderPhone findOrderPhoneByOrderId(Long orderId);

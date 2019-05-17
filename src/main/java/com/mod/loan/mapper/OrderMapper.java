@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface OrderMapper extends MyBaseMapper<Order> {
 
+    Order findByOrderNoAndSource(@Param("orderNo") String orderNo, @Param("source") int source);
+
     Order findByOrderNo(String orderNo);
 
     Order findUserLatestOrder(Long uid);
@@ -18,5 +20,5 @@ public interface OrderMapper extends MyBaseMapper<Order> {
 
     Integer countPaySuccessByUid(Long uid);
 
-    Order findByOrderNoAndUid(@Param("orderNo") String orderNo,@Param("uid") Long uid);
+    Order findByOrderNoAndUid(@Param("orderNo") String orderNo, @Param("uid") Long uid);
 }

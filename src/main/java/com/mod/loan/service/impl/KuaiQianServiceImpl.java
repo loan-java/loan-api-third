@@ -248,8 +248,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
     @Override
     public ResultMessage repay(String orderNo) {
         Long uid = RequestThread.getUid();
-        Order order = uid != null && uid > 0 ? orderMapper.findByOrderNoAndUid(orderNo, uid) :
-                orderMapper.findByOrderNo(orderNo);
+        Order order = orderMapper.findByOrderNoAndUid(orderNo, uid);
         return repay(order);
     }
 

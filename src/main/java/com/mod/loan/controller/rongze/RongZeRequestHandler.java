@@ -1,6 +1,7 @@
 package com.mod.loan.controller.rongze;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
@@ -34,7 +35,7 @@ public class RongZeRequestHandler {
         String loanAmount = data.getString("loan_amount");
         int loanTerm = data.getIntValue("loan_term");
 
-        orderService.submitOrder(orderNo, loanAmount, loanTerm);
+        orderService.submitOrder(orderNo, loanAmount, loanTerm, OrderSourceEnum.RONGZE.getSoruce());
 
         Map<String, Object> map = new HashMap<>();
         map.put("deal_result", "1");
@@ -56,7 +57,7 @@ public class RongZeRequestHandler {
     ResponseBean<Map<String, Object>> handleQueryOrderStatus(JSONObject param) throws BizException {
 
         String orderNo = getOrderNo(param);
-        Order order = orderService.findOrderByOrderNo(orderNo);
+        Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
         if (order == null) return ResponseBean.fail("订单不存在");
 
         /*11审核中10+：11-新建;12-等待复审;
@@ -94,7 +95,7 @@ public class RongZeRequestHandler {
     ResponseBean<Map<String, Object>> handleRepayment(JSONObject param) throws BizException {
         String orderNo = getOrderNo(param);
 
-        Order order = orderService.repayOrder(orderNo);
+        Order order = orderService.repayOrder(orderNo, OrderSourceEnum.RONGZE.getSoruce());
 
         Map<String, Object> map = new HashMap<>();
         map.put("need_confirm", "0");
