@@ -33,7 +33,7 @@ public class BizDataUtil {
         return StringUtils.isBlank(orderNo) ? "" : "RZ" + orderNo;
     }
 
-    public static String unBindRZOrderNo(String orderNo) {
+    public static String unbindRZOrderNo(String orderNo) {
         //获取融泽那边的订单号，系统存的是加了 RZ 前缀的
         return StringUtils.isBlank(orderNo) ? "" : orderNo.substring(2);
     }
