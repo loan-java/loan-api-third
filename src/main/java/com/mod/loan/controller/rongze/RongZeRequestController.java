@@ -36,10 +36,12 @@ public class RongZeRequestController {
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
 
+    private static String logPre = "融泽请求, ";
+
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
-        log.info("融泽请求收到, param: " + param.toJSONString());
+        log.info(logPre + "收到, param: " + param.toJSONString());
 
         Object result;
 
@@ -56,6 +58,7 @@ public class RongZeRequestController {
                 String bizDataStr = param.getString("biz_data");
                 String bizData = BizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
                 param.put("biz_data", bizData);
+                log.info(logPre + "解密后 biz_data: " + bizData);
             }
 
             String method = param.getString("method");
@@ -84,7 +87,7 @@ public class RongZeRequestController {
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
 
-        log.info("融泽请求返回, result: " + JSON.toJSONString(result));
+        log.info(logPre + "返回, result: " + JSON.toJSONString(result));
         return result;
     }
 
