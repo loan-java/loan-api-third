@@ -6,8 +6,11 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.model.User;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @ author liujianjian
@@ -33,7 +37,7 @@ public class RongZeRequestController {
     private RongZeRequestHandler rongZeRequestHandler;
 
     @RequestMapping("/dispatcherRequest")
-    public Object dispatcherRequest(@RequestBody JSONObject param) {
+    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
         log.info("收到融泽请求, param: " + param.toJSONString());
 
@@ -41,6 +45,9 @@ public class RongZeRequestController {
             String sign = param.getString("sign");
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
             if (!check) return ResponseBean.fail(ResponseEnum.M4006);
+
+            //绑定线程变量
+            binRequestThread(request, param);
 
             //解密 bizData
             if ("1".equals(param.getString("biz_enc"))) {
@@ -70,6 +77,30 @@ public class RongZeRequestController {
             logFail(e);
             return ResponseBean.fail(e.getMessage());
         }
+    }
+
+    private void binRequestThread(HttpServletRequest request, JSONObject param) {
+        RequestThread.remove();// 移除本地线程变量
+        String sourceId = param.getString("source_id"); //标志用户来源的app
+        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
+
+        String ip = HttpUtils.getIpAddr(request, ".");
+//        String clientVersion = obj.getString("version");
+//        String clientType = obj.getString("terminalId");
+        String clientAlias = Constant.merchant;
+        String sign = param.getString("sign");
+        String deviceCode = param.getString("deviceCode");
+        String token = param.getString("token");
+
+//        RequestThread.setClientVersion(clientVersion);
+//        RequestThread.setClientType(clientType);
+        RequestThread.setClientAlias(clientAlias);
+        RequestThread.setIp(ip);
+        RequestThread.setRequestTime(System.currentTimeMillis());
+        RequestThread.setDeviceCode(deviceCode);
+        RequestThread.setToken(token);
+        RequestThread.setSign(sign);
+        RequestThread.setSourceId(sourceId);
     }
 
     private void logFail(Exception e) {

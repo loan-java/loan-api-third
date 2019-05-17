@@ -102,4 +102,12 @@ public class RequestThread {
     public static void setSign(String sign) {
         get().setSign(sign);
     }
+
+    public static String getSourceId() {
+        return get().getSourceId();
+    }
+
+    public static void setSourceId(String sourceId) {
+        get().setSourceId(sourceId);
+    }
 }

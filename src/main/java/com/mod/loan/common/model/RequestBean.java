@@ -14,6 +14,7 @@ public class RequestBean {
     private String clientAlias;// 别名
     private String deviceCode;//设备号
     private String sign;
+    private String sourceId;
 
     public String getUa() {
         return ua;
@@ -93,5 +94,13 @@ public class RequestBean {
 
     public void setSign(String sign) {
         this.sign = sign;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 }

@@ -14,7 +14,7 @@ public class Order {
     @GeneratedValue(generator = "JDBC")
     private Long id;
 
-    @Column(name="order_no")
+    @Column(name = "order_no")
     private String orderNo;
     /**
      * 用户Id
@@ -97,11 +97,11 @@ public class Order {
     private BigDecimal reduceMoney;
 
     /**
-      * 审核中10+：11-新建;12-等待复审;
-	放款中20+；21-待放款;22-放款中;23-放款失败(可以重新放款);
-	还款中30+；31-已放款/还款中;32-还款确认中;33-逾期;34-坏账
-	已结清中40+；41-已结清;42-逾期还款;
-	订单结束50+；51-自动审核失败 ;52-复审失败;53-取消;
+     * 审核中10+：11-新建;12-等待复审;
+     * 放款中20+；21-待放款;22-放款中;23-放款失败(可以重新放款);
+     * 还款中30+；31-已放款/还款中;32-还款确认中;33-逾期;34-坏账
+     * 已结清中40+；41-已结清;42-逾期还款;
+     * 订单结束50+；51-自动审核失败 ;52-复审失败;53-取消;
      */
     private Integer status;
 
@@ -170,11 +170,21 @@ public class Order {
     @Column(name = "payment_type")
     private String paymentType;
 
+    /**
+     * 订单来源，0-聚合，1-融泽
+     */
+    @Column(name = "source")
+    private Integer source;
+
     private String repayOrderNo; //还款流水号
 
-    public String getPaymentType() { return paymentType; }
+    public String getPaymentType() {
+        return paymentType;
+    }
 
-    public void setPaymentType(String paymentType) { this.paymentType = paymentType; }
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
+    }
 
 
     /**
@@ -409,21 +419,21 @@ public class Order {
 
     /**
      * 审核中10+：11-新建;12-等待复审;
-	放款中20+；21-待放款;22-放款中;23-放款失败(可以重新放款);
-	还款中30+；31-已放款/还款中;32-还款确认中;33-逾期;34-坏账
-	已结清中40+；41-已结清;42-逾期还款;
-	订单结束50+；51-自动审核失败 ;52-复审失败;53-取消;
+     * 放款中20+；21-待放款;22-放款中;23-放款失败(可以重新放款);
+     * 还款中30+；31-已放款/还款中;32-还款确认中;33-逾期;34-坏账
+     * 已结清中40+；41-已结清;42-逾期还款;
+     * 订单结束50+；51-自动审核失败 ;52-复审失败;53-取消;
      */
     public Integer getStatus() {
         return status;
     }
 
     /**
-      * 审核中10+：11-新建;12-等待复审;
-	放款中20+；21-待放款;22-放款中;23-放款失败(可以重新放款);
-	还款中30+；31-已放款/还款中;32-还款确认中;33-逾期;34-坏账
-	已结清中40+；41-已结清;42-逾期还款;
-	订单结束50+；51-自动审核失败 ;52-复审失败;53-取消;
+     * 审核中10+：11-新建;12-等待复审;
+     * 放款中20+；21-待放款;22-放款中;23-放款失败(可以重新放款);
+     * 还款中30+；31-已放款/还款中;32-还款确认中;33-逾期;34-坏账
+     * 已结清中40+；41-已结清;42-逾期还款;
+     * 订单结束50+；51-自动审核失败 ;52-复审失败;53-取消;
      */
     public void setStatus(Integer status) {
         this.status = status;
@@ -537,29 +547,29 @@ public class Order {
         this.orderVersion = orderVersion;
     }
 
-	public String getMerchant() {
-		return merchant;
-	}
+    public String getMerchant() {
+        return merchant;
+    }
 
-	public void setMerchant(String merchant) {
-		this.merchant = merchant;
-	}
+    public void setMerchant(String merchant) {
+        this.merchant = merchant;
+    }
 
-	public String getOrderNo() {
-		return orderNo;
-	}
+    public String getOrderNo() {
+        return orderNo;
+    }
 
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
-	}
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
 
-	public Long getFollowUserId() {
-		return followUserId;
-	}
+    public Long getFollowUserId() {
+        return followUserId;
+    }
 
-	public void setFollowUserId(Long followUserId) {
-		this.followUserId = followUserId;
-	}
+    public void setFollowUserId(Long followUserId) {
+        this.followUserId = followUserId;
+    }
 
 
     public BigDecimal getInterestRate() {
@@ -600,5 +610,13 @@ public class Order {
 
     public void setRepayOrderNo(String repayOrderNo) {
         this.repayOrderNo = repayOrderNo;
+    }
+
+    public Integer getSource() {
+        return source;
+    }
+
+    public void setSource(Integer source) {
+        this.source = source;
     }
 }

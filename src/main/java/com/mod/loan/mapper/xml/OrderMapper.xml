@@ -31,7 +31,12 @@
     <result column="merchant" jdbcType="VARCHAR" property="merchant" />
     <result column="follow_user_id" jdbcType="BIGINT" property="followUserId" />
     <result column="payment_type" jdbcType="VARCHAR" property="paymentType"/>
+    <result column="source" jdbcType="INTEGER" property="source"/>
   </resultMap>
+
+  <select id="findByOrderNoAndSource" resultMap="BaseResultMap">
+    select * from tb_order where order_no=#{orderNo} and source=#{source} order by id desc limit 1
+  </select>
 
   <select id="findByOrderNo" resultMap="BaseResultMap">
     select * from tb_order where order_no=#{orderNo} order by id desc limit 1

@@ -11,15 +11,12 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
-import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.common.model.ResultMap;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.check.Log;
-import com.mod.loan.mapper.MerchantRateMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.MoneyUtil;
@@ -32,11 +29,9 @@ import com.mod.loan.util.baofoo.util.HttpUtil;
 import com.mod.loan.util.baofoo.util.SecurityUtil;
 import com.mod.loan.util.rongze.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mod.loan.common.mapper.BaseServiceImpl;
@@ -82,9 +77,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public Order repayOrder(String orderNo) throws BizException {
+    public Order repayOrder(String orderNo, int source) throws BizException {
 
-        Order order = findOrderByOrderNo(orderNo);
+        Order order = findOrderByOrderNoAndSource(orderNo, source);
         if (order == null) throw new BizException("订单不存在");
 
         ResultMessage message;
@@ -103,7 +98,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                     throw new BizException("支付渠道异常");
             }
         } else {
-            message = kuaiQianService.repay(orderNo);
+            message = kuaiQianService.repay(order);
         }
 
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
@@ -115,13 +110,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     }
 
     @Override
-    public Order findOrderByOrderNo(String orderNo) {
-        return orderMapper.findByOrderNo(orderNo);
+    public Order findOrderByOrderNoAndSource(String orderNo, int source) {
+        return orderMapper.findByOrderNoAndSource(orderNo, source);
     }
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public Order submitOrder(String orderNo, String loanAmount, int loanTerm) throws BizException {
+    public Order submitOrder(String orderNo, String loanAmount, int loanTerm, int source) throws BizException {
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         if (merchant == null) {
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
@@ -130,7 +125,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         MerchantRate record = merchantRateService.findByMerchant(RequestThread.getClientAlias());
         Long productId = record.getId();
 
-        Long uid = RequestThread.getUid();
+        Order order = orderMapper.findByOrderNoAndSource(orderNo, source);
+        boolean orderExist = order != null;
+
+        Long uid = orderExist ? order.getUid() : RequestThread.getUid();
         if (!redisMapper.lock(RedisConst.lock_user_order + uid, 5)) {
             throw new BizException("操作过于频繁");
         }
@@ -171,7 +169,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                 }
             }
         }
-        Order order = new Order();
+
+        if (!orderExist) order = new Order();
+
         MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(productId);
         if (null == merchantRate) {
             throw new BizException("未查到规则");
@@ -218,7 +218,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         orderPhone.setParamValue("");
         orderPhone.setPhoneModel("third|7");
         orderPhone.setPhoneType("H5");
-        addOrder(order, orderPhone);
+        order.setSource(source);
+        addOrUpdateOrder(order, orderPhone);
 
         // 通知风控
         RiskAuditMessage message = new RiskAuditMessage();
@@ -238,7 +239,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
     @Override
     public Order findUserLatestOrder(Long uid) {
-        // TODO Auto-generated method stub
         return orderMapper.findUserLatestOrder(uid);
     }
 
@@ -249,15 +249,24 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
     @Override
     public int addOrder(Order order, OrderPhone orderPhone) {
-        // TODO Auto-generated method stub
         orderMapper.insertSelective(order);
         orderPhone.setOrderId(order.getId());
         return orderPhoneMapper.insertSelective(orderPhone);
     }
 
     @Override
+    public void addOrUpdateOrder(Order order, OrderPhone orderPhone) {
+        if (order.getId() != null && order.getId() > 0) {
+            orderMapper.updateByPrimaryKeySelective(order);
+            orderPhone.setOrderId(order.getId());
+            orderPhoneMapper.updateByPrimaryKeySelective(orderPhone);
+            return;
+        }
+        addOrder(order, orderPhone);
+    }
+
+    @Override
     public OrderPhone findOrderPhoneByOrderId(Long orderId) {
-        // TODO Auto-generated method stub
         return orderPhoneMapper.selectByPrimaryKey(orderId);
     }
 

@@ -10,6 +10,9 @@ import org.apache.commons.lang.StringUtils;
  */
 public class BizDataUtil {
 
+    private static final String orderNoPre = ""; //订单号前缀
+//    private static final String orderNoPre = "RZ";
+
     //加密请求的业务数据
     public static String encryptBizData(String bizData, String despwd) throws Exception {
         if (StringUtils.isBlank(bizData)) return "";
@@ -30,12 +33,12 @@ public class BizDataUtil {
     }
 
     public static String bindRZOrderNo(String orderNo) {
-        return StringUtils.isBlank(orderNo) ? "" : "RZ" + orderNo;
+        return StringUtils.isBlank(orderNo) ? "" : orderNoPre + orderNo;
     }
 
     public static String unbindRZOrderNo(String orderNo) {
         //获取融泽那边的订单号，系统存的是加了 RZ 前缀的
-        return StringUtils.isBlank(orderNo) ? "" : orderNo.substring(2);
+        return StringUtils.isBlank(orderNo) ? "" : StringUtils.isNotBlank(orderNoPre) ? orderNo.substring(orderNoPre.length()) : orderNo;
     }
 
 }
