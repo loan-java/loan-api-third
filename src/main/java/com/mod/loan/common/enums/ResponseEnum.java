@@ -1,5 +1,7 @@
 package com.mod.loan.common.enums;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author wugy 2018年1月9日 下午5:27:14
  */
@@ -49,7 +51,7 @@ public enum ResponseEnum {
     }
 
     public int getCodeInt() {
-        return Integer.parseInt(getCode());
+        return StringUtils.isNumeric(getCode()) ? Integer.parseInt(getCode()) : -1;
     }
 
     public void setCode(String code) {

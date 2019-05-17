@@ -39,12 +39,14 @@ public class RongZeRequestController {
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
-        log.info("收到融泽请求, param: " + param.toJSONString());
+        log.info("融泽请求收到, param: " + param.toJSONString());
+
+        Object result;
 
         try {//校验 sig
             String sign = param.getString("sign");
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
-            if (!check) return ResponseBean.fail(ResponseEnum.M4006);
+            if (!check) throw new BizException(ResponseEnum.M4006);
 
             //绑定线程变量
             binRequestThread(request, param);
@@ -57,26 +59,33 @@ public class RongZeRequestController {
             }
 
             String method = param.getString("method");
-            if (StringUtils.isBlank(method)) return ResponseBean.fail(ResponseEnum.M5000);
+            if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
             switch (method) {
                 case "fund.withdraw.req": //推送用户确认收款信息
-                    return rongZeRequestHandler.handleOrderSubmit(param);
+                    result = rongZeRequestHandler.handleOrderSubmit(param);
+                    break;
                 case "fund.deal.contract": //查询借款合同
-                    return rongZeRequestHandler.handleQueryContract(param);
+                    result = rongZeRequestHandler.handleQueryContract(param);
+                    break;
                 case "fund.order.status": //查询订单状态
-                    return rongZeRequestHandler.handleQueryOrderStatus(param);
+                    result = rongZeRequestHandler.handleQueryOrderStatus(param);
+                    break;
                 case "fund.payment.req": //推送用户还款信息
-                    return rongZeRequestHandler.handleRepayment(param);
+                    result = rongZeRequestHandler.handleRepayment(param);
+                    break;
 
                 // TODO: 2019/5/15 其它 method
                 default:
-                    return ResponseBean.fail(ResponseEnum.M5000.getCodeInt(), "method not found");
+                    throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
         } catch (Exception e) {
             logFail(e);
-            return ResponseBean.fail(e.getMessage());
+            result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
+
+        log.info("融泽请求返回, result: " + JSON.toJSONString(result));
+        return result;
     }
 
     private void binRequestThread(HttpServletRequest request, JSONObject param) {
