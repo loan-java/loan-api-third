@@ -29,4 +29,8 @@ public class OrderRepayServiceImpl extends BaseServiceImpl<OrderRepay,String>  i
 		return orderRepayMapper.countRepaySuccess(orderId);
 	}
 
+	@Override
+	public OrderRepay selectByOrderId(Long orderId) {
+		return orderRepayMapper.selectByOrderId(orderId);
+	}
 }

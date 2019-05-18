@@ -7,4 +7,5 @@ public interface OrderRepayMapper extends MyBaseMapper<OrderRepay> {
 
     int countRepaySuccess(Long orderId);
 
+    OrderRepay selectByOrderId(Long orderId);
 }
