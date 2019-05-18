@@ -6,14 +6,20 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.controller.BaseRequestHandler;
 import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.UserBank;
+import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserBankService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 还款相关
@@ -29,6 +35,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
 
     @Autowired
     private UserBankService userBankService;
+
+    @Autowired
+    private OrderRepayService orderRepayService;
 
     /**
      * 获取还款计划
@@ -63,30 +72,42 @@ public class RepayRequestHandler extends BaseRequestHandler {
         // 逾期费用，单位元，保留小数点后两位
         repay.put("overdue_fee", order.getOverdueFee().toPlainString());
         // 还款成功的时间
-        repay.put("success_time", "");
+        repay.put("success_time", order.getRealRepayTime() == null ? "" : order.getRealRepayTime().getTime() / 1000);
         // 当期还款金额描述
-        repay.put("remark", "");
+        if (order.getRealRepayTime() != null) {
+            StringBuilder remark = new StringBuilder("含本金 ");
+            remark.append(order.getActualMoney().toPlainString());
+            remark.append(" 元，利息&手续费 ").append(order.getTotalFee().add(order.getInterestFee()).toPlainString()).append(" 元");
+            if (order.getOverdueFee() != null && order.getOverdueFee().compareTo(new BigDecimal("0")) > 0) {
+                remark.append("，逾期 ").append(order.getOverdueFee().toPlainString()).append(" 元");
+            }
+            repay.put("remark", remark.toString());
+        }
         // 费用项集合
         List<Map<String, Object>> billItem = new ArrayList<>();
         if (order.getActualMoney() != null) {
+            // 实际金额
             Map<String, Object> actualMoney = new HashMap<>(2);
             actualMoney.put("feetype", "1");
             actualMoney.put("dueamount", order.getActualMoney().toPlainString());
             billItem.add(actualMoney);
         }
         if (order.getTotalFee() != null) {
+            // 服务费
             Map<String, Object> totalFee = new HashMap<>(2);
             totalFee.put("feetype", "5");
             totalFee.put("dueamount", order.getTotalFee().toPlainString());
             billItem.add(totalFee);
         }
-        if (order.getInterestFee() != null) {
+        if (order.getInterestFee() != null && order.getInterestFee().compareTo(new BigDecimal("0")) > 0) {
+            // 利息
             Map<String, Object> interestFee = new HashMap<>(2);
             interestFee.put("feetype", "2");
             interestFee.put("dueamount", order.getInterestFee().toPlainString());
             billItem.add(interestFee);
         }
-        if (order.getOverdueFee() != null) {
+        if (order.getOverdueFee() != null && order.getOverdueFee().compareTo(new BigDecimal("0")) > 0) {
+            // 逾期费
             Map<String, Object> overdueFee = new HashMap<>(2);
             overdueFee.put("feetype", "2");
             overdueFee.put("dueamount", order.getOverdueFee().toPlainString());
@@ -106,6 +127,44 @@ public class RepayRequestHandler extends BaseRequestHandler {
         map.put("ank_card ", userBank.getCardNo());
         //还款计划
         map.put("repayment_plan", repayPlan);
+        return ResponseBean.success(map);
+    }
+
+    /**
+     * 获取还款状态
+     */
+    public ResponseBean<Map<String, Object>> getRepayStatus(JSONObject param) throws BizException {
+        JSONObject data = parseAndCheckBizData(param);
+        String orderNo = data.getString("order_no");
+        Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
+        if(order == null){
+            throw new BizException("订单不存在");
+        }
+        OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
+        if(orderRepay == null){
+            throw new BizException("无还款信息");
+        }
+        Map<String, Object> map = new HashMap<>();
+        // 订单编号
+        map.put("order_no ", orderNo);
+        // 还款期数
+        map.put("period_nos ", "1");
+        // 本次还款金额，单位 元
+        map.put("repay_amount", orderRepay.getRepayMoney() == null ? "" : orderRepay.getRepayMoney().toPlainString());
+        // 还款状态 1=还款成功 2=还款失败 0=还款中状态
+        map.put("repay_status", orderRepay.getRepayStatus() == 3 ? 1 : orderRepay.getRepayStatus() == 4 ? 2 : 0);
+        // 还款触发方式  1=主动还款 2=自动代扣
+        map.put("repay_place", orderRepay.getRepayType() == 7 ? 2 : 1);
+        // 执行还款的时间
+        map.put("success_time", orderRepay.getCreateTime().getTime() / 1000);
+        // 备注说明
+        String remark = "";
+        if (orderRepay.getRepayStatus() == 3) {
+            remark = "本金 " + order.getBorrowMoney().toPlainString() + "，利息 " + order.getInterestFee().toPlainString();
+        } else if (orderRepay.getRepayStatus() == 4) {
+            remark = orderRepay.getRemark();
+        }
+        map.put("remark", remark);
         return ResponseBean.success(map);
     }
 }
