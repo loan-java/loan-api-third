@@ -3,17 +3,22 @@ package com.mod.loan.controller.rongze;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
+import com.mod.loan.mapper.OrderUserMapper;
+import com.mod.loan.model.Merchant;
 import com.mod.loan.model.User;
+import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +39,21 @@ public class RongZeRequestController {
     private UserService userService;
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
+    @Resource
+    private CertRequestHandler certRequestHandler;
+    @Resource
+    private UserInfoBaseRequestHandler userInfoBaseRequestHandler;
+    @Resource
+    private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
+    @Resource
+    private AuditResultRequestHandler auditResultRequestHandler;
+
+    @Autowired
+    private MerchantService merchantService;
+
+
+    @Autowired
+    private OrderUserMapper orderUserMapper;
 
     private static String logPre = "融泽入口请求, ";
 
@@ -61,6 +81,10 @@ public class RongZeRequestController {
             binRequestThread(request, param);
 
             String method = param.getString("method");
+
+            //绑定线程变量
+            this.binRequestThread(request, param.getJSONObject("biz_data"), method);
+
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
             switch (method) {
@@ -76,7 +100,18 @@ public class RongZeRequestController {
                 case "fund.payment.req": //推送用户还款信息
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
-
+                case "fund.cert.auth": //查询复贷黑名单信息
+                    result = certRequestHandler.certAuth(param);
+                    break;
+                case "fund.userinfo.base": //推送用户基本信息
+                    result = userInfoBaseRequestHandler.userInfoBase(param);
+                    break;
+                case "fund.userinfo.addit": //查询用户补充信息
+                    result = userInfoAdditRequestHandler.userInfoAddit(param);
+                    break;
+                case "fund.audit.result": //查询审批结论
+                    result = auditResultRequestHandler.auditResult(param);
+                    break;
                 // TODO: 2019/5/15 其它 method
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
@@ -90,21 +125,31 @@ public class RongZeRequestController {
         return result;
     }
 
-    private void binRequestThread(HttpServletRequest request, JSONObject param) {
+    private void binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
         RequestThread.remove();// 移除本地线程变量
-        String sourceId = param.getString("source_id"); //标志用户来源的app
-        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
-
         String ip = HttpUtils.getIpAddr(request, ".");
+        Long uid=null;
+        String orderNo = null;
+        switch (method) {
+            case "fund.userinfo.base": //推送用户基本信息
+                orderNo = param.containsKey("orderInfo")?param.getJSONObject("orderInfo").getString("order_no"):null;
+                break;
+            default:
+                orderNo = param.containsKey("order_no")?param.getString("order_no"):null;
+        }
+        if(orderNo != null) {
+            uid=orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        }
+//        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
 //        String clientVersion = obj.getString("version");
 //        String clientType = obj.getString("terminalId");
+//        RequestThread.setClientVersion(clientVersion);
+//        RequestThread.setClientType(clientType);
+        String sourceId = param.getString("source_id"); //标志用户来源的app
         String clientAlias = Constant.merchant;
         String sign = param.getString("sign");
         String deviceCode = param.getString("deviceCode");
         String token = param.getString("token");
-
-//        RequestThread.setClientVersion(clientVersion);
-//        RequestThread.setClientType(clientType);
         RequestThread.setClientAlias(clientAlias);
         RequestThread.setIp(ip);
         RequestThread.setRequestTime(System.currentTimeMillis());
@@ -114,7 +159,15 @@ public class RongZeRequestController {
         RequestThread.setSourceId(sourceId);
 
         // TODO: 2019/5/17 根据订单号获取用户id
-        RequestThread.setUid(null);
+        RequestThread.setUid(uid);
+
+        //判断商户是否配置好
+        Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
+        if(merchant == null) {
+            log.info("商户【"+RequestThread.getClientAlias()+"】不存在，未配置");
+            log.info("==========================================");
+            throw new BizException("商户不存在");
+        }
     }
 
     private void logFail(Exception e) {
