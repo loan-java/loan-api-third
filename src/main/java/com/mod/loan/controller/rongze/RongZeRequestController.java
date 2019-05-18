@@ -50,6 +50,8 @@ public class RongZeRequestController {
     @Resource
     private AuditResultRequestHandler auditResultRequestHandler;
     @Resource
+    private WithDrawRequestHandler withDrawRequestHandler;
+    @Resource
     private BankRequestHandler bankRequestHandler;
     @Resource
     private RepayRequestHandler repayRequestHandler;
@@ -125,6 +127,9 @@ public class RongZeRequestController {
                     break;
                 case "fund.audit.result": //查询审批结论
                     result = auditResultRequestHandler.auditResult(param);
+                    break;
+                case "fund.withdraw.tria": //试算接口
+                    result = withDrawRequestHandler.withdrawTria(param);
                     break;
                 // TODO: 2019/5/15 其它 method
                 default:
