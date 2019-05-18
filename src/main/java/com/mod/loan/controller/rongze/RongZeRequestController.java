@@ -113,7 +113,11 @@ public class RongZeRequestController {
         RequestThread.setSign(sign);
         RequestThread.setSourceId(sourceId);
 
-        // TODO: 2019/5/17 根据订单号获取用户id
+        String bizData = param.getString("biz_data");
+        JSONObject data = JSONObject.parseObject(bizData);
+        String orderNo = data.getString("order_no");
+
+        // TODO: 2019/5/17 根据订单号 orderNo 获取用户id
         RequestThread.setUid(null);
     }
 
