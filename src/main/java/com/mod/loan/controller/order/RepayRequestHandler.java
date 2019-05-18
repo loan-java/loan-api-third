@@ -3,6 +3,7 @@ package com.mod.loan.controller.order;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.common.exception.BizException;
+import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.controller.BaseRequestHandler;
 import com.mod.loan.model.Order;
@@ -116,8 +117,7 @@ public class RepayRequestHandler extends BaseRequestHandler {
         repay.put("billitem", billItem);
         repayPlan.add(repay);
 
-        Long userId = 1L;
-        UserBank userBank = userBankService.selectUserCurrentBankCard(userId);
+        UserBank userBank = userBankService.selectUserCurrentBankCard(RequestThread.getUid());
         Map<String, Object> map = new HashMap<>(4);
         //账单的订单编号
         map.put("order_no ", orderNo);
