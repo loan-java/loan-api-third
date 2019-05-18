@@ -49,9 +49,6 @@ public class RongZeRequestController {
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
             if (!check) throw new BizException(ResponseEnum.M4006);
 
-            //绑定线程变量
-            binRequestThread(request, param);
-
             //解密 bizData
             if ("1".equals(param.getString("biz_enc"))) {
                 String bizDataStr = param.getString("biz_data");
@@ -59,6 +56,9 @@ public class RongZeRequestController {
                 param.put("biz_data", bizData);
                 log.info(logPre + "解密后 biz_data: " + bizData);
             }
+
+            //绑定线程变量
+            binRequestThread(request, param);
 
             String method = param.getString("method");
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
