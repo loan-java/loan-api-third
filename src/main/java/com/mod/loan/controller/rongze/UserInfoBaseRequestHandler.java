@@ -94,22 +94,22 @@ public class UserInfoBaseRequestHandler {
             user.setMerchant(RequestThread.getClientAlias());
             user.setCommonInfo(applyDetail.toJSONString());
             int n = userMapper.insertSelective(user);
-            if (n == 0) throw new BizException("新增用户失败");
+            if (n == 0) throw new BizException("推送用户基本信息:新增用户失败");
             UserIdent userIdent = new UserIdent();
             userIdent.setUid(user.getId());
             userIdent.setCreateTime(new Date());
             n = userIdentMapper.insertSelective(userIdent);
-            if (n == 0) throw new BizException("新增用户认证信息失败");
+            if (n == 0) throw new BizException("推送用户基本信息:新增用户认证信息失败");
             UserAddressList addressList = new UserAddressList();
             addressList.setUid(user.getId());
             addressList.setCreateTime(new Date());
             n = addressListMapper.insertSelective(addressList);
-            if (n == 0) throw new BizException("新增用户地址信息失败");
+            if (n == 0) throw new BizException("推送用户基本信息:新增用户地址信息失败");
             UserInfo userInfo = new UserInfo();
             userInfo.setEducation(userEducation);
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
             n = userInfoMapper.insertSelective(userInfo);
-            if (n == 0) throw new BizException("新增用户详情信息失败");
+            if (n == 0) throw new BizException("推送用户基本信息:新增用户详情信息失败");
         } else {
             user.setUserPhone(userMobile);
             user.setUserPwd("");
@@ -123,12 +123,12 @@ public class UserInfoBaseRequestHandler {
             user.setMerchant(RequestThread.getClientAlias());
             user.setCommonInfo(applyDetail.toJSONString());
             int n = userMapper.updateByPrimaryKey(user);
-            if (n == 0) throw new BizException("更新用户失败");
+            if (n == 0) throw new BizException("推送用户基本信息:更新用户失败");
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(user.getId());
             userInfo.setEducation(userEducation);
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
             n = userInfoMapper.updateByPrimaryKey(userInfo);
-            if (n == 0) throw new BizException("更新用户详情信息失败");
+            if (n == 0) throw new BizException("推送用户基本信息:更新用户详情信息失败");
         }
         //新增融泽用户订单关联信息
         OrderUser orderUser = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.RZ.getCode()), user.getId());
@@ -138,14 +138,14 @@ public class UserInfoBaseRequestHandler {
             orderUser.setSource(2);
             orderUser.setUid(user.getId());
             int m = orderUserMapper.insert(orderUser);
-            if (m == 0) throw new BizException("新增用户订单关联信息");
+            if (m == 0) throw new BizException("推送用户基本信息:新增用户订单关联信息");
         } else {
             orderUser.setCreateTime(new Date());
             orderUser.setOrderNo(orderNo);
             orderUser.setSource(2);
             orderUser.setUid(user.getId());
             int m = orderUserMapper.insert(orderUser);
-            if (m == 0) throw new BizException("更新用户订单关联信息");
+            if (m == 0) throw new BizException("推送用户基本信息:更新用户订单关联信息");
         }
 
         log.info("===============推送用户基本信息结束====================");

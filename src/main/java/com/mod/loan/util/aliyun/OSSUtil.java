@@ -139,10 +139,11 @@ public class OSSUtil {
         // 创建OSSClient实例。
         OSSClient ossClient = new OSSClient(endpoint, accessKeyId,accessKeySecret);
         String filepath = null;
+        String fileType = ".png";
         try {
-            String newFileName = UUID.randomUUID().toString().replaceAll("-", "") + ".png";
+            String newFileName = UUID.randomUUID().toString().replaceAll("-", "") + fileType;
             filepath = new DateTime().getYear() + "/" + new DateTime().toString("MMdd") + "/" + newFileName;
-            byte[] content = new BASE64Decoder().decodeBuffer(base64Str);   //将字符串转换为byte数组
+            byte[] content = base64Str.getBytes();   //将字符串转换为byte数组
             ossClient.putObject(Constant.OSS_STATIC_BUCKET_NAME, filepath, new ByteArrayInputStream(content));
         }catch (Exception e) {
             logger.error("文件上传失败", e);

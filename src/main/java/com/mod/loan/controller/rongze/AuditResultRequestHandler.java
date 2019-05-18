@@ -41,8 +41,7 @@ public class AuditResultRequestHandler {
 
         Order order = orderMapper.findByOrderNoAndSource(orderNo,Integer.valueOf(source));
         if(order == null){
-            log.info("订单不存在"+orderNo);
-            throw new BizException("查询订单不存在");
+            throw new BizException("查询审批结论:订单不存在"+orderNo);
         }
         int conclusion = 30; //10=审批通过 40=审批拒绝30=审批处理中
         String reapply = "0"; //是否可再申请 1-是，0-不可以

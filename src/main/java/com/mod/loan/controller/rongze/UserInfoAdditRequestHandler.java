@@ -10,12 +10,15 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.Base64Util;
 import com.mod.loan.util.aliyun.OSSUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,20 +31,16 @@ import java.util.Map;
 @Component
 public class UserInfoAdditRequestHandler {
 
-    @Autowired
+    @Resource
     UserService userService;
-    @Autowired
-    OrderUserMapper orderUserMapper;
-    @Autowired
+    @Resource
     UserMapper userMapper;
-    @Autowired
+    @Resource
     UserIdentMapper userIdentMapper;
-    @Autowired
-    UserAddressListMapper addressListMapper;
-    @Autowired
+    @Resource
     UserInfoMapper userInfoMapper;
-    @Autowired
-    UserBankMapper userBankMapper;
+    @Resource
+    private MoxieMobileMapper moxieMobileMapper;
 
 
     //推送用户补充信息
@@ -82,20 +81,18 @@ public class UserInfoAdditRequestHandler {
 //        String ext=bizData.getString("ext");
         //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
-        if (user == null) {
-            log.info("推送用户补充信息:用户不存在");
-            throw new BizException("用户不存在");
-        }
-        user = this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,photo_hand_ID);
+        if (user == null) throw new BizException("推送用户补充信息:用户不存在");
+
+        boolean idcardFlag = this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,photo_hand_ID);
+        boolean phoneFlag = this.checkPhone(orderNo,user);
         //更新用户信息
         user.setUserEmail(user_email);
         int userN = userMapper.updateByPrimaryKey(user);
-        if(userN ==0) throw new BizException("用户更新失败");
+        if(userN ==0) throw new BizException("推送用户补充信息:用户更新失败");
+
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
-        if (userInfo == null) {
-            log.info("推送用户补充信息:用户详细信息不存在");
-            throw new BizException("用户详细信息不存在");
-        }
+        if (userInfo == null) throw new BizException("推送用户补充信息:用户详细信息不存在");
+
         userInfo.setLiveProvince(addr_detail.split(" ")[0]);
         userInfo.setLiveCity(addr_detail.split(" ")[1]);
         userInfo.setLiveAddress(addr_detail);
@@ -115,19 +112,23 @@ public class UserInfoAdditRequestHandler {
         userInfo.setOthersContactName(emergency_contact_personA_name);
         userInfo.setOthersContactPhone(emergency_contact_personA_phone);
         int userInfoN = userInfoMapper.updateByPrimaryKey(userInfo);
-        if(userInfoN ==0) throw new BizException("用户详情信息更新失败");
+        if(userInfoN ==0) throw new BizException("推送用户补充信息:用户详情信息更新失败");
 
         UserIdent userIdent = userIdentMapper.selectByPrimaryKey(RequestThread.getUid());
-        if (userIdent == null) {
-            log.info("推送用户补充信息:用户认证信息不存在");
-            throw new BizException("用户认证信息不存在");
-        }
+        if (userIdent == null) throw new BizException("推送用户补充信息:用户认证信息不存在");
+
         userIdent.setUserDetails(2);
         userIdent.setUserDetailsTime(new Date());
-        userIdent.setRealName(2);
-        userIdent.setRealNameTime(new Date());
+        if(idcardFlag) {
+            userIdent.setRealName(2);
+            userIdent.setRealNameTime(new Date());
+        }
+        if(phoneFlag){
+            userIdent.setMobile(2);
+            userIdent.setMobileTime(new Date());
+        }
         int userIdentN = userIdentMapper.updateByPrimaryKey(userIdent);
-        if(userIdentN ==0) throw new BizException("用户认证信息更新失败");
+        if(userIdentN ==0) throw new BizException("推送用户补充信息:用户认证信息更新失败");
         log.info("===============推送用户补充信息结束====================");
         return ResponseBean.success(map);
     }
@@ -143,37 +144,76 @@ public class UserInfoAdditRequestHandler {
      * @return
      * @throws BizException
      */
-    public User upLoadUserIdcard(String orderNo,User user,String str1,String str2,String str3,String str4) throws BizException {
+    public boolean upLoadUserIdcard(String orderNo,User user,String str1,String str2,String str3,String str4) throws BizException {
+        boolean flag = false;
         try {
             JSONObject jsonObject1=new JSONObject();
             jsonObject1.put("order_no",orderNo);
             jsonObject1.put("fileid",str1);
             String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
-            log.info("身份证正面信息：" + result1);
-            String imgCertFront = OSSUtil.uploadImage(result1);
+            log.info("推送用户补充信息:身份证正面信息：" + result1);
+            String imgCertFront = OSSUtil.uploadImage(Base64Util.decode(result1.getBytes()));
             user.setImgCertFront(imgCertFront);
 
             JSONObject jsonObject2=new JSONObject();
             jsonObject2.put("order_no",orderNo);
             jsonObject2.put("fileid",str2);
             String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
-            log.info("身份证背面信息：" + result2);
-            String imgCertBack = OSSUtil.uploadImage(result2);
+            log.info("推送用户补充信息:身份证背面信息：" + result2);
+            String imgCertBack = OSSUtil.uploadImage(Base64Util.decode(result2.getBytes()));
             user.setImgCertBack(imgCertBack);
 
             JSONObject jsonObject3=new JSONObject();
             jsonObject3.put("order_no",orderNo);
             jsonObject3.put("fileid",str1);
             String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
-            log.info("身份证活体信息：" + result3);
-            String imgFace = OSSUtil.uploadImage(result3);
+            log.info("推送用户补充信息:身份证活体信息：" + result3);
+            String imgFace = OSSUtil.uploadImage(Base64Util.decode(result3.getBytes()));
             user.setImgFace(imgFace);
+            flag = true;
         }catch (Exception e){
-            e.printStackTrace();
-            log.info("推送用户补充信息:用户不存在");
-            throw new BizException("下载身份证相关信息文件失败");
+            log.error("推送用户补充信息:用户不存在",e);
         }
-        return user;
+        return flag;
+    }
+
+    /**
+     * 获取运营商数据
+     * @param orderNo
+     * @param user
+     * @return
+     */
+    public boolean checkPhone(String orderNo,User user) throws BizException {
+        boolean flag = false;
+        try {
+            JSONObject jsonObject1=new JSONObject();
+            jsonObject1.put("order_no",orderNo);
+            jsonObject1.put("type","1");
+            String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+            log.info("推送用户补充信息:下载运营商数据信息：" + mxMobile);
+            //判断运营商数据
+            JSONObject jsonObject = JSONObject.parseObject(mxMobile);
+            if(!jsonObject.containsKey("code") || !jsonObject.containsKey("data") ||jsonObject.getInteger("code") == 200){
+                throw new BizException("推送用户补充信息:下载运营商数据解析失败");
+            }
+            String dataStr = jsonObject.getJSONObject("data").toJSONString();
+            //上传
+            String mxMobilePath = OSSUtil.uploadStr(Base64Util.decode(dataStr.getBytes()),RequestThread.getUid());
+            if (StringUtils.isBlank(mxMobilePath)) {
+                throw new BizException("推送用户补充信息:运营商数据上传失败");
+            }
+            MoxieMobile moxieMobile = new MoxieMobile();
+            moxieMobile.setUid(RequestThread.getUid());
+            moxieMobile.setPhone(user.getUserPhone());
+            moxieMobile.setRemark(mxMobilePath);//oss上文件的地址存在remark这个字段
+            moxieMobileMapper.insertSelective(moxieMobile);
+
+            flag =true;
+        }catch (Exception e){
+            log.error("推送用户补充信息:运营商数据出错",e);
+        }
+
+        return flag;
     }
 
 
