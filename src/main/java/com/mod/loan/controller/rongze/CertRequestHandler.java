@@ -35,7 +35,7 @@ public class CertRequestHandler {
     private BlacklistService blacklistService;
 
 
-    //推送用户确认收款信息
+    //复贷黑名单信息
     ResponseBean<Map<String, Object>> certAuth(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
         String message="成功";

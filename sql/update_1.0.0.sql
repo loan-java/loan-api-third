@@ -15,5 +15,6 @@ CREATE TABLE `tb_user_order` (
   `uid` int(20) DEFAULT NULL COMMENT '用户id',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `source` int(4) DEFAULT NULL COMMENT '备用',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='融泽用户和订单关联表';
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `pk_uid` (`uid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COMMENT='融泽用户和订单关联表';

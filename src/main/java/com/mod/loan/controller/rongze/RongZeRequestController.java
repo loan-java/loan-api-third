@@ -42,6 +42,8 @@ public class RongZeRequestController {
     private CertRequestHandler certRequestHandler;
     @Resource
     private UserInfoBaseRequestHandler userInfoBaseRequestHandler;
+    @Resource
+    private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
@@ -95,8 +97,11 @@ public class RongZeRequestController {
                 case "fund.cert.auth": //查询复贷黑名单信息
                     result = certRequestHandler.certAuth(param);
                     break;
-                case "fund.userinfo.base": //查询复贷黑名单信息
+                case "fund.userinfo.base": //推送用户基本信息
                     result = userInfoBaseRequestHandler.userInfoBase(param);
+                    break;
+                case "fund.userinfo.addit": //查询用户补充信息
+                    result = userInfoAdditRequestHandler.userInfoAddit(param);
                     break;
                 // TODO: 2019/5/15 其它 method
                 default:

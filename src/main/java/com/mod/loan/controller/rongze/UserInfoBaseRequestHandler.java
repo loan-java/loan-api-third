@@ -48,7 +48,7 @@ public class UserInfoBaseRequestHandler {
     //推送用户基本信息
     ResponseBean<Map<String, Object>> userInfoBase(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
-        String message="成功";
+        String message = "成功";
         JSONObject bizData = param.getJSONObject("biz_data");
         log.info("===============推送用户基本信息开始====================" + bizData.toJSONString());
         JSONObject orderInfo = param.getJSONObject("orderInfo");//订单基本信息
@@ -93,19 +93,23 @@ public class UserInfoBaseRequestHandler {
             user.setUserOrigin(UserOriginEnum.RZ.getCode());
             user.setMerchant(RequestThread.getClientAlias());
             user.setCommonInfo(applyDetail.toJSONString());
-            userMapper.insertSelective(user);
+            int n = userMapper.insertSelective(user);
+            if (n == 0) throw new BizException("新增用户失败");
             UserIdent userIdent = new UserIdent();
             userIdent.setUid(user.getId());
             userIdent.setCreateTime(new Date());
-            userIdentMapper.insertSelective(userIdent);
+            n = userIdentMapper.insertSelective(userIdent);
+            if (n == 0) throw new BizException("新增用户认证信息失败");
             UserAddressList addressList = new UserAddressList();
             addressList.setUid(user.getId());
             addressList.setCreateTime(new Date());
-            addressListMapper.insertSelective(addressList);
+            n = addressListMapper.insertSelective(addressList);
+            if (n == 0) throw new BizException("新增用户地址信息失败");
             UserInfo userInfo = new UserInfo();
             userInfo.setEducation(userEducation);
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
-            userInfoMapper.insertSelective(userInfo);
+            n = userInfoMapper.insertSelective(userInfo);
+            if (n == 0) throw new BizException("新增用户详情信息失败");
         } else {
             user.setUserPhone(userMobile);
             user.setUserPwd("");
@@ -118,21 +122,34 @@ public class UserInfoBaseRequestHandler {
             user.setUserOrigin("2");
             user.setMerchant(RequestThread.getClientAlias());
             user.setCommonInfo(applyDetail.toJSONString());
-            userMapper.updateByPrimaryKey(user);
-            UserInfo userInfo =userInfoMapper.selectByPrimaryKey(user.getId());
+            int n =userMapper.updateByPrimaryKey(user);
+            if (n == 0) throw new BizException("更新用户失败");
+            UserInfo userInfo = userInfoMapper.selectByPrimaryKey(user.getId());
             userInfo.setEducation(userEducation);
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
-            userInfoMapper.updateByPrimaryKey(userInfo);
+            n = userInfoMapper.updateByPrimaryKey(userInfo);
+            if (n == 0) throw new BizException("更新用户详情信息失败");
         }
         //新增融泽用户订单关联信息
-        OrderUser orderUser = new OrderUser();
-        orderUser.setCreateTime(new Date());
-        orderUser.setOrderNo(orderNo);
-        orderUser.setSource(2);
-        orderUser.setUid(user.getId());
-        orderUserMapper.insert(orderUser);
+        OrderUser orderUser = orderUserMapper.selectByPrimaryKey(user.getId());
+        if(orderUser == null){
+            orderUser.setCreateTime(new Date());
+            orderUser.setOrderNo(orderNo);
+            orderUser.setSource(2);
+            orderUser.setUid(user.getId());
+            int m = orderUserMapper.insert(orderUser);
+            if (m == 0) throw new BizException("新增用户订单关联信息");
+        }else{
+            orderUser.setCreateTime(new Date());
+            orderUser.setOrderNo(orderNo);
+            orderUser.setSource(2);
+            orderUser.setUid(user.getId());
+            int m = orderUserMapper.insert(orderUser);
+            if (m == 0) throw new BizException("更新用户订单关联信息");
+        }
+
         log.info("===============推送用户基本信息结束====================");
-        return new ResponseBean<>(200, message, map);
+        return ResponseBean.success(map);
     }
 
 
