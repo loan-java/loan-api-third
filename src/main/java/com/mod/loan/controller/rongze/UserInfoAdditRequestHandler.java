@@ -196,12 +196,9 @@ public class UserInfoAdditRequestHandler {
             if(!jsonObject.containsKey("code") || !jsonObject.containsKey("data") ||jsonObject.getInteger("code") == 200){
                 throw new BizException("推送用户补充信息:下载运营商数据解析失败");
             }
-            //
-
-
             String dataStr = jsonObject.getJSONObject("data").toJSONString();
             //上传
-            String mxMobilePath = OSSUtil.uploadStr(Base64Util.decode(dataStr.getBytes()),RequestThread.getUid());
+            String mxMobilePath = OSSUtil.uploadStr(dataStr,RequestThread.getUid());
             if (StringUtils.isBlank(mxMobilePath)) {
                 throw new BizException("推送用户补充信息:运营商数据上传失败");
             }
