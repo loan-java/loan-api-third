@@ -8,6 +8,8 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
+import com.mod.loan.controller.bank.BankRequestHandler;
+import com.mod.loan.controller.order.RepayRequestHandler;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Merchant;
 import com.mod.loan.model.User;
@@ -47,6 +49,10 @@ public class RongZeRequestController {
     private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
     @Resource
     private AuditResultRequestHandler auditResultRequestHandler;
+    @Resource
+    private BankRequestHandler bankRequestHandler;
+    @Resource
+    private RepayRequestHandler repayRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
@@ -95,6 +101,19 @@ public class RongZeRequestController {
                 case "fund.payment.req": //推送用户还款信息
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
+                case "fund.bank.verify": //推送用户验证银行卡
+                    result = bankRequestHandler.bankCardCode(param);
+                    break;
+                case "fund.bank.bind": //推送用户绑定银行卡
+                    result = bankRequestHandler.bankBind(param);
+                    break;
+                case "fund.payment.plan": //查询还款计划
+                    result = repayRequestHandler.getRepayPlan(param);
+                    break;
+                case "fund.payment.result": //查询还款状态
+                    result = repayRequestHandler.getRepayStatus(param);
+                    break;
+
                 case "fund.cert.auth": //查询复贷黑名单信息
                     result = certRequestHandler.certAuth(param);
                     break;
