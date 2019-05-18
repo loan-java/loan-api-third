@@ -7,6 +7,7 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
+import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Merchant;
 import com.mod.loan.model.User;
 import com.mod.loan.service.MerchantService;
@@ -39,9 +40,15 @@ public class RongZeRequestController {
     private RongZeRequestHandler rongZeRequestHandler;
     @Resource
     private CertRequestHandler certRequestHandler;
+    @Resource
+    private UserInfoBaseRequestHandler userInfoBaseRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
+
+
+    @Autowired
+    private OrderUserMapper orderUserMapper;
 
     private static String logPre = "融泽请求, ";
 
@@ -57,9 +64,6 @@ public class RongZeRequestController {
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
             if (!check) throw new BizException(ResponseEnum.M4006);
 
-            //绑定线程变量
-            binRequestThread(request, param);
-
             //解密 bizData
             if ("1".equals(param.getString("biz_enc"))) {
                 String bizDataStr = param.getString("biz_data");
@@ -69,6 +73,10 @@ public class RongZeRequestController {
             }
 
             String method = param.getString("method");
+
+            //绑定线程变量
+            this.binRequestThread(request, param.getJSONObject("biz_data"), method);
+
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
             switch (method) {
@@ -87,6 +95,9 @@ public class RongZeRequestController {
                 case "fund.cert.auth": //查询复贷黑名单信息
                     result = certRequestHandler.certAuth(param);
                     break;
+                case "fund.userinfo.base": //查询复贷黑名单信息
+                    result = userInfoBaseRequestHandler.userInfoBase(param);
+                    break;
                 // TODO: 2019/5/15 其它 method
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
@@ -100,21 +111,31 @@ public class RongZeRequestController {
         return result;
     }
 
-    private void binRequestThread(HttpServletRequest request, JSONObject param) throws BizException {
+    private void binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
         RequestThread.remove();// 移除本地线程变量
-        String sourceId = param.getString("source_id"); //标志用户来源的app
-        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
-
         String ip = HttpUtils.getIpAddr(request, ".");
+        Long uid=null;
+        String orderNo = null;
+        switch (method) {
+            case "fund.userinfo.base": //推送用户基本信息
+                orderNo = param.containsKey("orderInfo")?param.getJSONObject("orderInfo").getString("order_no"):null;
+                break;
+            default:
+                orderNo = param.containsKey("order_no")?param.getString("order_no"):null;
+        }
+        if(orderNo != null) {
+            uid=orderUserMapper.getUidByOrderNo(orderNo);
+        }
+//        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
 //        String clientVersion = obj.getString("version");
 //        String clientType = obj.getString("terminalId");
+//        RequestThread.setClientVersion(clientVersion);
+//        RequestThread.setClientType(clientType);
+        String sourceId = param.getString("source_id"); //标志用户来源的app
         String clientAlias = Constant.merchant;
         String sign = param.getString("sign");
         String deviceCode = param.getString("deviceCode");
         String token = param.getString("token");
-
-//        RequestThread.setClientVersion(clientVersion);
-//        RequestThread.setClientType(clientType);
         RequestThread.setClientAlias(clientAlias);
         RequestThread.setIp(ip);
         RequestThread.setRequestTime(System.currentTimeMillis());
@@ -124,7 +145,7 @@ public class RongZeRequestController {
         RequestThread.setSourceId(sourceId);
 
         // TODO: 2019/5/17 根据订单号获取用户id
-        RequestThread.setUid(null);
+        RequestThread.setUid(uid);
 
         //判断商户是否配置好
         Merchant merchant = merchantService.findMerchantByAlias(clientAlias);

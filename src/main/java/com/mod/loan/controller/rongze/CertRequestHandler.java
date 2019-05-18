@@ -98,12 +98,12 @@ public class CertRequestHandler {
         if(userType.equals("1")){
             code=400;
         }else if(userType.equals("2")){
-            map.put("is_reloan","1");
-            map.put("amount_type","0");
-            map.put("pro_type","1");
-            map.put("term_type","0");
-            map.put("approval_term","1");
-            map.put("term_unit","1");
+            map.put("is_reloan",1);
+            map.put("amount_type",0);
+            map.put("pro_type",1);
+            map.put("term_type",0);
+            map.put("approval_term",1);
+            map.put("term_unit",1);
             map.put("credit_deadline", DateUtil.getNextDay(DateUtil.getStringDateShort(),"1"));
         }else{
             map.put("is_reloan","1");

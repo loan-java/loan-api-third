@@ -1,3 +1,4 @@
+import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.model.User;
 import com.mod.loan.util.DateUtil;
@@ -18,10 +19,12 @@ public class ControllerTest extends BaseSpringBootJunitTest {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private OrderUserMapper orderUserMapper;
+
     @Test
     public void md5PhoneAndIdcard() throws Exception {
-        User user= userMapper.getMd5PhoneAndIdcard("23B74636066879AC03570D0DFAC5813F");
-        System.out.println(user);
+        System.out.println(orderUserMapper.getUidByOrderNo("111"));
     }
 
     @Test
