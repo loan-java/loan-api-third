@@ -1,15 +1,28 @@
+import com.mod.loan.mapper.UserMapper;
+import com.mod.loan.model.User;
+import com.mod.loan.util.DateUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import sun.nio.cs.US_ASCII;
 
 
 public class ControllerTest extends BaseSpringBootJunitTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Test
+    public void md5PhoneAndIdcard() throws Exception {
+        User user= userMapper.getMd5PhoneAndIdcard("23B74636066879AC03570D0DFAC5813F");
+        System.out.println(user);
+    }
 
     @Test
     public void submitOrder() throws Exception {

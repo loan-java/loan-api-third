@@ -6,15 +6,17 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
+import com.mod.loan.model.Merchant;
 import com.mod.loan.model.User;
+import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +37,11 @@ public class RongZeRequestController {
     private UserService userService;
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
+    @Resource
+    private CertRequestHandler certRequestHandler;
+
+    @Autowired
+    private MerchantService merchantService;
 
     private static String logPre = "融泽请求, ";
 
@@ -77,7 +84,9 @@ public class RongZeRequestController {
                 case "fund.payment.req": //推送用户还款信息
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
-
+                case "fund.cert.auth": //查询复贷黑名单信息
+                    result = certRequestHandler.certAuth(param);
+                    break;
                 // TODO: 2019/5/15 其它 method
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
@@ -91,7 +100,7 @@ public class RongZeRequestController {
         return result;
     }
 
-    private void binRequestThread(HttpServletRequest request, JSONObject param) {
+    private void binRequestThread(HttpServletRequest request, JSONObject param) throws BizException {
         RequestThread.remove();// 移除本地线程变量
         String sourceId = param.getString("source_id"); //标志用户来源的app
         String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
@@ -116,6 +125,14 @@ public class RongZeRequestController {
 
         // TODO: 2019/5/17 根据订单号获取用户id
         RequestThread.setUid(null);
+
+        //判断商户是否配置好
+        Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
+        if(merchant == null) {
+            log.info("商户【"+RequestThread.getClientAlias()+"】不存在，未配置");
+            log.info("==========================================");
+            throw new BizException("商户不存在");
+        }
     }
 
     private void logFail(Exception e) {
