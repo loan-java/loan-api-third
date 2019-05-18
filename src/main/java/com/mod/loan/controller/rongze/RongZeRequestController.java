@@ -3,6 +3,7 @@ package com.mod.loan.controller.rongze;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
@@ -44,6 +45,8 @@ public class RongZeRequestController {
     private UserInfoBaseRequestHandler userInfoBaseRequestHandler;
     @Resource
     private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
+    @Resource
+    private AuditResultRequestHandler auditResultRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
@@ -103,6 +106,9 @@ public class RongZeRequestController {
                 case "fund.userinfo.addit": //查询用户补充信息
                     result = userInfoAdditRequestHandler.userInfoAddit(param);
                     break;
+                case "fund.audit.result": //查询审批结论
+                    result = auditResultRequestHandler.auditResult(param);
+                    break;
                 // TODO: 2019/5/15 其它 method
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
@@ -129,7 +135,7 @@ public class RongZeRequestController {
                 orderNo = param.containsKey("order_no")?param.getString("order_no"):null;
         }
         if(orderNo != null) {
-            uid=orderUserMapper.getUidByOrderNo(orderNo);
+            uid=orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
         }
 //        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
 //        String clientVersion = obj.getString("version");

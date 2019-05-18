@@ -7,7 +7,11 @@ import org.apache.ibatis.annotations.Select;
 
 public interface OrderUserMapper extends MyBaseMapper<OrderUser> {
 
-    @Select("select uid from tb_user_order where order_no=${}")
-    Long getUidByOrderNo(@Param("orderNo")String orderNo);
+    @Select("select distinct uid from tb_user_order where order_no=#{orderNo} and source=#{source} limit 1")
+    Long getUidByOrderNoAndSource(@Param("orderNo")String orderNo,@Param("source")Integer source);
+
+    @Select("select id,order_no as orderNo,source,uid,create_time as createTime " +
+            " from tb_user_order where order_no=#{orderNo} and source=#{source} and uid=#{uid} ")
+    OrderUser getUidByOrderNoAndSourceAndUid(@Param("orderNo")String orderNo,@Param("source")Integer source,@Param("uid")Long uid);
 
 }

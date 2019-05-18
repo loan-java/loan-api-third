@@ -24,7 +24,7 @@ public class ControllerTest extends BaseSpringBootJunitTest {
 
     @Test
     public void md5PhoneAndIdcard() throws Exception {
-        System.out.println(orderUserMapper.getUidByOrderNo("111"));
+        System.out.println(orderUserMapper.getUidByOrderNoAndSourceAndUid("111",2,(long)1));
     }
 
     @Test
