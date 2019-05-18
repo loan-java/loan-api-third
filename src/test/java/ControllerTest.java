@@ -1,7 +1,12 @@
+import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.model.RequestThread;
+import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.model.User;
+import com.mod.loan.util.Base64Util;
 import com.mod.loan.util.DateUtil;
+import com.mod.loan.util.aliyun.OSSUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -60,4 +65,20 @@ public class ControllerTest extends BaseSpringBootJunitTest {
         System.out.println(body);
         return body;
     }
+
+
+    @Test
+    public void uploadOssAndDownOss() throws Exception {
+        String data="";
+        JSONObject jsonObject=JSONObject.parseObject(data);
+        String dataStr = jsonObject.getJSONObject("data").toJSONString();
+        //上传
+        String mxMobilePath = OSSUtil.uploadStr(Base64Util.decode(dataStr.getBytes()), (long) 9999999);
+        System.out.println("上传:"+mxMobilePath);
+        //下载
+        String mxMobilePath2 = OSSUtil.ossGetFile(mxMobilePath, Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
+        System.out.println("下载:"+mxMobilePath2);
+    }
+
+
 }
