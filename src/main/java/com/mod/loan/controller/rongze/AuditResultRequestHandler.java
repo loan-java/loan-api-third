@@ -33,7 +33,6 @@ public class AuditResultRequestHandler {
     //查询审批结论
     ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        String message="成功";
         JSONObject bizData = param.getJSONObject("biz_data");
         log.info("===============查询审批结论开始====================" + bizData.toJSONString());
 
