@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze;
+package com.mod.loan.service.impl.rongze;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.exception.BizException;
@@ -36,10 +36,10 @@ public class CertRequestHandler {
 
 
     //复贷黑名单信息
-    ResponseBean<Map<String, Object>> certAuth(JSONObject param) throws BizException {
+    public ResponseBean<Map<String, Object>> certAuth(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
         String message="成功";
-        JSONObject bizData = param.getJSONObject("biz_data");
+        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============贷相关信息开始====================" + bizData.toJSONString());
         String md5 = bizData.getString("md5");
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户

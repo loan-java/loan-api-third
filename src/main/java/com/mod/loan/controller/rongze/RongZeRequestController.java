@@ -8,11 +8,14 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
+import com.mod.loan.controller.bank.BankRequestHandler;
+import com.mod.loan.controller.order.RepayRequestHandler;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Merchant;
 import com.mod.loan.model.User;
 import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.service.impl.rongze.*;
 import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
 
 /**
  * @ author liujianjian
@@ -47,6 +51,12 @@ public class RongZeRequestController {
     private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
     @Resource
     private AuditResultRequestHandler auditResultRequestHandler;
+    @Resource
+    private WithDrawRequestHandler withDrawRequestHandler;
+    @Resource
+    private BankRequestHandler bankRequestHandler;
+    @Resource
+    private RepayRequestHandler repayRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
@@ -56,7 +66,7 @@ public class RongZeRequestController {
     private static String logPre = "融泽入口请求, ";
 
     @RequestMapping("/dispatcherRequest")
-    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
+    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) throws BizException {
 
         log.info(logPre + "收到, param: " + param.toJSONString());
 
@@ -95,6 +105,19 @@ public class RongZeRequestController {
                 case "fund.payment.req": //推送用户还款信息
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
+                case "fund.bank.verify": //推送用户验证银行卡
+                    result = bankRequestHandler.bankCardCode(param);
+                    break;
+                case "fund.bank.bind": //推送用户绑定银行卡
+                    result = bankRequestHandler.bankBind(param);
+                    break;
+                case "fund.payment.plan": //查询还款计划
+                    result = repayRequestHandler.getRepayPlan(param);
+                    break;
+                case "fund.payment.result": //查询还款状态
+                    result = repayRequestHandler.getRepayStatus(param);
+                    break;
+
                 case "fund.cert.auth": //查询复贷黑名单信息
                     result = certRequestHandler.certAuth(param);
                     break;
@@ -107,10 +130,19 @@ public class RongZeRequestController {
                 case "fund.audit.result": //查询审批结论
                     result = auditResultRequestHandler.auditResult(param);
                     break;
+                case "fund.withdraw.tria": //试算接口
+                    result = withDrawRequestHandler.withdrawTria(param);
+                    break;
                 // TODO: 2019/5/15 其它 method
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
+        } catch (SQLException e) {
+            log.error("融泽入口请求系统异常",e);
+            throw new RuntimeException("融泽入口请求系统异常!");
+        } catch (RuntimeException e) {
+            log.error("融泽入口请求系统异常",e);
+            throw new RuntimeException("融泽入口请求系统异常!");
         } catch (Exception e) {
             logFail(e);
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
@@ -123,7 +155,7 @@ public class RongZeRequestController {
     private void binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
         RequestThread.remove();// 移除本地线程变量
 
-        JSONObject bizData = param.getJSONObject("biz_data");
+        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
 
         Long uid = null;
         String orderNo = null;
