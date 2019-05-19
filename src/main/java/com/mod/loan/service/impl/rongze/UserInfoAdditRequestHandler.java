@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -44,6 +45,7 @@ public class UserInfoAdditRequestHandler {
 
 
     //推送用户补充信息
+    @Transactional
     public ResponseBean<Map<String, Object>> userInfoAddit(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
         String message="成功";
@@ -93,13 +95,13 @@ public class UserInfoAdditRequestHandler {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
         if (userInfo == null) throw new RuntimeException("推送用户补充信息:用户详细信息不存在");
 
-        userInfo.setLiveProvince(addr_detail.split(" ")[0]);
-        userInfo.setLiveCity(addr_detail.split(" ")[1]);
-        userInfo.setLiveAddress(addr_detail);
+//        userInfo.setLiveProvince(addr_detail.split(" ")[0]);
+//        userInfo.setLiveCity(addr_detail.split(" ")[1]);
+//        userInfo.setLiveAddress(addr_detail);
         userInfo.setLiveMarry(user_marriage);
-        userInfo.setWorkCompanyProvince(company_addr_detail.split(" ")[0]);
-        userInfo.setWorkCompanyCity(company_addr_detail.split(" ")[1]);
-        userInfo.setWorkCompanyArea(company_addr_detail.split(" ")[2]);
+//        userInfo.setWorkCompanyProvince(company_addr_detail.split(" ")[0]);
+//        userInfo.setWorkCompanyCity(company_addr_detail.split(" ")[1]);
+//        userInfo.setWorkCompanyArea(company_addr_detail.split(" ")[2]);
         userInfo.setWorkAddress(company_addr_detail);
         userInfo.setWorkCompany(company_name);
         userInfo.setWorkCompanyPhone(company_number);
@@ -152,6 +154,11 @@ public class UserInfoAdditRequestHandler {
             jsonObject1.put("fileid",str1);
             String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
             log.info("推送用户补充信息:身份证正面信息：" + result1);
+            JSONObject resultJson1 = JSONObject.parseObject(result1);
+            if(!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200){
+                throw new BizException("推送用户补充信息:身份证正面信息解析失败"  + result1);
+            }
+
             String imgCertFront = OSSUtil.uploadImage(Base64Util.decode(result1.getBytes()));
             user.setImgCertFront(imgCertFront);
 
@@ -160,6 +167,10 @@ public class UserInfoAdditRequestHandler {
             jsonObject2.put("fileid",str2);
             String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
             log.info("推送用户补充信息:身份证背面信息：" + result2);
+            JSONObject resultJson2 = JSONObject.parseObject(result2);
+            if(!resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200){
+                throw new BizException("推送用户补充信息:身份证背面信息解析失败" + result2);
+            }
             String imgCertBack = OSSUtil.uploadImage(Base64Util.decode(result2.getBytes()));
             user.setImgCertBack(imgCertBack);
 
@@ -168,6 +179,10 @@ public class UserInfoAdditRequestHandler {
             jsonObject3.put("fileid",str1);
             String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
             log.info("推送用户补充信息:身份证活体信息：" + result3);
+            JSONObject resultJson3 = JSONObject.parseObject(result3);
+            if(!resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200){
+                throw new BizException("推送用户补充信息:身份证活体信息解析失败" + result3);
+            }
             String imgFace = OSSUtil.uploadImage(Base64Util.decode(result3.getBytes()));
             user.setImgFace(imgFace);
             flag = true;
@@ -193,7 +208,7 @@ public class UserInfoAdditRequestHandler {
             log.info("推送用户补充信息:下载运营商数据信息：" + mxMobile);
             //判断运营商数据
             JSONObject jsonObject = JSONObject.parseObject(mxMobile);
-            if(!jsonObject.containsKey("code") || !jsonObject.containsKey("data") ||jsonObject.getInteger("code") == 200){
+            if(!jsonObject.containsKey("code") || !jsonObject.containsKey("data") ||jsonObject.getInteger("code") != 200){
                 throw new BizException("推送用户补充信息:下载运营商数据解析失败");
             }
             String dataStr = jsonObject.getJSONObject("data").toJSONString();
