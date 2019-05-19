@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze;
+package com.mod.loan.service.impl.rongze;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.UserOriginEnum;
@@ -44,10 +44,10 @@ public class UserInfoAdditRequestHandler {
 
 
     //推送用户补充信息
-    ResponseBean<Map<String, Object>> userInfoAddit(JSONObject param) throws BizException {
+    public ResponseBean<Map<String, Object>> userInfoAddit(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
         String message="成功";
-        JSONObject bizData = param.getJSONObject("biz_data");
+        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============推送用户补充信息开始====================" + bizData.toJSONString());
         //机构定制信息
         String orderNo=bizData.getString("order_no");

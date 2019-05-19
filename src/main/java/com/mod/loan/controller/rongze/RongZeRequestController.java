@@ -15,6 +15,7 @@ import com.mod.loan.model.Merchant;
 import com.mod.loan.model.User;
 import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.service.impl.rongze.*;
 import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
 
 /**
  * @ author liujianjian
@@ -64,7 +66,7 @@ public class RongZeRequestController {
     private static String logPre = "融泽入口请求, ";
 
     @RequestMapping("/dispatcherRequest")
-    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
+    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) throws BizException {
 
         log.info(logPre + "收到, param: " + param.toJSONString());
 
@@ -135,6 +137,12 @@ public class RongZeRequestController {
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
+        } catch (SQLException e) {
+            log.error("融泽入口请求系统异常",e);
+            throw new RuntimeException("融泽入口请求系统异常!");
+        } catch (RuntimeException e) {
+            log.error("融泽入口请求系统异常",e);
+            throw new RuntimeException("融泽入口请求系统异常!");
         } catch (Exception e) {
             logFail(e);
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
@@ -147,7 +155,7 @@ public class RongZeRequestController {
     private void binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
         RequestThread.remove();// 移除本地线程变量
 
-        JSONObject bizData = param.getJSONObject("biz_data");
+        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
 
         Long uid = null;
         String orderNo = null;

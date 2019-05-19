@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze;
+package com.mod.loan.service.impl.rongze;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
@@ -39,9 +39,9 @@ public class WithDrawRequestHandler {
     private MerchantRateService merchantRateService;
 
     //查询审批结论
-    ResponseBean<Map<String, Object>> withdrawTria(JSONObject param) throws Exception {
+    public ResponseBean<Map<String, Object>> withdrawTria(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        JSONObject bizData = param.getJSONObject("biz_data");
+        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============试算接口开始====================" + bizData.toJSONString());
         String loanAmount = bizData.getString("loan_amount");
         Integer loanTerm = bizData.getInteger("loan_term");

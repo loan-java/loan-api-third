@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze;
+package com.mod.loan.service.impl.rongze;
 
 
 import com.alibaba.fastjson.JSONObject;
@@ -31,9 +31,9 @@ public class AuditResultRequestHandler {
 
 
     //查询审批结论
-    ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
+    public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        JSONObject bizData = param.getJSONObject("biz_data");
+        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============查询审批结论开始====================" + bizData.toJSONString());
 
         String orderNo = bizData.getString("order_no");
