@@ -85,8 +85,8 @@ public class UserInfoAdditRequestHandler {
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null) throw new BizException("推送用户补充信息:用户不存在");
 
-        boolean idcardFlag = this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
-        boolean phoneFlag = this.checkPhone(orderNo,user);
+        this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
+        this.checkPhone(orderNo,user);
         //更新用户信息
         user.setUserEmail(user_email);
         int userN = userMapper.updateByPrimaryKey(user);
@@ -121,14 +121,10 @@ public class UserInfoAdditRequestHandler {
 
         userIdent.setUserDetails(2);
         userIdent.setUserDetailsTime(new Date());
-        if(idcardFlag) {
-            userIdent.setRealName(2);
-            userIdent.setRealNameTime(new Date());
-        }
-        if(phoneFlag){
-            userIdent.setMobile(2);
-            userIdent.setMobileTime(new Date());
-        }
+        userIdent.setRealName(2);
+        userIdent.setRealNameTime(new Date());
+        userIdent.setMobile(2);
+        userIdent.setMobileTime(new Date());
         int userIdentN = userIdentMapper.updateByPrimaryKey(userIdent);
         if(userIdentN ==0) throw new RuntimeException("推送用户补充信息:用户认证信息更新失败");
         log.info("===============推送用户补充信息结束====================");
