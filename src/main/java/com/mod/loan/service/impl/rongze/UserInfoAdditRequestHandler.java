@@ -83,7 +83,7 @@ public class UserInfoAdditRequestHandler {
 //        String ext=bizData.getString("ext");
         //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
-        if (user == null) throw new RuntimeException("推送用户补充信息:用户不存在");
+        if (user == null) throw new BizException("推送用户补充信息:用户不存在");
 
         boolean idcardFlag = this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
         boolean phoneFlag = this.checkPhone(orderNo,user);
@@ -93,7 +93,7 @@ public class UserInfoAdditRequestHandler {
         if(userN ==0) throw new RuntimeException("推送用户补充信息:用户更新失败");
 
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
-        if (userInfo == null) throw new RuntimeException("推送用户补充信息:用户详细信息不存在");
+        if (userInfo == null) throw new BizException("推送用户补充信息:用户详细信息不存在");
 
 //        userInfo.setLiveProvince(addr_detail.split(" ")[0]);
 //        userInfo.setLiveCity(addr_detail.split(" ")[1]);
@@ -117,7 +117,7 @@ public class UserInfoAdditRequestHandler {
         if(userInfoN ==0) throw new RuntimeException("推送用户补充信息:用户详情信息更新失败");
 
         UserIdent userIdent = userIdentMapper.selectByPrimaryKey(RequestThread.getUid());
-        if (userIdent == null) throw new RuntimeException("推送用户补充信息:用户认证信息不存在");
+        if (userIdent == null) throw new BizException("推送用户补充信息:用户认证信息不存在");
 
         userIdent.setUserDetails(2);
         userIdent.setUserDetailsTime(new Date());

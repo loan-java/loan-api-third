@@ -38,7 +38,7 @@ public class WithDrawRequestHandler {
     @Autowired
     private MerchantRateService merchantRateService;
 
-    //查询审批结论
+    //试算接口
     public ResponseBean<Map<String, Object>> withdrawTria(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
         JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
