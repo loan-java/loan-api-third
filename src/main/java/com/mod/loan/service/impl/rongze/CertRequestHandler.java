@@ -1,6 +1,7 @@
 package com.mod.loan.service.impl.rongze;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.mapper.UserMapper;
@@ -47,7 +48,7 @@ public class CertRequestHandler {
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户
         User user = userMapper.getMd5PhoneAndIdcard(md5);
         if(user != null) {
-            if(StringUtils.isEmpty(user.getUserOrigin()) || user.getUserOrigin().equals("1")) {
+            if(StringUtils.isEmpty(user.getUserOrigin()) || user.getUserOrigin().equals(UserOriginEnum.RZ.getCode())) {
                 log.info(user.getId() + "聚合用户，不走当前线路");
                 log.info("==================================================================");
                 userType = "1";
