@@ -8,7 +8,7 @@ import org.apache.commons.lang.StringUtils;
  * @ author liujianjian
  * @ date 2019/5/15 22:20
  */
-public class BizException extends RuntimeException {
+public class BizException extends Exception {
 
     private String code;
 

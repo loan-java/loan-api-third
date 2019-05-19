@@ -53,7 +53,7 @@ public class UserInfoAdditRequestHandler {
         String orderNo=bizData.getString("order_no");
         String ID_Positive=bizData.getJSONArray("ID_Positive").getString(0);
         String ID_Negative=bizData.getJSONArray("ID_Negative").getString(0);
-        String photo_hand_ID=bizData.getJSONArray("photo_hand_ID").getString(0);
+//        String photo_hand_ID=bizData.getJSONArray("photo_hand_ID").getString(0);
         String photo_assay=bizData.getJSONArray("photo_assay").getString(bizData.getJSONArray("photo_assay").size()-1);
         String addr_detail=bizData.getString("addr_detail");
 //        String family_live_type=bizData.getString("family_live_type");
@@ -81,17 +81,17 @@ public class UserInfoAdditRequestHandler {
 //        String ext=bizData.getString("ext");
         //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
-        if (user == null) throw new BizException("推送用户补充信息:用户不存在");
+        if (user == null) throw new RuntimeException("推送用户补充信息:用户不存在");
 
-        boolean idcardFlag = this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,photo_hand_ID);
+        boolean idcardFlag = this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
         boolean phoneFlag = this.checkPhone(orderNo,user);
         //更新用户信息
         user.setUserEmail(user_email);
         int userN = userMapper.updateByPrimaryKey(user);
-        if(userN ==0) throw new BizException("推送用户补充信息:用户更新失败");
+        if(userN ==0) throw new RuntimeException("推送用户补充信息:用户更新失败");
 
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
-        if (userInfo == null) throw new BizException("推送用户补充信息:用户详细信息不存在");
+        if (userInfo == null) throw new RuntimeException("推送用户补充信息:用户详细信息不存在");
 
         userInfo.setLiveProvince(addr_detail.split(" ")[0]);
         userInfo.setLiveCity(addr_detail.split(" ")[1]);
@@ -112,10 +112,10 @@ public class UserInfoAdditRequestHandler {
         userInfo.setOthersContactName(emergency_contact_personA_name);
         userInfo.setOthersContactPhone(emergency_contact_personA_phone);
         int userInfoN = userInfoMapper.updateByPrimaryKey(userInfo);
-        if(userInfoN ==0) throw new BizException("推送用户补充信息:用户详情信息更新失败");
+        if(userInfoN ==0) throw new RuntimeException("推送用户补充信息:用户详情信息更新失败");
 
         UserIdent userIdent = userIdentMapper.selectByPrimaryKey(RequestThread.getUid());
-        if (userIdent == null) throw new BizException("推送用户补充信息:用户认证信息不存在");
+        if (userIdent == null) throw new RuntimeException("推送用户补充信息:用户认证信息不存在");
 
         userIdent.setUserDetails(2);
         userIdent.setUserDetailsTime(new Date());
@@ -128,7 +128,7 @@ public class UserInfoAdditRequestHandler {
             userIdent.setMobileTime(new Date());
         }
         int userIdentN = userIdentMapper.updateByPrimaryKey(userIdent);
-        if(userIdentN ==0) throw new BizException("推送用户补充信息:用户认证信息更新失败");
+        if(userIdentN ==0) throw new RuntimeException("推送用户补充信息:用户认证信息更新失败");
         log.info("===============推送用户补充信息结束====================");
         return ResponseBean.success(map);
     }
