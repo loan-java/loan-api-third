@@ -160,7 +160,7 @@ public class RongZeRequestController {
         Long uid = null;
         String orderNo = null;
         switch (method) {
-            case "fund.userinfo.base": //推送用户基本信息
+            case "fund.userinfo.base": //用户基本信息
                 orderNo = bizData.containsKey("orderInfo") ? bizData.getJSONObject("orderInfo").getString("order_no") : null;
                 break;
             default:
