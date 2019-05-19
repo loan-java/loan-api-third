@@ -260,7 +260,10 @@ public class KuaiQianServiceImpl implements KuaiQianService {
         long uid = order.getUid();
 
         UserBank userBank = userBankService.selectUserCurrentBankCard(uid);
-
+        if(userBank == null) {
+            logger.info("用户: "+uid+", 未绑定银行卡信息, userBank null");
+            return new ResultMessage(ResponseEnum.M3003);
+        }
         TransInfo transInfo = new TransInfo();
         /* 消费信息 */
         //版本号

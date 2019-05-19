@@ -110,8 +110,11 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
 
-        MerchantRate record = merchantRateService.findByMerchant(RequestThread.getClientAlias());
-        Long productId = record.getId();
+        MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
+        if (null == merchantRate) {
+            throw new BizException("未查到规则");
+        }
+        Long productId = merchantRate.getId();
 
         Order order = orderMapper.findByOrderNoAndSource(orderNo, source);
         boolean orderExist = order != null;
@@ -124,7 +127,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         if (2 != userIdent.getRealName() || 2 != userIdent.getUserDetails() || 2 != userIdent.getBindbank()
                 || 2 != userIdent.getMobile() || 2 != userIdent.getLiveness()) {
             // 提示认证未完成
-            throw new BizException("认证未完成");
+            throw new BizException("用户认证未完成");
         }
         Blacklist blacklist = blacklistService.getByUid(uid);
         if (null != blacklist) {
@@ -160,10 +163,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
         if (!orderExist) order = new Order();
 
-        MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(productId);
-        if (null == merchantRate) {
-            throw new BizException("未查到规则");
-        }
         if (merchantRate.getProductMoney().compareTo(new BigDecimal(loanAmount)) != 0
                 || merchantRate.getProductDay() != loanTerm) {
             throw new BizException("规则不匹配");
