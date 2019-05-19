@@ -3,8 +3,12 @@ package com.mod.loan.controller.rongze;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
+import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.config.Constant;
+import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Order;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.util.rongze.BizDataUtil;
@@ -26,6 +30,8 @@ public class RongZeRequestHandler {
 
     @Resource
     private OrderService orderService;
+    @Resource
+    private OrderUserMapper orderUserMapper;
 
     //推送用户确认收款信息
     ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) throws BizException {
@@ -49,7 +55,7 @@ public class RongZeRequestHandler {
         String orderNo = getOrderNo(param);
 
         Map<String, Object> map = new HashMap<>();
-        map.put("contract_url", "url");
+        map.put("contract_url", Constant.sysDomainHost + "/static/loan-contract.html?uid=" + getCurrentUserId(orderNo) + "&source=" + OrderSourceEnum.RONGZE.getSoruce());
         return ResponseBean.success(map);
     }
 
@@ -121,5 +127,14 @@ public class RongZeRequestHandler {
     private JSONObject parseBizData(JSONObject param) {
         String bizData = param.getString("biz_data");
         return StringUtils.isNotBlank(bizData) ? JSONObject.parseObject(bizData) : null;
+    }
+
+    private long getCurrentUserId(String orderNo) {
+        Long uid = RequestThread.getUid();
+        if (uid == null || uid <= 0) {
+            uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        }
+        RequestThread.setUid(uid);
+        return uid;
     }
 }

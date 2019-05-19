@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
 
 /**
  * @ author liujianjian
@@ -66,7 +65,7 @@ public class RongZeRequestController {
     private static String logPre = "融泽入口请求, ";
 
     @RequestMapping("/dispatcherRequest")
-    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) throws BizException {
+    public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
         log.info(logPre + "收到, param: " + param.toJSONString());
 
@@ -137,12 +136,6 @@ public class RongZeRequestController {
                 default:
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
-        } catch (SQLException e) {
-            log.error("融泽入口请求系统异常",e);
-            throw new RuntimeException("融泽入口请求系统异常!");
-        } catch (RuntimeException e) {
-            log.error("融泽入口请求系统异常",e);
-            throw new RuntimeException("融泽入口请求系统异常!");
         } catch (Exception e) {
             logFail(e);
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
@@ -155,7 +148,7 @@ public class RongZeRequestController {
     private void binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
         RequestThread.remove();// 移除本地线程变量
 
-        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
+        JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
 
         Long uid = null;
         String orderNo = null;
@@ -201,7 +194,7 @@ public class RongZeRequestController {
         if (e instanceof BizException)
             log.info(getPreLog() + e.getMessage());
         else
-            log.error(getPreLog() + e.getMessage(), e);
+            log.error("融泽入口请求系统异常, " + getPreLog() + e.getMessage(), e);
     }
 
     private String getPreLog() {

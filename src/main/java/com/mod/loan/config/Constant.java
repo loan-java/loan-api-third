@@ -51,6 +51,13 @@ public class Constant {
 
     public static String orgPrivateKey;
 
+    public static String sysDomainHost; //系统域名
+
+    @Value("${sys.domain.host}")
+    public void setSysDomainHost(String sysDomainHost) {
+        Constant.sysDomainHost = sysDomainHost;
+    }
+
     @Value("${rongze.request.app.id}")
     public void setRongZeRequestAppId(String rongZeRequestAppId) {
         Constant.rongZeRequestAppId = rongZeRequestAppId;

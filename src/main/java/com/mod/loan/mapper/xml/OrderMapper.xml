@@ -34,6 +34,10 @@
     <result column="source" jdbcType="INTEGER" property="source"/>
   </resultMap>
 
+  <select id="findUserFirstOrder" resultMap="BaseResultMap">
+    select * from tb_order where uid=#{uid} and source=#{source} order by id asc limit 1
+  </select>
+
   <select id="findByOrderNoAndSource" resultMap="BaseResultMap">
     select * from tb_order where order_no=#{orderNo} and source=#{source} order by id desc limit 1
   </select>
