@@ -93,7 +93,7 @@ public class RongZeRequestController {
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
             switch (method) {
-                case "fund.withdraw.req": //推送用户确认收款信息
+                case "fund.withdraw.req": //提交用户确认收款信息
                     result = rongZeRequestHandler.handleOrderSubmit(param);
                     break;
                 case "fund.deal.contract": //查询借款合同
@@ -102,13 +102,13 @@ public class RongZeRequestController {
                 case "fund.order.status": //查询订单状态
                     result = rongZeRequestHandler.handleQueryOrderStatus(param);
                     break;
-                case "fund.payment.req": //推送用户还款信息
+                case "fund.payment.req": //用户还款
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
-                case "fund.bank.verify": //推送用户验证银行卡
+                case "fund.bank.verify": //用户验证银行卡
                     result = bankRequestHandler.bankCardCode(param);
                     break;
-                case "fund.bank.bind": //推送用户绑定银行卡
+                case "fund.bank.bind": //用户绑定银行卡
                     result = bankRequestHandler.bankBind(param);
                     break;
                 case "fund.payment.plan": //查询还款计划
@@ -121,7 +121,7 @@ public class RongZeRequestController {
                 case "fund.cert.auth": //查询复贷黑名单信息
                     result = certRequestHandler.certAuth(param);
                     break;
-                case "fund.userinfo.base": //推送用户基本信息
+                case "fund.userinfo.base": //提交用户基本信息
                     result = userInfoBaseRequestHandler.userInfoBase(param);
                     break;
                 case "fund.userinfo.addit": //查询用户补充信息
