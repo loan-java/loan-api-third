@@ -104,11 +104,11 @@ public class RongZeRequestController {
                 case "fund.payment.req": //用户还款
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
-                case "fund.bank.bind": //用户绑定银行卡
-                    result = bankRequestHandler.bankBind(param);
-                    break;
                 case "fund.bank.verify": //用户验证银行卡
                     result = bankRequestHandler.bankCardCode(param);
+                    break;
+                case "fund.bank.bind": //用户绑定银行卡
+                    result = bankRequestHandler.bankBind(param);
                     break;
                 case "fund.payment.plan": //查询还款计划
                     result = repayRequestHandler.getRepayPlan(param);
