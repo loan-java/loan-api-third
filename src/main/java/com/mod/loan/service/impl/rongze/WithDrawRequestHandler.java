@@ -1,5 +1,6 @@
 package com.mod.loan.service.impl.rongze;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.enums.UserOriginEnum;
@@ -79,13 +80,15 @@ public class WithDrawRequestHandler {
         map.put("service_fee", totalFee.toString());//放款时预扣除手续费，单位元，保留小数点后 2 位
         map.put("pay_amount", shouldRepay.toString());//用户的总还款额，单位元，保留小数点后 2 位（总还款额包括本金利息管理费手续费等一切费用之和）
         //====================================================
-        JSONObject trial_result_data = new JSONObject();
-        trial_result_data.put("period_amount", shouldRepay.toString());//用户每期应还总金额，单位元，保留小数点后 2 位
-        trial_result_data.put("principal", borrowMoney.toString());//本金，单位元，保留小数点后 2 位
+        JSONArray trial_result_data = new JSONArray();
+        JSONObject one = new JSONObject();
+        one.put("period_amount", shouldRepay.toString());//用户每期应还总金额，单位元，保留小数点后 2 位
+        one.put("principal", borrowMoney.toString());//本金，单位元，保留小数点后 2 位
 //        trial_result_data.put("interest", order.getInterestRate().toString());//利息，单位元，保留小数点后 2 位
-        trial_result_data.put("otherfee", totalFee);//除去本金+利息的其他费用，保留小数点后 2 位
-        trial_result_data.put("can_repay_time", new Timestamp(repayTime.getTime()));//应还款日期，精确到毫秒（比如 153907308680
-        trial_result_data.put("period_no", 1);//还款计划编号,期数
+        one.put("otherfee", totalFee);//除去本金+利息的其他费用，保留小数点后 2 位
+        one.put("can_repay_time", new Timestamp(repayTime.getTime()));//应还款日期，精确到毫秒（比如 153907308680
+        one.put("period_no", 1);//还款计划编号,期数
+        trial_result_data.add(one);
         map.put("trial_result_data", trial_result_data.toJSONString());
         log.info("===============试算接口结束====================");
         return ResponseBean.success(map);
