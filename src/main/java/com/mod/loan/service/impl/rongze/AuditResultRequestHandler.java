@@ -1,7 +1,6 @@
 package com.mod.loan.service.impl.rongze;
 
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.OrderStatusEnum;
 import com.mod.loan.common.enums.PolicyResultEnum;
@@ -9,10 +8,6 @@ import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.config.Constant;
-import com.mod.loan.config.rabbitmq.RabbitConst;
-import com.mod.loan.mapper.OrderMapper;
-import com.mod.loan.model.Order;
 import com.mod.loan.model.User;
 import com.mod.loan.model.UserBank;
 import com.mod.loan.model.UserIdent;
@@ -23,8 +18,8 @@ import com.mod.loan.service.UserIdentService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.TimeUtils;
-import com.mod.loan.util.rongze.RongZeRequestUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +90,7 @@ public class AuditResultRequestHandler {
                 if (!PolicyResultEnum.isAgree(riskCode)) {
                     //拒绝
                     conclusion = 40;
-                    remark = decisionResDetailDTO.getDesc();
+                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
                     reapply = "1";
                     reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
                 } else {
