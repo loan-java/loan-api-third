@@ -41,6 +41,7 @@ public class RongZeRequestHandler {
         String loanAmount = data.getString("loan_amount");
         int loanTerm = data.getIntValue("loan_term");
 
+        checkAndGetUserId(orderNo);
         orderService.submitOrder(orderNo, loanAmount, loanTerm, OrderSourceEnum.RONGZE.getSoruce());
 
         Map<String, Object> map = new HashMap<>();
@@ -55,7 +56,7 @@ public class RongZeRequestHandler {
         String orderNo = getOrderNo(param);
 
         Map<String, Object> map = new HashMap<>();
-        map.put("contract_url", Constant.sysDomainHost + "/static/loan-contract.html?uid=" + getCurrentUserId(orderNo) + "&source=" + OrderSourceEnum.RONGZE.getSoruce());
+        map.put("contract_url", Constant.sysDomainHost + "/static/loan-contract.html?uid=" + checkAndGetUserId(orderNo) + "&source=" + OrderSourceEnum.RONGZE.getSoruce());
         return ResponseBean.success(map);
     }
 
@@ -63,6 +64,8 @@ public class RongZeRequestHandler {
     ResponseBean<Map<String, Object>> handleQueryOrderStatus(JSONObject param) throws BizException {
 
         String orderNo = getOrderNo(param);
+        checkAndGetUserId(orderNo);
+
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
         if (order == null) return ResponseBean.fail("订单不存在");
 
@@ -100,6 +103,7 @@ public class RongZeRequestHandler {
     //用户还款
     ResponseBean<Map<String, Object>> handleRepayment(JSONObject param) throws BizException {
         String orderNo = getOrderNo(param);
+        checkAndGetUserId(orderNo);
 
         Order order = orderService.repayOrder(orderNo, OrderSourceEnum.RONGZE.getSoruce());
 
@@ -129,12 +133,12 @@ public class RongZeRequestHandler {
         return StringUtils.isNotBlank(bizData) ? JSONObject.parseObject(bizData) : null;
     }
 
-    private long getCurrentUserId(String orderNo) throws BizException {
+    private long checkAndGetUserId(String orderNo) throws BizException {
         Long uid = RequestThread.getUid();
         if (uid == null || uid <= 0) {
             uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
         }
-        if (uid == null) throw new BizException("未获取到用户id");
+        if (uid == null) throw new BizException("根据订单号未获取到用户id");
         RequestThread.setUid(uid);
         return uid;
     }
