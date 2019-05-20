@@ -7,6 +7,9 @@ package com.mod.loan.common.enums;
  */
 public enum OrderStatusEnum {
 
+    INIT("INIT", "初始化"),
+    WAIT("WAIT", "处理中,请稍后查询"),
+
     /**
      * 订单状态
      */
