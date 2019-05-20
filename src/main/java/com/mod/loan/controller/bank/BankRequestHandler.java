@@ -101,6 +101,7 @@ public class BankRequestHandler extends BaseRequestHandler {
 
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
+        log.info("merchant=" + JSONObject.toJSONString(merchant));
         switch (merchant.getBindType()) {
             case 4:
                 message = userBankService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile);
@@ -125,6 +126,8 @@ public class BankRequestHandler extends BaseRequestHandler {
      * 绑定银行卡
      */
     public ResponseBean<Map<String, Object>> bankBind(JSONObject param) throws BizException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("deal_result", "0");
         JSONObject data = parseAndCheckBizData(param);
         //订单编号
         String orderNo = data.getString("order_no");
@@ -136,20 +139,21 @@ public class BankRequestHandler extends BaseRequestHandler {
         String userMobile = data.getString("user_mobile");
         //用户填写的验证码
         String verifyCode = data.getString("verify_code");
-        if(!Constant.ENVIROMENT.equals("dev")){
-            if (StringUtils.isBlank(verifyCode)) {
-                throw new BizException("验证码不能为空");
-            }
-            if (verifyCode.length() > 6) {
-                throw new BizException("验证码长度过长");
-            }
+        Long uid = RequestThread.getUid();
+        User user = userService.selectByPrimaryKey(uid);
+        if(user == null){
+            throw new BizException("当前用户不存在，无法绑定银行卡");
         }
-        User user = userService.selectByPrimaryKey(RequestThread.getUid());
-        Order order = orderService.findUserLatestOrder(user.getId());
+        Order order = orderService.findUserLatestOrder(uid);
         if (order != null && order.getStatus() < 40) {
             throw new BizException("当前无法绑定银行卡");
         }
-        Long uid = RequestThread.getUid();
+        if (StringUtils.isBlank(verifyCode)) {
+            throw new BizException("验证码不能为空");
+        }
+        if (verifyCode.length() > 6) {
+            throw new BizException("验证码长度过长");
+        }
         String bindInfo = redisMapper.get(RedisConst.user_bank_bind + uid);
         if (StringUtils.isBlank(bindInfo)) {
             throw new BizException("验证码失效,请重新获取");
@@ -176,13 +180,11 @@ public class BankRequestHandler extends BaseRequestHandler {
             default:
                 throw new BizException("支付渠道异常");
         }
-
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
-            Map<String, Object> map = new HashMap<>();
             map.put("deal_result", "1");
-            return ResponseBean.success(map);
+        } else {
+            throw new BizException(message.getStatus(), message.getMessage());
         }
-
-        throw new BizException(message.getStatus(), message.getMessage());
+        return ResponseBean.success(map);
     }
 }

@@ -127,6 +127,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         if (2 != userIdent.getRealName() || 2 != userIdent.getUserDetails() || 2 != userIdent.getBindbank()
                 || 2 != userIdent.getMobile() || 2 != userIdent.getLiveness()) {
             // 提示认证未完成
+            log.error("用户认证未完成：" + JSONObject.toJSONString(userIdent));
             throw new BizException("用户认证未完成");
         }
         Blacklist blacklist = blacklistService.getByUid(uid);

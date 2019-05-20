@@ -1,5 +1,6 @@
 package com.mod.loan.util.baofoo.rsa;
 
+import lombok.extern.slf4j.Slf4j;
 import sun.misc.BASE64Decoder;
 
 import java.io.*;
@@ -16,6 +17,7 @@ import java.util.Enumeration;
  * @author 行者
  * @version 4.1.0
  */
+@Slf4j
 public final class RsaReadUtil {
 
     public static void main(String[] args) {
@@ -36,9 +38,9 @@ public final class RsaReadUtil {
             pubKeyStream.read(reads);
             return getPublicKeyByText(new String(reads));
         } catch (FileNotFoundException e) {
-            // //log.error("公钥文件不存在:", e);
+             log.error("公钥文件不存在:" + pubCerPath, e);
         } catch (IOException e) {
-            // log.error("公钥文件读取失败:", e);
+             log.error("公钥文件读取失败:", e);
         } finally {
             if (pubKeyStream != null) {
                 try {
