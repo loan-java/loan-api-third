@@ -129,11 +129,12 @@ public class RongZeRequestHandler {
         return StringUtils.isNotBlank(bizData) ? JSONObject.parseObject(bizData) : null;
     }
 
-    private long getCurrentUserId(String orderNo) {
+    private long getCurrentUserId(String orderNo) throws BizException {
         Long uid = RequestThread.getUid();
         if (uid == null || uid <= 0) {
             uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
         }
+        if (uid == null) throw new BizException("未获取到用户id");
         RequestThread.setUid(uid);
         return uid;
     }
