@@ -71,6 +71,8 @@ public class RongZeRequestController {
 
         Object result;
 
+        String method = param.getString("method");
+
         try {//校验 sig
             String sign = param.getString("sign");
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
@@ -83,8 +85,6 @@ public class RongZeRequestController {
                 param.put("biz_data", bizData);
                 log.info(logPre + "解密后 biz_data: " + bizData);
             }
-
-            String method = param.getString("method");
 
             //绑定线程变量
             this.binRequestThread(request, param, method);
@@ -141,7 +141,7 @@ public class RongZeRequestController {
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
 
-        log.info(logPre + "返回, result: " + JSON.toJSONString(result));
+        log.info(logPre + "method: " + method + ", 返回, result: " + JSON.toJSONString(result));
         return result;
     }
 
