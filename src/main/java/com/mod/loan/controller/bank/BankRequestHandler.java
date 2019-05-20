@@ -7,6 +7,7 @@ import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.common.model.ResultMap;
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.BaseRequestHandler;
@@ -135,11 +136,13 @@ public class BankRequestHandler extends BaseRequestHandler {
         String userMobile = data.getString("user_mobile");
         //用户填写的验证码
         String verifyCode = data.getString("verify_code");
-        if (StringUtils.isBlank(verifyCode)) {
-            throw new BizException("验证码不能为空");
-        }
-        if (verifyCode.length() > 6) {
-            throw new BizException("验证码长度过长");
+        if(!Constant.ENVIROMENT.equals("dev")){
+            if (StringUtils.isBlank(verifyCode)) {
+                throw new BizException("验证码不能为空");
+            }
+            if (verifyCode.length() > 6) {
+                throw new BizException("验证码长度过长");
+            }
         }
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         Order order = orderService.findUserLatestOrder(user.getId());
