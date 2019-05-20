@@ -89,7 +89,7 @@ public class WithDrawRequestHandler {
         one.put("can_repay_time", new Timestamp(repayTime.getTime()));//应还款日期，精确到毫秒（比如 153907308680
         one.put("period_no", 1);//还款计划编号,期数
         trial_result_data.add(one);
-        map.put("trial_result_data", trial_result_data.toJSONString());
+        map.put("trial_result_data", trial_result_data);
         log.info("===============试算接口结束====================");
         return ResponseBean.success(map);
     }
