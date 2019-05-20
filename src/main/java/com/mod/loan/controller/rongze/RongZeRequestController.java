@@ -129,7 +129,7 @@ public class RongZeRequestController {
                 case "fund.audit.result": //查询审批结论
                     result = auditResultRequestHandler.queryAuditResult(param);
                     break;
-                case "fund.withdraw.tria": //试算接口
+                case "fund.withdraw.trial": //试算接口
                     result = withDrawRequestHandler.withdrawTria(param);
                     break;
                 // TODO: 2019/5/15 其它 method
