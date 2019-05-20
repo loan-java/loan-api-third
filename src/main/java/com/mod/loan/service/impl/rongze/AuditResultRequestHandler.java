@@ -64,41 +64,49 @@ public class AuditResultRequestHandler {
                 user.getId());
         DecisionResDetailDTO pd = qjldPolicyService.qjldPolicyNoSync(serials_no, user, userBank);
 
-        String reapply = ""; //是否可再次申请
-        String reapplyTime = ""; //可再申请的时间
-        String remark = ""; //拒绝原因
+        String reapply = null; //是否可再次申请
+        String reapplyTime = null; //可再申请的时间
+        String remark = "处理中"; //拒绝原因
 
         Long refuseTime = null; //审批拒绝时间
         Long approvalTime = null; //审批通过时间
         int conclusion = 30; //处理中
-        int proType = 1; //单期产品
-        int amountType = 0; //审批金额是否固定，0 - 固定
-        int termType = 0; //审批期限是否固定，0 - 固定
-        int approvalAmount = 1500; //审批金额
-        int approvalTerm = 6; //审批期限
-        int termUnit = 1; //期限单位，1 - 天
-        String creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd"); //审批结果有效期，当前时间
+        Integer proType = null; //单期产品
+        Integer amountType = null; //审批金额是否固定，0 - 固定
+        Integer termType = null; //审批期限是否固定，0 - 固定
+        Integer approvalAmount = null; //审批金额
+        Integer approvalTerm = null; //审批期限
+        Integer termUnit = null; //期限单位，1 - 天
+        String creditDeadline = null; //审批结果有效期，当前时间
 
-//        if (pd != null) {
-//            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
-//            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
-//                //处理中
-//            }
-//            if (decisionResDetailDTO != null) {
-//                String riskCode = decisionResDetailDTO.getCode();
-//                if (!PolicyResultEnum.isAgree(riskCode)) {
-//                    //拒绝
-//                    refuseTime = System.currentTimeMillis();
-//                    conclusion = 40;
-//                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
-//                    reapply = "1";
-//                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
-//                } else {
-//                    conclusion = 10; //通过
-//                    approvalTime = System.currentTimeMillis();
-//                }
-//            }
-//        }
+        if (pd != null) {
+            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
+            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
+                //处理中
+            }
+            if (decisionResDetailDTO != null) {
+                String riskCode = decisionResDetailDTO.getCode();
+                if (!PolicyResultEnum.isAgree(riskCode)) {
+                    //拒绝
+                    refuseTime = System.currentTimeMillis();
+                    conclusion = 40;
+                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
+                    reapply = "1";
+                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
+                } else {
+                    conclusion = 10; //通过
+                    approvalTime = System.currentTimeMillis();
+                    creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+                    proType = 1; //单期产品
+                    amountType = 0; //审批金额是否固定，0 - 固定
+                    termType = 0; //审批期限是否固定，0 - 固定
+                    approvalAmount = 1500; //审批金额
+                    approvalTerm = 6; //审批期限
+                    termUnit = 1; //期限单位，1 - 天
+                    remark = "通过";
+                }
+            }
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
         map.put("conclusion", conclusion);
