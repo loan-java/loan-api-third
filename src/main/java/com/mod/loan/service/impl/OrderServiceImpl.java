@@ -88,7 +88,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         } else {
             message = kuaiQianService.repay(order);
         }
-
+        log.info("还款结果message=" + JSONObject.toJSONString(message));
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             JSONObject res = JSONObject.parseObject(JSON.toJSONString(message.getData()));
             order.setRepayOrderNo(res.getString("repayOrderNo"));
