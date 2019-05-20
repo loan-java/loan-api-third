@@ -79,34 +79,36 @@ public class AuditResultRequestHandler {
         Integer termUnit = null; //期限单位，1 - 天
         String creditDeadline = null; //审批结果有效期，当前时间
 
-//        if (pd != null) {
-//            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
-//            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
-//                //处理中
-//            }
-//            if (decisionResDetailDTO != null) {
+        if (pd != null) {
+            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
+            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
+                //处理中
+            }
+            if (decisionResDetailDTO != null) {
+                String riskCode = PolicyResultEnum.AGREE.getCode();
 //                String riskCode = decisionResDetailDTO.getCode();
-//                if (!PolicyResultEnum.isAgree(riskCode)) {
-//                    //拒绝
-//                    refuseTime = System.currentTimeMillis();
-//                    conclusion = 40;
-//                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
-//                    reapply = "1";
-//                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
-//                } else {
-//                    conclusion = 10; //通过
-//                    approvalTime = System.currentTimeMillis();
-//                    creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-//                    proType = 1; //单期产品
-//                    amountType = 0; //审批金额是否固定，0 - 固定
-//                    termType = 0; //审批期限是否固定，0 - 固定
-//                    approvalAmount = 1500; //审批金额
-//                    approvalTerm = 6; //审批期限
-//                    termUnit = 1; //期限单位，1 - 天
-//                    remark = "通过";
-//                }
-//            }
-//        }
+                if (PolicyResultEnum.isAgree(riskCode)) {
+                    //通过
+                    conclusion = 10;
+                    approvalTime = System.currentTimeMillis();
+                    creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+                    proType = 1; //单期产品
+                    amountType = 0; //审批金额是否固定，0 - 固定
+                    termType = 0; //审批期限是否固定，0 - 固定
+                    approvalAmount = 1500; //审批金额
+                    approvalTerm = 6; //审批期限
+                    termUnit = 1; //期限单位，1 - 天
+                    remark = "通过";
+                } else {
+                    //拒绝
+                    refuseTime = System.currentTimeMillis();
+                    conclusion = 40;
+                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
+                    reapply = "1";
+                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
+                }
+            }
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
         map.put("conclusion", conclusion);
