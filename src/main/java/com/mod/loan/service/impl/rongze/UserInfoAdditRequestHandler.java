@@ -125,6 +125,8 @@ public class UserInfoAdditRequestHandler {
         userIdent.setRealNameTime(new Date());
         userIdent.setMobile(2);
         userIdent.setMobileTime(new Date());
+        userIdent.setLiveness(2);
+        userIdent.setLivenessTime(new Date());
         int userIdentN = userIdentMapper.updateByPrimaryKey(userIdent);
         if(userIdentN ==0) throw new RuntimeException("推送用户补充信息:用户认证信息更新失败");
         log.info("===============推送用户补充信息结束====================");
