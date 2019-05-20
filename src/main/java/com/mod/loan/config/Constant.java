@@ -26,10 +26,10 @@ public class Constant {
     public static String baoFooMemberId;
     public static String baoFooTerminalId;
     public static String baoFooVersion;
-    public static String baofooBankKeyPath;
-    public static String baofooBankPubPath;
-    public static String baofooBankKeyPassword;
-    public static String baofooBankUrl;
+//    public static String baofooBankKeyPath;
+//    public static String baofooBankPubPath;
+//    public static String baofooBankKeyPassword;
+//    public static String baofooBankUrl;
 
     public static String JuHeCallBackUrl;
 
@@ -139,26 +139,26 @@ public class Constant {
         JuHeCallBackUrl = juHeCallBackUrl;
     }
 
-
-    @Value("${baofoo.bank.key.path}")
-    public void setBaofooBankKeyPath(String baofooBankKeyPath) {
-        Constant.baofooBankKeyPath = baofooBankKeyPath;
-    }
-
-    @Value("${baofoo.bank.pub.path}")
-    public void setBaofooBankPubPath(String baofooBankPubPath) {
-        Constant.baofooBankPubPath = baofooBankPubPath;
-    }
-
-    @Value("${baofoo.bank.key.password}")
-    public void setBaofooBankKeyPassword(String baofooBankKeyPassword) {
-        Constant.baofooBankKeyPassword = baofooBankKeyPassword;
-    }
-
-    @Value("${baofoo.bank.url}")
-    public void setBaofooBankUrl(String baofooBankUrl) {
-        Constant.baofooBankUrl = baofooBankUrl;
-    }
+//
+//    @Value("${baofoo.bank.key.path}")
+//    public void setBaofooBankKeyPath(String baofooBankKeyPath) {
+//        Constant.baofooBankKeyPath = baofooBankKeyPath;
+//    }
+//
+//    @Value("${baofoo.bank.pub.path}")
+//    public void setBaofooBankPubPath(String baofooBankPubPath) {
+//        Constant.baofooBankPubPath = baofooBankPubPath;
+//    }
+//
+//    @Value("${baofoo.bank.key.password}")
+//    public void setBaofooBankKeyPassword(String baofooBankKeyPassword) {
+//        Constant.baofooBankKeyPassword = baofooBankKeyPassword;
+//    }
+//
+//    @Value("${baofoo.bank.url}")
+//    public void setBaofooBankUrl(String baofooBankUrl) {
+//        Constant.baofooBankUrl = baofooBankUrl;
+//    }
 
 
     @Value("${baofoo.key.store.path}")
