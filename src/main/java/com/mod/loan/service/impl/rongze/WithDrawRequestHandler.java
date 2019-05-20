@@ -76,16 +76,16 @@ public class WithDrawRequestHandler {
         //====================================================
         map.put("daily_rate", interestRate.divide(new BigDecimal(1000), 4, BigDecimal.ROUND_HALF_UP).toString());//日利率，如果贷款周期为天，需要传，例如 0.0002
 //        map.put("monthly_rate","monthly_rate");//月利率，如果贷款周期为月，需要传，例如 0.0002
-        map.put("receive_amount", actualMoney.toString());//用户卡中收到款的金额，单位元，保留小数点后 2 位
-        map.put("service_fee", totalFee.toString());//放款时预扣除手续费，单位元，保留小数点后 2 位
-        map.put("pay_amount", shouldRepay.toString());//用户的总还款额，单位元，保留小数点后 2 位（总还款额包括本金利息管理费手续费等一切费用之和）
+        map.put("receive_amount", actualMoney.setScale(2).toString());//用户卡中收到款的金额，单位元，保留小数点后 2 位
+        map.put("service_fee", totalFee.setScale(2).toString());//放款时预扣除手续费，单位元，保留小数点后 2 位
+        map.put("pay_amount", shouldRepay.setScale(2).toString());//用户的总还款额，单位元，保留小数点后 2 位（总还款额包括本金利息管理费手续费等一切费用之和）
         //====================================================
         JSONArray trial_result_data = new JSONArray();
         JSONObject one = new JSONObject();
-        one.put("period_amount", shouldRepay.toString());//用户每期应还总金额，单位元，保留小数点后 2 位
-        one.put("principal", borrowMoney.toString());//本金，单位元，保留小数点后 2 位
+        one.put("period_amount", shouldRepay.setScale(2).toString());//用户每期应还总金额，单位元，保留小数点后 2 位
+        one.put("principal", borrowMoney.setScale(2).toString());//本金，单位元，保留小数点后 2 位
 //        trial_result_data.put("interest", order.getInterestRate().toString());//利息，单位元，保留小数点后 2 位
-        one.put("otherfee", totalFee);//除去本金+利息的其他费用，保留小数点后 2 位
+        one.put("otherfee", totalFee.setScale(2).toString());//除去本金+利息的其他费用，保留小数点后 2 位
         one.put("can_repay_time", new Timestamp(repayTime.getTime()));//应还款日期，精确到毫秒（比如 153907308680
         one.put("period_no", 1);//还款计划编号,期数
         trial_result_data.add(one);
