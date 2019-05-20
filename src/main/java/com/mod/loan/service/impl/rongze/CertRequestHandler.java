@@ -104,16 +104,23 @@ public class CertRequestHandler {
             }
         }
         //userType： 1-不可申请用户，2-复贷用户，3-正常申请用户
+        int proType = 1; //单期产品
+        int amountType = 0; //审批金额是否固定，0 - 固定
+        int termType = 0; //审批期限是否固定，0 - 固定
+        int approvalAmount = 1500; //审批金额
+        int approvalTerm = 6; //审批期限
+        int termUnit = 1; //期限单位，1 - 天
         int code = 200; //200-通过，400-不通过
         if (userType.equals("1")) {
             code = 400;
         } else if (userType.equals("2")) {
             map.put("is_reloan", 1);
-            map.put("amount_type", 0);
-            map.put("pro_type", 1);
-            map.put("term_type", 0);
-            map.put("approval_term", 1);
-            map.put("term_unit", 1);
+            map.put("amount_type", amountType);
+            map.put("pro_type", proType);
+            map.put("term_type", termType);
+            map.put("approval_term", approvalTerm);
+            map.put("approval_amount", approvalAmount);
+            map.put("term_unit", termUnit);
             map.put("credit_deadline", DateUtil.getNextDay(DateUtil.getStringDateShort(), "1"));
         } else {
             map.put("is_reloan", 0);
