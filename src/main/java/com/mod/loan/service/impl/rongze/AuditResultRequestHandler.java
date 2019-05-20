@@ -85,8 +85,7 @@ public class AuditResultRequestHandler {
                 //处理中
             }
             if (decisionResDetailDTO != null) {
-                String riskCode = PolicyResultEnum.AGREE.getCode();
-//                String riskCode = decisionResDetailDTO.getCode();
+                String riskCode = decisionResDetailDTO.getCode();
                 if (PolicyResultEnum.isAgree(riskCode)) {
                     //通过
                     conclusion = 10;
