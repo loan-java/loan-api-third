@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 推送用户基本信息
+ * 推送用户补充信息
  */
 @Slf4j
 @Component
