@@ -101,6 +101,7 @@ public class BankRequestHandler extends BaseRequestHandler {
 
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
+        log.info("merchant=" + JSONObject.toJSONString(merchant));
         switch (merchant.getBindType()) {
             case 4:
                 message = userBankService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile);
