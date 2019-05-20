@@ -100,7 +100,7 @@ public class AuditResultRequestHandler {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
-        map.put("conclusion", conclusion);
+        map.put("conclusion", 30);
         map.put("reapply", reapply);
         map.put("reapplytime", reapplyTime);
         map.put("remark", remark);
