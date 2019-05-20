@@ -141,7 +141,7 @@ public class RongZeRequestController {
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
 
-        log.info(logPre + method + ", 返回, result: " + JSON.toJSONString(result));
+        log.info(logPre + "method: " + method + ", 返回, result: " + JSON.toJSONString(result));
         return result;
     }
 
