@@ -80,24 +80,24 @@ public class AuditResultRequestHandler {
         int termUnit = 1; //期限单位，1 - 天
         String creditDeadline = DateFormatUtils.format(now, "yyyy-MM-dd"); //审批结果有效期，当前时间
 
-        if (pd != null) {
-            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
-            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
-                //处理中
-            }
-            if (decisionResDetailDTO != null) {
-                String riskCode = decisionResDetailDTO.getCode();
-                if (!PolicyResultEnum.isAgree(riskCode)) {
-                    //拒绝
-                    conclusion = 40;
-                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
-                    reapply = "1";
-                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
-                } else {
-                    conclusion = 10; //通过
-                }
-            }
-        }
+//        if (pd != null) {
+//            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
+//            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
+//                //处理中
+//            }
+//            if (decisionResDetailDTO != null) {
+//                String riskCode = decisionResDetailDTO.getCode();
+//                if (!PolicyResultEnum.isAgree(riskCode)) {
+//                    //拒绝
+//                    conclusion = 40;
+//                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
+//                    reapply = "1";
+//                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
+//                } else {
+//                    conclusion = 10; //通过
+//                }
+//            }
+//        }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
         map.put("conclusion", 30);
