@@ -68,9 +68,8 @@ public class AuditResultRequestHandler {
         String reapplyTime = ""; //可再申请的时间
         String remark = ""; //拒绝原因
 
-        Date now = new Date();
-        long refuseTime = now.getTime(); //审批拒绝时间
-        long approvalTime = now.getTime(); //审批通过时间
+        Long refuseTime = null; //审批拒绝时间
+        Long approvalTime = null; //审批通过时间
         int conclusion = 30; //处理中
         int proType = 1; //单期产品
         int amountType = 0; //审批金额是否固定，0 - 固定
@@ -78,7 +77,7 @@ public class AuditResultRequestHandler {
         int approvalAmount = 1500; //审批金额
         int approvalTerm = 6; //审批期限
         int termUnit = 1; //期限单位，1 - 天
-        String creditDeadline = DateFormatUtils.format(now, "yyyy-MM-dd"); //审批结果有效期，当前时间
+        String creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd"); //审批结果有效期，当前时间
 
 //        if (pd != null) {
 //            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
@@ -89,18 +88,20 @@ public class AuditResultRequestHandler {
 //                String riskCode = decisionResDetailDTO.getCode();
 //                if (!PolicyResultEnum.isAgree(riskCode)) {
 //                    //拒绝
+//                    refuseTime = System.currentTimeMillis();
 //                    conclusion = 40;
 //                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
 //                    reapply = "1";
 //                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
 //                } else {
 //                    conclusion = 10; //通过
+//                    approvalTime = System.currentTimeMillis();
 //                }
 //            }
 //        }
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
-        map.put("conclusion", 30);
+        map.put("conclusion", conclusion);
         map.put("reapply", reapply);
         map.put("reapplytime", reapplyTime);
         map.put("remark", remark);
