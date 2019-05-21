@@ -154,11 +154,6 @@ public class AuditResultRequestHandler {
             throw new BizException("查询审批结论:用户不存在/用户非融泽用户,订单号=" + orderNo);
         }
 
-        UserIdent userIdent = userIdentService.selectByPrimaryKey(RequestThread.getUid());
-        if (userIdent == null) {
-            throw new BizException("查询审批结论:用户不存在,订单号=" + orderNo);
-        }
-
         int proType = 1; //单期产品
         int amountType = 0; //审批金额是否固定，0 - 固定
         int termType = 0; //审批期限是否固定，0 - 固定
@@ -173,9 +168,12 @@ public class AuditResultRequestHandler {
         String remark = "审批拒绝";
         String creditDeadline = DateUtil.getStringDateShort(); //审批结果有效期，当前时间
 
-        if (userIdent.getRealName() == 2 && userIdent.getMobile() == 2 && userIdent.getUserDetails() == 2
-                && userIdent.getLiveness() == 2) {
+        if (StringUtils.isEmpty(user.getUserQq()) || user.getUserQq().equals("10")) {
             conclusion = 10;
+        }else if(user.getUserQq().equals("30")){
+            conclusion = 30;
+        }else{
+            conclusion = 40;
         }
         map.put("reapplytime", reapplyTime);
         map.put("pro_type", proType);
@@ -202,11 +200,12 @@ public class AuditResultRequestHandler {
      * @throws Exception
      */
     public ResponseBean<Map<String, Object>> auditResultChange(JSONObject param) throws Exception {
-        if(Constant.ENVIROMENT.equals("dev")){
-            return this.auditResult(param);
-        }else{
-            return this.queryAuditResult(param);
-        }
+//        if(Constant.ENVIROMENT.equals("dev")){
+//            return this.auditResult(param);
+//        }else{
+//            return this.queryAuditResult(param);
+//        }
+        return this.auditResult(param);
     }
 
 
