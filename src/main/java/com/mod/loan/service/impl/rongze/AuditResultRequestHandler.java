@@ -51,18 +51,29 @@ public class AuditResultRequestHandler {
     private UserBankService userBankService;
 
     //查询审批结论
-    public ResponseBean<Map<String, Object>> queryAuditResult(JSONObject param) {
+    public ResponseBean<Map<String, Object>> queryAuditResult(JSONObject param) throws BizException {
 
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
+        log.info("===============查询审批结论开始====================" + bizData.toJSONString());
+
         String orderNo = bizData.getString("order_no");
 
         long uid = RequestThread.get().getUid();
+
+        User user = userService.selectByPrimaryKey(uid);
+        if (user == null || user.getUserOrigin().equals(UserOriginEnum.JH.getCode())) {
+            throw new BizException("查询审批结论:用户不存在/用户非融泽用户,订单号=" + orderNo);
+        }
+
+        UserIdent userIdent = userIdentService.selectByPrimaryKey(uid);
+        if (userIdent == null) {
+            throw new BizException("查询审批结论:用户不存在,订单号=" + orderNo);
+        }
+
         UserBank userBank = userBankService.selectUserCurrentBankCard(uid);
         if (userBank == null) userBank = new UserBank();
 
-        User user = userService.selectByPrimaryKey(uid);
-        String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),
-                user.getId());
+        String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),user.getId());
         DecisionResDetailDTO pd = qjldPolicyService.qjldPolicyNoSync(serials_no, user, userBank);
 
         String reapply = null; //是否可再次申请
@@ -124,6 +135,9 @@ public class AuditResultRequestHandler {
         map.put("approval_term", approvalTerm);
         map.put("credit_deadline", creditDeadline);
         map.put("approval_amount", approvalAmount);
+
+        log.info("===============查询审批结论结束====================");
+
         return ResponseBean.success(map);
     }
 
@@ -134,18 +148,36 @@ public class AuditResultRequestHandler {
         log.info("===============查询审批结论开始====================" + bizData.toJSONString());
 
         String orderNo = bizData.getString("order_no");
-        int conclusion = 10; //10=审批通过 40=审批拒绝30=审批处理中
-        String reapply = "0"; //是否可再申请 1-是，0-不可以
-        Timestamp approvalTime = new Timestamp(System.currentTimeMillis()); //是否可再申请 1-是，0-不可以
-        String reapplyTime = ""; //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
-        String remark = "审批通过";
+
+        User user = userService.selectByPrimaryKey(RequestThread.getUid());
+        if (user == null || user.getUserOrigin().equals(UserOriginEnum.JH.getCode())) {
+            throw new BizException("查询审批结论:用户不存在/用户非融泽用户,订单号=" + orderNo);
+        }
+
+        UserIdent userIdent = userIdentService.selectByPrimaryKey(RequestThread.getUid());
+        if (userIdent == null) {
+            throw new BizException("查询审批结论:用户不存在,订单号=" + orderNo);
+        }
+
         int proType = 1; //单期产品
         int amountType = 0; //审批金额是否固定，0 - 固定
         int termType = 0; //审批期限是否固定，0 - 固定
         int approvalAmount = 1500; //审批金额
         int approvalTerm = 6; //审批期限
         int termUnit = 1; //期限单位，1 - 天
+
+        int conclusion = 40; //10=审批通过 40=审批拒绝30=审批处理中
+        String reapply = "1"; //是否可再申请 1-是，0-不可以
+        Timestamp approvalTime = new Timestamp(System.currentTimeMillis()); //是否可再申请 1-是，0-不可以
+        String reapplyTime = DateFormatUtils.format(new Date().getTime() + (1000L * 3600 * 24 * 7), "yyyy-MM-dd"); //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
+        String remark = "审批拒绝";
         String creditDeadline = DateUtil.getStringDateShort(); //审批结果有效期，当前时间
+
+        if (userIdent.getRealName() == 2 && userIdent.getMobile() == 2 && userIdent.getUserDetails() == 2
+                && userIdent.getLiveness() == 2 && userIdent.getBindbank() == 2) {
+            conclusion = 10;
+        }
+        map.put("reapplytime", approvalTime);
         map.put("pro_type", proType);
         map.put("term_unit", termUnit);
         map.put("amount_type", amountType);
@@ -153,7 +185,6 @@ public class AuditResultRequestHandler {
         map.put("approval_amount", approvalAmount);
         map.put("approval_term", approvalTerm);
         map.put("credit_deadline", creditDeadline);
-        map.put("reapplytime", reapplyTime);
         map.put("refuse_time", approvalTime);
         map.put("remark", remark);
         map.put("reapply", reapply);
@@ -164,7 +195,12 @@ public class AuditResultRequestHandler {
     }
 
 
-
+    /**
+     * 根据不同环境跳转
+     * @param param
+     * @return
+     * @throws Exception
+     */
     public ResponseBean<Map<String, Object>> auditResultChange(JSONObject param) throws Exception {
         if(Constant.ENVIROMENT.equals("dev")){
             return this.auditResult(param);
