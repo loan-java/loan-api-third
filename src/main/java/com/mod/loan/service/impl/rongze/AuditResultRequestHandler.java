@@ -205,6 +205,7 @@ public class AuditResultRequestHandler {
 //        }else{
 //            return this.queryAuditResult(param);
 //        }
+        System.out.println("Constant.ENVIROMENT==================:"+ Constant.ENVIROMENT);
         return this.auditResult(param);
     }
 
