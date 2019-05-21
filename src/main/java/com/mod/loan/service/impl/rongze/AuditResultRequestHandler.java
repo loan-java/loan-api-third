@@ -174,7 +174,7 @@ public class AuditResultRequestHandler {
         String creditDeadline = DateUtil.getStringDateShort(); //审批结果有效期，当前时间
 
         if (userIdent.getRealName() == 2 && userIdent.getMobile() == 2 && userIdent.getUserDetails() == 2
-                && userIdent.getLiveness() == 2 && userIdent.getBindbank() == 2) {
+                && userIdent.getLiveness() == 2) {
             conclusion = 10;
         }
         map.put("reapplytime", reapplyTime);
