@@ -64,9 +64,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
             repay.put("bill_status", "1");
         }
         // 账单到期时间 精确到毫秒（比如 1539073086805)
-        repay.put("due_time", order.getRepayTime().getTime() / 1000);
+        repay.put("due_time", order.getRepayTime().getTime());
         // 当期最早可以还款的时间 精确到毫秒（比如 1539073086805 ）
-        repay.put("can_repay_time", System.currentTimeMillis() / 1000);
+        repay.put("can_repay_time", System.currentTimeMillis());
         // 还款方式：1=主动还款 2=跳转机构 H5 还款  4=银行代扣 5=主动还款+银行代扣
         repay.put("pay_type", 5);
         // 当前所需的还款金额，单位元，保留小数点后两位 （该金额应该是本金利息加上逾期金额减去已还款金额的结果，逾期金额、已还款金额可能为零）
@@ -121,7 +121,7 @@ public class RepayRequestHandler extends BaseRequestHandler {
         repayPlan.add(repay);
 
         UserBank userBank = userBankService.selectUserCurrentBankCard(RequestThread.getUid());
-        if(userBank == null) {
+        if (userBank == null) {
             throw new BizException("===============用户银行卡不存在uid=" + RequestThread.getUid());
         }
         Map<String, Object> map = new HashMap<>(4);
@@ -148,11 +148,11 @@ public class RepayRequestHandler extends BaseRequestHandler {
 
         String orderNo = data.getString("order_no");
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
-        if(order == null){
+        if (order == null) {
             throw new BizException("订单不存在");
         }
         OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
-        if(orderRepay == null){
+        if (orderRepay == null) {
             throw new BizException("无还款信息");
         }
         Map<String, Object> map = new HashMap<>();
