@@ -146,9 +146,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
         }
         Map<String, Object> map = new HashMap<>();
         // 订单编号
-        map.put("order_no ", orderNo);
+        map.put("order_no", orderNo);
         // 还款期数
-        map.put("period_nos ", "1");
+        map.put("period_nos", "1");
         // 本次还款金额，单位 元
         map.put("repay_amount", orderRepay.getRepayMoney() == null ? "" : orderRepay.getRepayMoney().toPlainString());
         // 还款状态 1=还款成功 2=还款失败 0=还款中状态
