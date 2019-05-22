@@ -70,7 +70,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
         // 还款方式：1=主动还款 2=跳转机构 H5 还款  4=银行代扣 5=主动还款+银行代扣
         repay.put("pay_type", 5);
         // 当前所需的还款金额，单位元，保留小数点后两位 （该金额应该是本金利息加上逾期金额减去已还款金额的结果，逾期金额、已还款金额可能为零）
-        repay.put("amount", order.getShouldRepay());
+
+        BigDecimal amount = order.getHadRepay() == null ? order.getShouldRepay() : order.getShouldRepay().subtract(order.getHadRepay());
+        repay.put("amount", amount);
         // 已还款金额，单位元，保留小数点后两位
         repay.put("paid_amount", order.getHadRepay().toPlainString());
         // 逾期费用，单位元，保留小数点后两位

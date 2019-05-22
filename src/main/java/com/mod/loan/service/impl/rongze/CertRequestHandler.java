@@ -103,12 +103,16 @@ public class CertRequestHandler {
                             log.info(user.getId() + "最后一笔订单已结清");
                             log.info("==================================================================");
                             userType = "2";
-                            OrderUser ou = new OrderUser();
-                            ou.setCreateTime(new Date());
-                            ou.setOrderNo(orderNo);
-                            ou.setSource(2);
-                            ou.setUid(user.getId());
-                            orderUserMapper.insertSelective(ou);
+
+                            OrderUser ou = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.RZ.getCode()), user.getId());
+                            if (ou == null) {
+                                ou = new OrderUser();
+                                ou.setCreateTime(new Date());
+                                ou.setOrderNo(orderNo);
+                                ou.setSource(2);
+                                ou.setUid(user.getId());
+                                orderUserMapper.insertSelective(ou);
+                            }
                         }
                     }
                 }
