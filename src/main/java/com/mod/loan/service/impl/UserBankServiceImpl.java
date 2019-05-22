@@ -108,8 +108,7 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
 
             if (StringUtils.isBlank(readySignVO.getSignature())) {
                 //异常不得做为订单状态。
-                log.error("缺少验签参数！");
-                log.error("绑卡返回参数=" + postString);
+                log.error("缺少验签参数，[宝付]绑卡发送验证码返回参数：" + postString);
                 throw new Exception("缺少验签参数！");
             }
 
