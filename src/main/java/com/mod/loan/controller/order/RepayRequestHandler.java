@@ -124,7 +124,7 @@ public class RepayRequestHandler extends BaseRequestHandler {
         //银行名称编码（并非汉字）
         map.put("open_bank", userBank.getCardCode());
         //银行卡号
-        map.put("ank_card", userBank.getCardNo());
+        map.put("bank_card", userBank.getCardNo());
         //还款计划
         map.put("repayment_plan", repayPlan);
         return ResponseBean.success(map);
