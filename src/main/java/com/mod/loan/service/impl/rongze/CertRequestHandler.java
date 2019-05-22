@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
@@ -16,6 +17,7 @@ import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class CertRequestHandler {
 
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
     @Autowired
@@ -36,6 +38,8 @@ public class CertRequestHandler {
 
     @Autowired
     private BlacklistService blacklistService;
+    @Resource
+    private OrderUserMapper orderUserMapper;
 
 
     //复贷黑名单信息
@@ -45,6 +49,7 @@ public class CertRequestHandler {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============查询复贷和黑名单信息开始====================" + bizData.toJSONString());
         String md5 = bizData.getString("md5");
+        String orderNo = bizData.getString("order_no");
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户
         User user = userMapper.getMd5PhoneAndIdcard(md5);
         if (user != null) {
@@ -98,6 +103,12 @@ public class CertRequestHandler {
                             log.info(user.getId() + "最后一笔订单已结清");
                             log.info("==================================================================");
                             userType = "2";
+                            OrderUser ou = new OrderUser();
+                            ou.setCreateTime(new Date());
+                            ou.setOrderNo(orderNo);
+                            ou.setSource(2);
+                            ou.setUid(user.getId());
+                            orderUserMapper.insertSelective(ou);
                         }
                     }
                 }
