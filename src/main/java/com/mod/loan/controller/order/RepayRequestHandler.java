@@ -45,6 +45,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> getRepayPlan(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
+        log.info("===============获取还款计划开始====================" + data.toJSONString());
+
+
         String orderNo = data.getString("order_no");
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
 
@@ -118,6 +121,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
         repayPlan.add(repay);
 
         UserBank userBank = userBankService.selectUserCurrentBankCard(RequestThread.getUid());
+        if(userBank == null) {
+            throw new BizException("===============用户银行卡不存在uid=" + RequestThread.getUid());
+        }
         Map<String, Object> map = new HashMap<>(4);
         //账单的订单编号
         map.put("order_no", orderNo);
@@ -127,6 +133,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
         map.put("bank_card", userBank.getCardNo());
         //还款计划
         map.put("repayment_plan", repayPlan);
+
+        log.info("===============获取还款计划结束====================");
+
         return ResponseBean.success(map);
     }
 
@@ -135,6 +144,8 @@ public class RepayRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> getRepayStatus(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
+        log.info("===============获取还款状态开始====================" + data.toJSONString());
+
         String orderNo = data.getString("order_no");
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
         if(order == null){
@@ -165,6 +176,7 @@ public class RepayRequestHandler extends BaseRequestHandler {
             remark = orderRepay.getRemark();
         }
         map.put("remark", remark);
+        log.info("===============获取还款状态结束====================");
         return ResponseBean.success(map);
     }
 }
