@@ -115,7 +115,7 @@ public class BankRequestHandler extends BaseRequestHandler {
 
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             Map<String, Object> map = new HashMap<>();
-            map.put("need_confirm ", "1");
+            map.put("need_confirm", "1");
             return ResponseBean.success(map);
         }
 
