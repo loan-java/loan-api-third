@@ -94,6 +94,7 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
             dateArray.put("acc_info", cardInfo);
 
             String signVStr = FormatUtil.coverMap2String(dateArray);
+            log.info("绑卡请求参数:" + signVStr);
             //签名
             String signature = SecurityUtil.sha1X16(signVStr, "UTF-8");
             String sign = SignatureUtils.encryptByRSA(signature, pfxpath, Constant.baoFooKeyStorePassword);
@@ -106,6 +107,8 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
             ReadySignVO readySignVO = JSONObject.parseObject(JSONObject.toJSONString(returnData), ReadySignVO.class);
 
             if (StringUtils.isBlank(readySignVO.getSignature())) {
+                //异常不得做为订单状态。
+                log.error("缺少验签参数，[宝付]绑卡发送验证码返回参数：" + postString);
                 throw new Exception("缺少验签参数！");
             }
 
@@ -118,15 +121,18 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
 
             if (!SignatureUtils.verifySignature(cerpath, rSignature, rSign)) {
                 //验签失败
+                log.error("验签失败，[宝付]绑卡发送验证码返回参数：" + postString);
                 return new ResultMessage(ResponseEnum.M4000, "验签失败");
             }
 
             if (StringUtils.isBlank(readySignVO.getResp_code())) {
+                log.error("缺少resp_code参数，[宝付]绑卡发送验证码返回参数：" + postString);
                 return new ResultMessage(ResponseEnum.M4000, "缺少resp_code参数！");
             }
 
             if ("S".equals(readySignVO.getResp_code())) {
                 if (StringUtils.isBlank(readySignVO.getDgtl_envlp())) {
+                    log.error("缺少dgtl_envlp参数，[宝付]绑卡发送验证码返回参数：" + postString);
                     return new ResultMessage(ResponseEnum.M4000, "缺少dgtl_envlp参数！");
                 }
 
@@ -134,9 +140,8 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
                         readySignVO.getDgtl_envlp(), pfxpath, Constant.baoFooKeyStorePassword));
                 //获取返回的AESKey
                 String rAesKey = FormatUtil.getAesKey(rDgtlEnvLp);
-                Log.write("返回的AESkey:" + rAesKey);
-                Log.write("唯一码:" + SecurityUtil.Base64Decode(
-                        SecurityUtil.AesDecrypt(readySignVO.getUnique_code(), rAesKey)));
+                log.info("返回的AESkey:" + rAesKey);
+                log.info("唯一码:" + SecurityUtil.Base64Decode(SecurityUtil.AesDecrypt(readySignVO.getUnique_code(), rAesKey)));
 
                 readySignVO.setUnique_code(SecurityUtil.Base64Decode(
                         SecurityUtil.AesDecrypt(readySignVO.getUnique_code(), rAesKey)));
@@ -205,6 +210,7 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
             Map<String, String> returnData = FormatUtil.getParm(postString);
 
             if (!returnData.containsKey("signature")) {
+                log.error("缺少验签参数，[宝付]绑定银行卡返回参数：" + postString);
                 throw new Exception("缺少验签参数！");
             }
 
@@ -217,13 +223,15 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
 
             if (SignatureUtils.verifySignature(cerpath, rSignature, rSign)) {
                 //验签成功
-                Log.write("Yes");
+                log.info("Yes");
             }
             if (!returnData.containsKey("resp_code")) {
+                log.error("缺少resp_code参数，[宝付]绑定银行卡返回参数：" + postString);
                 throw new Exception("缺少resp_code参数！");
             }
             if ("S".equals(returnData.get("resp_code"))) {
                 if (!returnData.containsKey("dgtl_envlp")) {
+                    log.error("缺少dgtl_envlp参数，[宝付]绑定银行卡返回参数：" + postString);
                     throw new Exception("缺少dgtl_envlp参数！");
                 }
                 String rDgtlEnvlp = SecurityUtil.Base64Decode(RsaCodingUtil.decryptByPriPfxFile(returnData.get("dgtl_envlp"), pfxpath, Constant.baoFooKeyStorePassword));
@@ -245,9 +253,9 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
                 redisMapper.remove(RedisConst.user_bank_bind + uid);
                 return new ResultMessage(ResponseEnum.M2000, userBank.getId());
             } else if ("I".equals(returnData.get("resp_code"))) {
-                Log.write("处理中！");
+                log.info("处理中！");
             } else if ("F".equals(returnData.get("resp_code"))) {
-                Log.write("失败！");
+                log.info("失败！");
             } else {
                 //异常不得做为订单状态。
                 log.error("宝付鉴权绑卡失败，请求参数为={},响应参数为={}",
