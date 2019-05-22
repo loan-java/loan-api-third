@@ -48,7 +48,7 @@ public class CertRequestHandler {
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户
         User user = userMapper.getMd5PhoneAndIdcard(md5);
         if (user != null) {
-            if (StringUtils.isEmpty(user.getUserOrigin()) || user.getUserOrigin().equals(UserOriginEnum.RZ.getCode())) {
+            if (StringUtils.isEmpty(user.getUserOrigin()) || !user.getUserOrigin().equals(UserOriginEnum.RZ.getCode())) {
                 log.info(user.getId() + "聚合用户，不走当前线路");
                 log.info("==================================================================");
                 userType = "1";
