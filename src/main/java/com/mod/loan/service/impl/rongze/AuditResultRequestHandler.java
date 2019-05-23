@@ -166,7 +166,7 @@ public class AuditResultRequestHandler {
         Timestamp approvalTime = new Timestamp(System.currentTimeMillis());
         String reapplyTime = DateFormatUtils.format(new Date().getTime() + (1000L * 3600 * 24 * 7), "yyyy-MM-dd"); //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
         String remark = "审批拒绝";
-        String creditDeadline = DateUtil.getStringDateShort(); //审批结果有效期，当前时间
+        String creditDeadline = DateUtil.getNextDay(DateUtil.getStringDateShort(),"30"); //审批结果有效期，往后30天
 
         if (StringUtils.isEmpty(user.getUserQq()) || user.getUserQq().equals("10")) {
             conclusion = 10;
