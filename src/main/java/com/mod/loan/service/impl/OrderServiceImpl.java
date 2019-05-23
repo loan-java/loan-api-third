@@ -81,7 +81,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         } else if (orderRepay.getRepayStatus() == 0) {
             throw new BizException("订单正在自动扣款，请勿重复提交");
         } else if (orderRepay.getRepayStatus() == 3 && orderRepay.getRepayType() == 7) {
-            throw new BizException("系统自动扣款成功，请勿重复提交");
+            throw new BizException("已经还款了，请刷新页面");
         }
 
         if (merchant != null) {
