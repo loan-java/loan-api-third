@@ -43,7 +43,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private OrderPhoneMapper orderPhoneMapper;
     @Resource
     private OrderPayMapper orderPayMapper;
-
+    @Resource
+    private OrderRepayService orderRepayService;
     @Resource
     private UserService userService;
     @Resource
@@ -73,6 +74,15 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(Constant.merchant);
         log.info("还款Merchant(" + Constant.merchant + "): " + JSONObject.toJSONString(merchant));
+
+        OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
+        if (orderRepay.getRepayStatus() == 0 && orderRepay.getRepayType() == 7) {
+            throw new BizException("系统正在自动扣款，请勿重复提交");
+        } else if (orderRepay.getRepayStatus() == 0) {
+            throw new BizException("订单正在自动扣款，请勿重复提交");
+        } else if (orderRepay.getRepayStatus() == 3 && orderRepay.getRepayType() == 7) {
+            throw new BizException("系统自动扣款成功，请勿重复提交");
+        }
 
         if (merchant != null) {
             switch (merchant.getBindType()) {
