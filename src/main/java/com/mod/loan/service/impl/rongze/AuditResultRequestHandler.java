@@ -170,10 +170,13 @@ public class AuditResultRequestHandler {
 
         if (StringUtils.isEmpty(user.getUserQq()) || user.getUserQq().equals("10")) {
             conclusion = 10;
+            remark = "审批通过";
         }else if(user.getUserQq().equals("30")){
             conclusion = 30;
+            remark = "审批处理中";
         }else{
             conclusion = 40;
+            remark = "审批拒绝";
         }
         map.put("reapplytime", reapplyTime);
         map.put("pro_type", proType);
