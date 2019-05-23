@@ -838,6 +838,6 @@ public class DateUtil {
 
 
     public static void main(String[] args) {
-        System.out.println(DateUtil.getNextDay(DateUtil.getStringDateShort(),"1"));
+        System.out.println(DateUtil.getNextDay(DateUtil.getStringDateShort(),"30"));
     }
 }

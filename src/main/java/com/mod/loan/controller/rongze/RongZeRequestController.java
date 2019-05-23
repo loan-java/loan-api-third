@@ -68,6 +68,7 @@ public class RongZeRequestController {
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
         log.info(logPre + "收到, param: " + param.toJSONString());
+        log.info(logPre + "=============================================");
 
         Object result;
 
@@ -83,7 +84,7 @@ public class RongZeRequestController {
                 String bizDataStr = param.getString("biz_data");
                 String bizData = BizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
                 param.put("biz_data", bizData);
-                log.info(logPre + "解密后 biz_data: " + bizData);
+                log.info("========================" + method + "解密后的数据：" + param.toJSONString());
             }
 
             //绑定线程变量

@@ -28,4 +28,7 @@
         <result column="user_wechat" jdbcType="VARCHAR" property="userWechat"/>
         <result column="common_info" jdbcType="VARCHAR" property="commonInfo"/>
     </resultMap>
+    <select id="getMd5PhoneAndIdcard" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select *  from tb_user where UPPER(md5(CONCAT(user_phone,UPPER(user_cert_no))))=#{str}
+    </select>
 </mapper>

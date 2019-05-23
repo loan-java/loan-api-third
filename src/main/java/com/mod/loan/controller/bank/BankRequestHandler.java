@@ -63,6 +63,8 @@ public class BankRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> bankCardCode(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
+        log.info("===============银行卡鉴权发送验证码开始====================" + data.toJSONString());
+
         //订单编号
         String orderNo = data.getString("order_no");
         //绑卡卡号
@@ -113,9 +115,11 @@ public class BankRequestHandler extends BaseRequestHandler {
                 throw new BizException("支付渠道异常");
         }
 
+        log.info("===============银行卡鉴权发送验证码结束====================" + JSONObject.toJSONString(message));
+
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             Map<String, Object> map = new HashMap<>();
-            map.put("need_confirm ", "1");
+            map.put("need_confirm", "1");
             return ResponseBean.success(map);
         }
 
@@ -129,6 +133,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         Map<String, Object> map = new HashMap<>();
         map.put("deal_result", "0");
         JSONObject data = parseAndCheckBizData(param);
+        log.info("======================绑定银行卡开始===========" + data.toJSONString());
         //订单编号
         String orderNo = data.getString("order_no");
         //绑卡卡号
@@ -163,7 +168,8 @@ public class BankRequestHandler extends BaseRequestHandler {
         }
 
         Bank bank = bankMapper.selectByPrimaryKey(openBank);
-        String bankName = bank == null ? "" : bank.getBankName();
+        String bankName = (bank == null ? "" : bank.getBankName());
+
         if (StringUtils.isBlank(userMobile)) {
             userMobile = user.getUserPhone();
         }
@@ -185,6 +191,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         } else {
             throw new BizException(message.getStatus(), message.getMessage());
         }
+        log.info("======================绑定银行卡结束=================");
         return ResponseBean.success(map);
     }
 }

@@ -45,6 +45,9 @@ public class RepayRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> getRepayPlan(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
+        log.info("===============获取还款计划开始====================" + data.toJSONString());
+
+
         String orderNo = data.getString("order_no");
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
 
@@ -61,13 +64,15 @@ public class RepayRequestHandler extends BaseRequestHandler {
             repay.put("bill_status", "1");
         }
         // 账单到期时间 精确到毫秒（比如 1539073086805)
-        repay.put("due_time", order.getRepayTime().getTime() / 1000);
+        repay.put("due_time", order.getRepayTime().getTime());
         // 当期最早可以还款的时间 精确到毫秒（比如 1539073086805 ）
-        repay.put("can_repay_time", System.currentTimeMillis() / 1000);
+        repay.put("can_repay_time", System.currentTimeMillis());
         // 还款方式：1=主动还款 2=跳转机构 H5 还款  4=银行代扣 5=主动还款+银行代扣
         repay.put("pay_type", 5);
         // 当前所需的还款金额，单位元，保留小数点后两位 （该金额应该是本金利息加上逾期金额减去已还款金额的结果，逾期金额、已还款金额可能为零）
-        repay.put("amount", order.getShouldRepay());
+
+        BigDecimal amount = order.getHadRepay() == null ? order.getShouldRepay() : order.getShouldRepay().subtract(order.getHadRepay());
+        repay.put("amount", amount);
         // 已还款金额，单位元，保留小数点后两位
         repay.put("paid_amount", order.getHadRepay().toPlainString());
         // 逾期费用，单位元，保留小数点后两位
@@ -118,15 +123,21 @@ public class RepayRequestHandler extends BaseRequestHandler {
         repayPlan.add(repay);
 
         UserBank userBank = userBankService.selectUserCurrentBankCard(RequestThread.getUid());
+        if (userBank == null) {
+            throw new BizException("===============用户银行卡不存在uid=" + RequestThread.getUid());
+        }
         Map<String, Object> map = new HashMap<>(4);
         //账单的订单编号
-        map.put("order_no ", orderNo);
+        map.put("order_no", orderNo);
         //银行名称编码（并非汉字）
-        map.put("open_bank ", userBank.getCardCode());
+        map.put("open_bank", userBank.getCardCode());
         //银行卡号
-        map.put("ank_card ", userBank.getCardNo());
+        map.put("bank_card", userBank.getCardNo());
         //还款计划
         map.put("repayment_plan", repayPlan);
+
+        log.info("===============获取还款计划结束====================");
+
         return ResponseBean.success(map);
     }
 
@@ -135,20 +146,22 @@ public class RepayRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> getRepayStatus(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
+        log.info("===============获取还款状态开始====================" + data.toJSONString());
+
         String orderNo = data.getString("order_no");
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
-        if(order == null){
+        if (order == null) {
             throw new BizException("订单不存在");
         }
         OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
-        if(orderRepay == null){
+        if (orderRepay == null) {
             throw new BizException("无还款信息");
         }
         Map<String, Object> map = new HashMap<>();
         // 订单编号
-        map.put("order_no ", orderNo);
+        map.put("order_no", orderNo);
         // 还款期数
-        map.put("period_nos ", "1");
+        map.put("period_nos", "1");
         // 本次还款金额，单位 元
         map.put("repay_amount", orderRepay.getRepayMoney() == null ? "" : orderRepay.getRepayMoney().toPlainString());
         // 还款状态 1=还款成功 2=还款失败 0=还款中状态
@@ -165,6 +178,7 @@ public class RepayRequestHandler extends BaseRequestHandler {
             remark = orderRepay.getRemark();
         }
         map.put("remark", remark);
+        log.info("===============获取还款状态结束====================");
         return ResponseBean.success(map);
     }
 }
