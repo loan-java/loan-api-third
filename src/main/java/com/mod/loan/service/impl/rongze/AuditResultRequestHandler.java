@@ -200,13 +200,11 @@ public class AuditResultRequestHandler {
      * @throws Exception
      */
     public ResponseBean<Map<String, Object>> auditResultChange(JSONObject param) throws Exception {
-//        if(Constant.ENVIROMENT.equals("dev")){
-//            return this.auditResult(param);
-//        }else{
-//            return this.queryAuditResult(param);
-//        }
-        System.out.println("Constant.ENVIROMENT==================:"+ Constant.ENVIROMENT);
-        return this.auditResult(param);
+        if(Constant.ENVIROMENT.equals("dev")){
+            return this.auditResult(param);
+        }else{
+            return this.queryAuditResult(param);
+        }
     }
 
 
