@@ -195,7 +195,7 @@ public class BaofooServiceImpl implements BaofooService {
                 orderRepay.setRepayNo(orderSeriesId);
                 orderRepay.setUid(uid);
                 orderRepay.setOrderId(order.getId());
-                orderRepay.setRepayType(2);
+                orderRepay.setRepayType(1);
                 BigDecimal repayMoney = new BigDecimal(amount).divide(new BigDecimal(100));
                 orderRepay.setRepayMoney(repayMoney);
                 orderRepay.setBank(userBank.getCardName());
