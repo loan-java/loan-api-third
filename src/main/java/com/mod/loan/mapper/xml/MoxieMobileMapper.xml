@@ -15,4 +15,24 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
+
+  <select id="selectLastOne" resultMap="BaseResultMap">
+    select * from tb_moxie_mobile
+    <where>
+      <if test="uid != null">
+        and uid = #{uid}
+      </if>
+    </where>
+    order by id desc limit 1
+  </select>
+
+  <select id="selectByTaskId" resultMap="BaseResultMap">
+    select uid from tb_moxie_mobile
+    <where>
+      <if test="taskId != null">
+        and task_id = #{taskId}
+      </if>
+    </where>
+  </select>
+
 </mapper>
