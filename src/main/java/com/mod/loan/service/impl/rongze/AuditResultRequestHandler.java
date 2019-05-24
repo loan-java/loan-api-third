@@ -73,8 +73,8 @@ public class AuditResultRequestHandler {
         UserBank userBank = userBankService.selectUserCurrentBankCard(uid);
         if (userBank == null) userBank = new UserBank();
 
-        String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5),user.getId());
-        DecisionResDetailDTO pd = qjldPolicyService.qjldPolicyNoSync(serials_no, user, userBank);
+        String serials_no = String.format("%s%s%s", "p", new DateTime().toString(TimeUtils.dateformat5), user.getId());
+        DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicySync(serials_no, user, userBank);
 
         String reapply = null; //是否可再次申请
         String reapplyTime = null; //可再申请的时间
@@ -91,33 +91,33 @@ public class AuditResultRequestHandler {
         Integer termUnit = null; //期限单位，1 - 天
         String creditDeadline = null; //审批结果有效期，当前时间
 
-        if (pd != null) {
-            DecisionResDetailDTO decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(pd.getTrans_id());
-            if (decisionResDetailDTO == null || OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
+        if (decisionResDetailDTO != null) {
+            if (OrderStatusEnum.INIT.getCode().equals(decisionResDetailDTO.getOrderStatus()) || OrderStatusEnum.WAIT.getCode().equals(decisionResDetailDTO.getOrderStatus())) {
                 //处理中
+                log.info("风控同步结果暂无");
+                decisionResDetailDTO = qjldPolicyService.qjldPolicQuery(decisionResDetailDTO.getTrans_id());
+                log.info("风控查询结果:" + JSONObject.toJSONString(decisionResDetailDTO));
             }
-            if (decisionResDetailDTO != null) {
-                String riskCode = decisionResDetailDTO.getCode();
-                if (PolicyResultEnum.isAgree(riskCode)) {
-                    //通过
-                    conclusion = 10;
-                    approvalTime = System.currentTimeMillis();
-                    creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
-                    proType = 1; //单期产品
-                    amountType = 0; //审批金额是否固定，0 - 固定
-                    termType = 0; //审批期限是否固定，0 - 固定
-                    approvalAmount = 1500; //审批金额
-                    approvalTerm = 6; //审批期限
-                    termUnit = 1; //期限单位，1 - 天
-                    remark = "通过";
-                } else {
-                    //拒绝
-                    refuseTime = System.currentTimeMillis();
-                    conclusion = 40;
-                    remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
-                    reapply = "1";
-                    reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
-                }
+            String riskCode = decisionResDetailDTO.getCode();
+            if (PolicyResultEnum.isAgree(riskCode)) {
+                //通过
+                conclusion = 10;
+                approvalTime = System.currentTimeMillis();
+                creditDeadline = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
+                proType = 1; //单期产品
+                amountType = 0; //审批金额是否固定，0 - 固定
+                termType = 0; //审批期限是否固定，0 - 固定
+                approvalAmount = 1500; //审批金额
+                approvalTerm = 6; //审批期限
+                termUnit = 1; //期限单位，1 - 天
+                remark = "通过";
+            } else {
+                //拒绝
+                refuseTime = System.currentTimeMillis();
+                conclusion = 40;
+                remark = StringUtils.isNotBlank(decisionResDetailDTO.getDesc()) ? decisionResDetailDTO.getDesc() : "拒绝";
+                reapply = "1";
+                reapplyTime = DateFormatUtils.format(refuseTime + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
             }
         }
         Map<String, Object> map = new HashMap<>();
@@ -166,15 +166,15 @@ public class AuditResultRequestHandler {
         Timestamp approvalTime = new Timestamp(System.currentTimeMillis());
         String reapplyTime = DateFormatUtils.format(new Date().getTime() + (1000L * 3600 * 24 * 7), "yyyy-MM-dd"); //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
         String remark = "审批拒绝";
-        String creditDeadline = DateUtil.getNextDay(DateUtil.getStringDateShort(),"30"); //审批结果有效期，往后30天
+        String creditDeadline = DateUtil.getNextDay(DateUtil.getStringDateShort(), "30"); //审批结果有效期，往后30天
 
         if (StringUtils.isEmpty(user.getUserQq()) || user.getUserQq().equals("10")) {
             conclusion = 10;
             remark = "审批通过";
-        }else if(user.getUserQq().equals("30")){
+        } else if (user.getUserQq().equals("30")) {
             conclusion = 30;
             remark = "审批处理中";
-        }else{
+        } else {
             conclusion = 40;
             remark = "审批拒绝";
         }
@@ -198,14 +198,15 @@ public class AuditResultRequestHandler {
 
     /**
      * 根据不同环境跳转
+     *
      * @param param
      * @return
      * @throws Exception
      */
     public ResponseBean<Map<String, Object>> auditResultChange(JSONObject param) throws Exception {
-        if(Constant.ENVIROMENT.equals("dev")){
+        if (Constant.ENVIROMENT.equals("dev")) {
             return this.auditResult(param);
-        }else{
+        } else {
             return this.queryAuditResult(param);
         }
     }
