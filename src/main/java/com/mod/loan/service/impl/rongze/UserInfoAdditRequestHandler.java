@@ -84,11 +84,12 @@ public class UserInfoAdditRequestHandler {
         //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null) throw new BizException("推送用户补充信息:用户不存在");
-
+        this.deleteUpLoadFile(user);
         this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
         this.checkPhone(orderNo,user);
         //更新用户信息
         user.setUserEmail(user_email);
+
         int userN = userMapper.updateByPrimaryKey(user);
         if(userN ==0) throw new RuntimeException("推送用户补充信息:用户更新失败");
 
