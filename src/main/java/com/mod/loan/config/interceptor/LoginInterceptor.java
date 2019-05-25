@@ -1,34 +1,17 @@
 package com.mod.loan.config.interceptor;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.mod.loan.common.model.ResultMap;
-import com.mod.loan.controller.user.UserAddressListController;
-import com.mod.loan.util.*;
-import org.apache.commons.lang.StringUtils;
+import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.model.RequestThread;
+import com.mod.loan.util.RSAUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.annotation.Api;
-import com.mod.loan.common.annotation.LoginRequired;
-import com.mod.loan.common.enums.ResponseEnum;
-import com.mod.loan.common.model.RequestThread;
-import com.mod.loan.common.model.ResultMessage;
-import com.mod.loan.config.redis.RedisConst;
-import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.service.MerchantService;
-
-import io.jsonwebtoken.Claims;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @author wgy 2017年8月24日 上午10:48:12

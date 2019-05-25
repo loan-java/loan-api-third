@@ -6,6 +6,7 @@ import java.util.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.enums.RiskAuditSourceEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
@@ -219,18 +220,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setSource(source);
         addOrUpdateOrder(order, orderPhone);
 
-        // 通知风控
-        RiskAuditMessage message = new RiskAuditMessage();
-        message.setOrderId(order.getId());
-        message.setStatus(1);
-        message.setMerchant(RequestThread.getClientAlias());
-        message.setUid(uid);
-        message.setUserPhone(userService.selectByPrimaryKey(uid).getUserPhone());
-        try {
-            rabbitTemplate.convertAndSend(RabbitConst.queue_risk_order_notify, message);
-        } catch (Exception e) {
-            log.error("通知风控消息发送异常：" + e.getMessage(), e);
-        }
+        //直接改为待放款
+        order.setStatus(Constant.ORDER_FOR_LENDING);
+        orderMapper.updateByPrimaryKey(order);
 
         return order;
     }

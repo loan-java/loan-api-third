@@ -8,6 +8,11 @@ public class Constant {
 
     public final static String KUAI_QIAN_UID_PFX = "JSD";
 
+    /**
+     * 订单状态：待放款
+     */
+    public final static Integer ORDER_FOR_LENDING = 21;
+
     public static String ENVIROMENT;
 
     public static String OSS_STATIC_BUCKET_NAME;
