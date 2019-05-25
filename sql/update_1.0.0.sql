@@ -18,3 +18,10 @@ CREATE TABLE `tb_user_order` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `pk_uid_order_source` (`uid`,`order_no`,`source`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COMMENT='融泽用户和订单关联表';
+
+CREATE TABLE `tb_user_sms` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `mobile` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
