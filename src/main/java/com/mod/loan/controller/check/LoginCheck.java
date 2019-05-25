@@ -7,7 +7,6 @@ import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.controller.user.UserRealNameController;
 import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.SignUtil;
 import com.mod.loan.util.jwtUtil;
@@ -25,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 public class LoginCheck {
-    private static Logger logger = LoggerFactory.getLogger(UserRealNameController.class);
+    private static Logger logger = LoggerFactory.getLogger(LoginCheck.class);
 
     @Autowired
     private RedisMapper redisMapper;
