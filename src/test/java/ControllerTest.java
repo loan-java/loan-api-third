@@ -1,4 +1,5 @@
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.OrderUserMapper;
@@ -7,6 +8,8 @@ import com.mod.loan.model.User;
 import com.mod.loan.util.Base64Util;
 import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.aliyun.OSSUtil;
+import com.mod.loan.util.rongze.RongZeRequestUtil;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -87,16 +90,53 @@ public class ControllerTest extends BaseSpringBootJunitTest {
 
 
     @Test
-    public void uploadOssAndDownOss() throws Exception {
-        String data="";
-        JSONObject jsonObject=JSONObject.parseObject(data);
-        String dataStr = jsonObject.getJSONObject("data").toJSONString();
+    public void getRzInfor() throws Exception {
+        JSONObject jsonObject1=new JSONObject();
+        jsonObject1.put("order_no","1658473363288821760");
+        jsonObject1.put("fileid","15564321122325608");
+        String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
+        JSONObject resultJson1 = JSONObject.parseObject(result1);
+        if(!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200){
+            throw new BizException("推送用户补充信息:身份证正面信息解析失败"  + result1);
+        }
+        JSONObject data = resultJson1.getJSONObject("data");
+
+        String base64str = data.getString("filestr");
+        String filesuffix = data.getString("filesuffix");
+
+        String imgCertFront = OSSUtil.uploadImage(base64str,filesuffix);
+
+        System.out.println("image::" + imgCertFront);
+
+    }
+
+
+    @Test
+    public void getRzInforR() throws Exception {
+        JSONObject jsonObject1=new JSONObject();
+        jsonObject1.put("order_no","1658473363288821760");
+        jsonObject1.put("type","1");
+        String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+        //判断运营商数据
+        JSONObject jsonObject = JSONObject.parseObject(mxMobile);
+        if(!jsonObject.containsKey("code") || !jsonObject.containsKey("data") ||jsonObject.getInteger("code") != 200){
+            throw new BizException("推送用户补充信息:下载运营商数据解析失败");
+        }
+        String dataStr = jsonObject.getString("data");
+        JSONObject all = JSONObject.parseObject(dataStr);
+        JSONObject data = all.getJSONObject("data");
+        JSONObject report = data.getJSONObject("report");
+        JSONObject members = report.getJSONObject("members");
         //上传
-        String mxMobilePath = OSSUtil.uploadStr(Base64Util.decode(dataStr.getBytes()), (long) 9999999);
-        System.out.println("上传:"+mxMobilePath);
-        //下载
-        String mxMobilePath2 = OSSUtil.ossGetFile(mxMobilePath, Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
-        System.out.println("下载:"+mxMobilePath2);
+        String mxMobilePath = OSSUtil.uploadStr(members.toJSONString(),999L);
+
+        System.out.println("运营商：："+mxMobilePath);
+    }
+
+
+    @Test
+    public void deleteOSSfile() throws Exception {
+        OSSUtil.deleteFile("2019/0524/ce461a4693ae43d690c3cc212d95c2df.jpg",Constant.OSS_STATIC_BUCKET_NAME);
     }
 
 

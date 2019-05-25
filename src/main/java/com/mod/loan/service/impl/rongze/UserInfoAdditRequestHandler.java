@@ -84,11 +84,12 @@ public class UserInfoAdditRequestHandler {
         //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null) throw new BizException("推送用户补充信息:用户不存在");
-
+        this.deleteUpLoadFile(user);
         this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
         this.checkPhone(orderNo,user);
         //更新用户信息
         user.setUserEmail(user_email);
+
         int userN = userMapper.updateByPrimaryKey(user);
         if(userN ==0) throw new RuntimeException("推送用户补充信息:用户更新失败");
 
@@ -134,6 +135,30 @@ public class UserInfoAdditRequestHandler {
     }
 
     /**
+     * 删除之前的认证信息
+     * @param user
+     */
+    public void deleteUpLoadFile(User user){
+        try {
+            if(!StringUtils.isEmpty(user.getImgCertBack())){
+                OSSUtil.deleteFile(user.getImgCertBack(),Constant.OSS_STATIC_BUCKET_NAME);
+            }
+            if(!StringUtils.isEmpty(user.getImgCertFront())){
+                OSSUtil.deleteFile(user.getImgCertFront(),Constant.OSS_STATIC_BUCKET_NAME);
+            }
+            if(!StringUtils.isEmpty(user.getImgFace())){
+                OSSUtil.deleteFile(user.getImgFace(),Constant.OSS_STATIC_BUCKET_NAME);
+            }
+            MoxieMobile moxieMobile = moxieMobileMapper.selectLastOne(user.getId());
+            if(moxieMobile != null && !StringUtils.isEmpty(moxieMobile.getRemark())){
+                OSSUtil.deleteFile(user.getImgCertFront(),Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
+            }
+        }catch (Exception e){
+            log.error("删除照片，运营商信息失败",e);
+        }
+    }
+
+    /**
      * 上传身份证文件，并保存到user上
      * @param orderNo
      * @param user
@@ -151,37 +176,42 @@ public class UserInfoAdditRequestHandler {
             jsonObject1.put("order_no",orderNo);
             jsonObject1.put("fileid",str1);
             String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
-            log.info("推送用户补充信息:身份证正面信息：" + result1);
             JSONObject resultJson1 = JSONObject.parseObject(result1);
             if(!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200){
                 throw new BizException("推送用户补充信息:身份证正面信息解析失败"  + result1);
             }
-
-            String imgCertFront = OSSUtil.uploadImage(Base64Util.decode(result1.getBytes()));
+            JSONObject data = resultJson1.getJSONObject("data");
+            String base64str = data.getString("filestr");
+            String filesuffix = data.getString("filesuffix");
+            String imgCertFront = OSSUtil.uploadImage(base64str,filesuffix);
             user.setImgCertFront(imgCertFront);
 
             JSONObject jsonObject2=new JSONObject();
             jsonObject2.put("order_no",orderNo);
             jsonObject2.put("fileid",str2);
             String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
-            log.info("推送用户补充信息:身份证背面信息：" + result2);
             JSONObject resultJson2 = JSONObject.parseObject(result2);
             if(!resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200){
                 throw new BizException("推送用户补充信息:身份证背面信息解析失败" + result2);
             }
-            String imgCertBack = OSSUtil.uploadImage(Base64Util.decode(result2.getBytes()));
+            JSONObject data2 = resultJson1.getJSONObject("data");
+            String base64str2 = data2.getString("filestr");
+            String filesuffix2 = data2.getString("filesuffix");
+            String imgCertBack = OSSUtil.uploadImage(base64str2,filesuffix2);
             user.setImgCertBack(imgCertBack);
 
             JSONObject jsonObject3=new JSONObject();
             jsonObject3.put("order_no",orderNo);
             jsonObject3.put("fileid",str1);
             String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
-            log.info("推送用户补充信息:身份证活体信息：" + result3);
             JSONObject resultJson3 = JSONObject.parseObject(result3);
             if(!resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200){
                 throw new BizException("推送用户补充信息:身份证活体信息解析失败" + result3);
             }
-            String imgFace = OSSUtil.uploadImage(Base64Util.decode(result3.getBytes()));
+            JSONObject data3 = resultJson1.getJSONObject("data");
+            String base64str3 = data3.getString("filestr");
+            String filesuffix3 = data3.getString("filesuffix");
+            String imgFace = OSSUtil.uploadImage(base64str3,filesuffix3);
             user.setImgFace(imgFace);
             flag = true;
         }catch (Exception e){
@@ -203,15 +233,18 @@ public class UserInfoAdditRequestHandler {
             jsonObject1.put("order_no",orderNo);
             jsonObject1.put("type","1");
             String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
-            log.info("推送用户补充信息:下载运营商数据信息：" + mxMobile);
             //判断运营商数据
             JSONObject jsonObject = JSONObject.parseObject(mxMobile);
             if(!jsonObject.containsKey("code") || !jsonObject.containsKey("data") ||jsonObject.getInteger("code") != 200){
                 throw new BizException("推送用户补充信息:下载运营商数据解析失败");
             }
-            String dataStr = jsonObject.getJSONObject("data").toJSONString();
+            String dataStr = jsonObject.getString("data");
+            JSONObject all = JSONObject.parseObject(dataStr);
+            JSONObject data = all.getJSONObject("data");
+            JSONObject report = data.getJSONObject("report");
+            JSONObject members = report.getJSONObject("members");
             //上传
-            String mxMobilePath = OSSUtil.uploadStr(dataStr,RequestThread.getUid());
+            String mxMobilePath = OSSUtil.uploadStr(members.toJSONString(),user.getId());
             if (StringUtils.isBlank(mxMobilePath)) {
                 throw new BizException("推送用户补充信息:运营商数据上传失败");
             }

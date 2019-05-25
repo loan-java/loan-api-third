@@ -18,6 +18,7 @@ public class Constant {
     public static String OSS_STATIC_BUCKET_NAME;
     public static String OSS_STATIC_BUCKET_NAME_MOBILE;
     public static String OSS_ACCESSKEY_ID;
+    public static String OSS_ENDPOINT_IN;
     public static String OSS_ACCESS_KEY_SECRET;
 
     public static String JWT_SERCETKEY;
@@ -54,6 +55,9 @@ public class Constant {
     public static String orgPrivateKey;
 
     public static String sysDomainHost; //系统域名
+
+    @Value("${oss.endpoint.in}")
+    public void setOssEndpointIn(String ossEndpointIn) { Constant.OSS_ENDPOINT_IN = ossEndpointIn; }
 
     @Value("${sys.domain.host}")
     public void setSysDomainHost(String sysDomainHost) {

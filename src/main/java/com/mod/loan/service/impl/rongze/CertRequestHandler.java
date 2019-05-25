@@ -109,7 +109,7 @@ public class CertRequestHandler {
                                 ou = new OrderUser();
                                 ou.setCreateTime(new Date());
                                 ou.setOrderNo(orderNo);
-                                ou.setSource(2);
+                                ou.setSource(Integer.valueOf(UserOriginEnum.RZ.getCode()));
                                 ou.setUid(user.getId());
                                 orderUserMapper.insertSelective(ou);
                             }
