@@ -96,10 +96,10 @@ public class TbDecisionResDetail {
     }
 
     /**
-     * @param orderstatus
+     * @param orderStatus
      */
-    public void setOrderstatus(String orderstatus) {
-        this.orderStatus = orderstatus;
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     /**
@@ -253,12 +253,12 @@ public class TbDecisionResDetail {
     }
 
 
-    public TbDecisionResDetail(Long order_id, String orderNo, String decisionNo, String transId, String orderstatus) {
+    public TbDecisionResDetail(Long order_id, String orderNo, String decisionNo, String transId, String orderStatus) {
         this.setOrderId(order_id);
         this.setDecisionNo(orderNo);
         this.setDecisionNo(decisionNo);
         this.setTransId(transId);
-        this.setOrderstatus(orderstatus);
+        this.setOrderStatus(orderStatus);
         this.setCreatetime(new Date());
         this.setUpdatetime(new Date());
     }
