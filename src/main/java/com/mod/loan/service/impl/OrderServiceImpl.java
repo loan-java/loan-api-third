@@ -15,6 +15,7 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
+import com.mod.loan.mapper.TbDecisionResDetailMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.MoneyUtil;
@@ -64,6 +65,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private KuaiQianService kuaiQianService;
     @Resource
     private BaofooService baofooService;
+    @Resource
+    private TbDecisionResDetailMapper decisionResDetailMapper;
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
@@ -223,6 +226,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         //直接改为待放款
         order.setStatus(Constant.ORDER_FOR_LENDING);
         orderMapper.updateByPrimaryKey(order);
+
+        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
+        if (decisionResDetail != null) {
+            decisionResDetail.setOrderId(order.getId());
+            decisionResDetail.setUpdatetime(new Date());
+            decisionResDetailMapper.updateByTransId(decisionResDetail);
+        }
 
         return order;
     }

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mod.loan.mapper.TbDecisionResDetailMapper">
+    <resultMap id="BaseResultMap" type="com.mod.loan.model.TbDecisionResDetail">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="order_id" property="orderId" jdbcType="BIGINT"/>
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
+        <result column="decision_no" property="decisionNo" jdbcType="VARCHAR"/>
+        <result column="trans_id" property="transId" jdbcType="VARCHAR"/>
+        <result column="order_status" property="orderstatus" jdbcType="VARCHAR"/>
+        <result column="order_money" property="orderMoney" jdbcType="BIGINT"/>
+        <result column="fee" property="fee" jdbcType="BIT"/>
+        <result column="custom_grade" property="customGrade" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="descs" property="descs" jdbcType="VARCHAR"/>
+        <result column="res_score" property="resscore" jdbcType="DOUBLE"/>
+        <result column="strategies" property="strategies" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createtime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updatetime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <update id="updateByTransId" parameterType="com.mod.loan.model.TbDecisionResDetail">
+    update tb_decision_res_detail set
+    order_id =#{orderId},
+    order_status =#{orderstatus},
+    order_money =#{orderMoney},
+    fee =#{fee},
+    custom_grade =#{customGrade},
+    code =#{code},
+    descs =#{descs},
+    res_score =#{resscore},
+    strategies=#{strategies},
+    update_time = now()
+    where trans_id =#{transId}
+    </update>
+
+    <select id="selectByTransId" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select * from tb_decision_res_detail where trans_id =#{transId}
+    </select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        select * from tb_decision_res_detail where order_no =#{orderNo} order by id desc limit 1
+    </select>
+
+</mapper>
