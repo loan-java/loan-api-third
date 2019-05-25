@@ -46,7 +46,7 @@ public class TbDecisionResDetail {
     private String descs;
 
     @Column(name = "res_score")
-    private Double resscore;
+    private Double resScore;
 
     @Lob
     @Basic(fetch = LAZY)
@@ -175,15 +175,15 @@ public class TbDecisionResDetail {
     /**
      * @return resScore
      */
-    public Double getResscore() {
-        return resscore;
+    public Double getResScore() {
+        return resScore;
     }
 
     /**
-     * @param resscore
+     * @param resScore
      */
-    public void setResscore(Double resscore) {
-        this.resscore = resscore;
+    public void setResScore(Double resScore) {
+        this.resScore = resScore;
     }
 
     /**
@@ -247,7 +247,7 @@ public class TbDecisionResDetail {
         this.customGrade = decisionResDetailDTO.getCustom_grade() != null ? decisionResDetailDTO.getCustom_grade().toString() : null;
         this.code = decisionResDetailDTO.getCode();
         this.descs = decisionResDetailDTO.getDesc();
-        this.resscore = decisionResDetailDTO.getResScore();
+        this.resScore = decisionResDetailDTO.getResScore();
         this.strategies = decisionResDetailDTO.getStrategies() != null ? decisionResDetailDTO.getStrategies().toString() : null;
         this.setUpdatetime(new Date());
     }

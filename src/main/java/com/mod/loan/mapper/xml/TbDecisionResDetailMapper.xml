@@ -16,7 +16,7 @@
         <result column="custom_grade" property="customGrade" jdbcType="VARCHAR"/>
         <result column="code" property="code" jdbcType="VARCHAR"/>
         <result column="descs" property="descs" jdbcType="VARCHAR"/>
-        <result column="res_score" property="resscore" jdbcType="DOUBLE"/>
+        <result column="res_score" property="resScore" jdbcType="DOUBLE"/>
         <result column="strategies" property="strategies" jdbcType="VARCHAR"/>
         <result column="create_time" property="createtime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updatetime" jdbcType="TIMESTAMP"/>
@@ -25,13 +25,13 @@
     <update id="updateByTransId" parameterType="com.mod.loan.model.TbDecisionResDetail">
     update tb_decision_res_detail set
     order_id =#{orderId},
-    order_status =#{orderstatus},
+    order_status =#{orderStatus},
     order_money =#{orderMoney},
     fee =#{fee},
     custom_grade =#{customGrade},
     code =#{code},
     descs =#{descs},
-    res_score =#{resscore},
+    res_score =#{resScore},
     strategies=#{strategies},
     update_time = now()
     where trans_id =#{transId}
