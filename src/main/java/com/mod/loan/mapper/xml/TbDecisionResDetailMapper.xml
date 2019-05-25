@@ -10,7 +10,7 @@
         <result column="order_no" property="orderNo" jdbcType="VARCHAR"/>
         <result column="decision_no" property="decisionNo" jdbcType="VARCHAR"/>
         <result column="trans_id" property="transId" jdbcType="VARCHAR"/>
-        <result column="order_status" property="orderstatus" jdbcType="VARCHAR"/>
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR"/>
         <result column="order_money" property="orderMoney" jdbcType="BIGINT"/>
         <result column="fee" property="fee" jdbcType="BIT"/>
         <result column="custom_grade" property="customGrade" jdbcType="VARCHAR"/>

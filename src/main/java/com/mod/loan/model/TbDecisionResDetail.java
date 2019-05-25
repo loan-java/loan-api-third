@@ -26,7 +26,7 @@ public class TbDecisionResDetail {
     private String transId;
 
     @Column(name = "order_status")
-    private String orderstatus;
+    private String orderStatus;
 
     @Column(name = "order_money")
     private Long orderMoney;
@@ -92,14 +92,14 @@ public class TbDecisionResDetail {
      * @return orderStatus
      */
     public String getOrderstatus() {
-        return orderstatus;
+        return orderStatus;
     }
 
     /**
      * @param orderstatus
      */
     public void setOrderstatus(String orderstatus) {
-        this.orderstatus = orderstatus;
+        this.orderStatus = orderstatus;
     }
 
     /**
@@ -241,7 +241,7 @@ public class TbDecisionResDetail {
     public TbDecisionResDetail(DecisionResDetailDTO decisionResDetailDTO) {
         this.decisionNo = decisionResDetailDTO.getDecision_no();
         this.transId = decisionResDetailDTO.getTrans_id();
-        this.orderstatus = decisionResDetailDTO.getOrderStatus();
+        this.orderStatus = decisionResDetailDTO.getOrderStatus();
         this.orderMoney = decisionResDetailDTO.getOrder_money();
         this.fee = decisionResDetailDTO.getFee();
         this.customGrade = decisionResDetailDTO.getCustom_grade() != null ? decisionResDetailDTO.getCustom_grade().toString() : null;

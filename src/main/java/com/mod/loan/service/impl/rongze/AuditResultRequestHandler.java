@@ -2,7 +2,6 @@ package com.mod.loan.service.impl.rongze;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.OrderStatusEnum;
 import com.mod.loan.common.enums.PolicyResultEnum;
 import com.mod.loan.common.enums.RiskAuditSourceEnum;
 import com.mod.loan.common.enums.UserOriginEnum;
@@ -10,31 +9,22 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.mapper.TbDecisionResDetailMapper;
 import com.mod.loan.model.TbDecisionResDetail;
 import com.mod.loan.model.User;
-import com.mod.loan.model.UserBank;
 import com.mod.loan.model.UserIdent;
-import com.mod.loan.model.dto.DecisionResDetailDTO;
-import com.mod.loan.service.QjldPolicyService;
-import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserIdentService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.DateUtil;
-import com.mod.loan.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.joda.time.DateTime;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,23 +79,25 @@ public class AuditResultRequestHandler {
             conclusion = 40;
             remark = "审批失败";
         } else {
+            if (decisionResDetail == null) {
+                // 通知风控
+                RiskAuditMessage message = new RiskAuditMessage();
+                message.setOrderNo(orderNo);
+                message.setStatus(1);
+                message.setMerchant(RequestThread.getClientAlias());
+                message.setUid(user.getId());
+                message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
+                message.setTimes(0);
+                try {
+                    rabbitTemplate.convertAndSend(RabbitConst.queue_risk_order_notify, message);
+                } catch (Exception e) {
+                    log.error("消息发送异常：", e);
+                }
+            }
             conclusion = 30;
             remark = "审批处理中";
         }
 
-        // 通知风控
-        RiskAuditMessage message = new RiskAuditMessage();
-        message.setOrderNo(orderNo);
-        message.setStatus(1);
-        message.setMerchant(RequestThread.getClientAlias());
-        message.setUid(user.getId());
-        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
-        message.setTimes(0);
-        try {
-            rabbitTemplate.convertAndSend(RabbitConst.queue_risk_order_notify, message);
-        } catch (Exception e) {
-            log.error("消息发送异常：", e);
-        }
 
         //单期产品
         int proType = 1;
