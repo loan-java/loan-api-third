@@ -25,3 +25,8 @@ CREATE TABLE `tb_user_sms` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+alter table tb_decision_res_detail add column order_no  varchar(30) default null comment '订单编号' after order_id;
+
+create unique index order_no on tb_decision_res_detail(order_no);
