@@ -1,12 +1,11 @@
 package com.mod.loan.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Table(name = "tb_order")
 public class Order {
@@ -176,7 +175,6 @@ public class Order {
     @Column(name = "source")
     private Integer source;
 
-    private String repayOrderNo; //还款流水号
 
     public String getPaymentType() {
         return paymentType;
@@ -604,13 +602,6 @@ public class Order {
         this.userType = userType;
     }
 
-    public String getRepayOrderNo() {
-        return repayOrderNo;
-    }
-
-    public void setRepayOrderNo(String repayOrderNo) {
-        this.repayOrderNo = repayOrderNo;
-    }
 
     public Integer getSource() {
         return source;
