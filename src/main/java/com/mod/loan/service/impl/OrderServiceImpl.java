@@ -222,8 +222,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setSource(source);
         addOrUpdateOrder(order, orderPhone);
 
-        //直接改为待放款
-        order.setStatus(Constant.ORDER_FOR_LENDING);
+        //直接改为人工审核
+        order.setStatus(Constant.unsettledOrderStatus);
         orderMapper.updateByPrimaryKey(order);
 
         TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
