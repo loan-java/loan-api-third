@@ -10,6 +10,8 @@ import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderRepay;
+import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.util.rongze.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,9 @@ public class RongZeRequestHandler {
 
     @Resource
     private OrderService orderService;
+
+    @Resource
+    private OrderRepayService orderRepayService;
     @Resource
     private OrderUserMapper orderUserMapper;
 
@@ -76,30 +81,25 @@ public class RongZeRequestHandler {
         订单结束50+；51-自动审核失败 ;52-复审失败;53-取消*/
 
         int status;
-        String remark="";
+        String remark = "";
         if (order.getStatus() == 23) {
             status = 169; //放款失败
-            remark="放款失败";
-        }
-        else if (order.getStatus() == 31) {
+            remark = "放款失败";
+        } else if (order.getStatus() == 31) {
             status = 170; //放款成功
-            remark="放款成功";
-        }
-        else if (order.getStatus() == 21 || order.getStatus() == 22 || order.getStatus() == 11 || order.getStatus() == 12) {
+            remark = "放款成功";
+        } else if (order.getStatus() == 21 || order.getStatus() == 22 || order.getStatus() == 11 || order.getStatus() == 12) {
             status = 171; //放款处理中
-            remark="放款处理中";
-        }
-        else if (order.getStatus() == 33) {
+            remark = "放款处理中";
+        } else if (order.getStatus() == 33) {
             status = 180; //贷款逾期
-            remark="贷款逾期";
-        }
-        else if (order.getStatus() == 41 || order.getStatus() == 42) {
+            remark = "贷款逾期";
+        } else if (order.getStatus() == 41 || order.getStatus() == 42) {
             status = 200; //贷款结清
-            remark="贷款结清";
-        }
-        else {
+            remark = "贷款结清";
+        } else {
             status = 169;
-            remark="审核失败";
+            remark = "审核失败";
         }
 
         long updateTime = order.getCreateTime().getTime();
@@ -125,10 +125,12 @@ public class RongZeRequestHandler {
 
         Order order = orderService.repayOrder(orderNo, OrderSourceEnum.RONGZE.getSoruce());
 
+        OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
+
         Map<String, Object> map = new HashMap<>();
         map.put("need_confirm", "0");
         map.put("deal_result", "1");
-        map.put("transactionid", order.getRepayOrderNo());
+        map.put("transactionid", orderRepay.getRepayNo());
         map.put("reason", "");
         return ResponseBean.success(map);
     }
