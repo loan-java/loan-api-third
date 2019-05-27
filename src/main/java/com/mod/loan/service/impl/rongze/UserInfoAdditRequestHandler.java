@@ -95,14 +95,17 @@ public class UserInfoAdditRequestHandler {
 
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
         if (userInfo == null) throw new BizException("推送用户补充信息:用户详细信息不存在");
-
-//        userInfo.setLiveProvince(addr_detail.split(" ")[0]);
-//        userInfo.setLiveCity(addr_detail.split(" ")[1]);
-//        userInfo.setLiveAddress(addr_detail);
-        userInfo.setLiveMarry(user_marriage);
-//        userInfo.setWorkCompanyProvince(company_addr_detail.split(" ")[0]);
-//        userInfo.setWorkCompanyCity(company_addr_detail.split(" ")[1]);
-//        userInfo.setWorkCompanyArea(company_addr_detail.split(" ")[2]);
+//        if(addr_detail.split(" ").length >= 2) {
+//            userInfo.setLiveProvince(addr_detail.split(" ")[0]);
+//            userInfo.setLiveCity(addr_detail.split(" ")[1]);
+//            userInfo.setLiveAddress(addr_detail);
+//        }
+        userInfo.setLiveMarry(this.getHYZK(user_marriage));
+//        if(company_addr_detail.split(" ").length >= 3) {
+//            userInfo.setWorkCompanyProvince(company_addr_detail.split(" ")[0]);
+//            userInfo.setWorkCompanyCity(company_addr_detail.split(" ")[1]);
+//            userInfo.setWorkCompanyArea(company_addr_detail.split(" ")[2]);
+//        }
         userInfo.setWorkAddress(company_addr_detail);
         userInfo.setWorkCompany(company_name);
         userInfo.setWorkCompanyPhone(company_number);
@@ -311,5 +314,16 @@ public class UserInfoAdditRequestHandler {
         map.put("7","朋友");
         return  map.get(type);
     }
+
+    public static String getHYZK(String type){
+        Map<String,String> map=new HashMap<>();
+        map.put("D02","已婚");
+        map.put("D05","未知");
+        map.put("D04","离异");
+        map.put("D03","丧偶");
+        map.put("D01","未婚");
+        return  map.get(type);
+    }
+
 
 }
