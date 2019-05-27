@@ -128,7 +128,7 @@ public class UserInfoBaseRequestHandler {
             int n = userMapper.updateByPrimaryKey(user);
             if (n == 0) throw new RuntimeException("推送用户基本信息:更新用户失败");
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(user.getId());
-            userInfo.setEducation(userEducation);
+            userInfo.setEducation(this.getXLBM(userEducation));
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
             n = userInfoMapper.updateByPrimaryKey(userInfo);
             if (n == 0) throw new RuntimeException("推送用户基本信息:更新用户详情信息失败");
@@ -154,6 +154,18 @@ public class UserInfoBaseRequestHandler {
 
         log.info("===============推送用户基本信息结束====================");
         return ResponseBean.success(map);
+    }
+
+
+
+    public static String getXLBM(String type){
+        Map<String,String> map=new HashMap<>();
+        map.put("E02","高中 / 职中");
+        map.put("E04","本科（学士）");
+        map.put("E05","研究生及以上");
+        map.put("E03","大专");
+        map.put("E01","初中及以下");
+        return  map.get(type);
     }
 
 

@@ -1,20 +1,18 @@
 package com.mod.loan.service.impl;
 
-import java.math.BigDecimal;
-import java.util.*;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
-import com.mod.loan.common.enums.RiskAuditSourceEnum;
 import com.mod.loan.common.exception.BizException;
-import com.mod.loan.common.message.RiskAuditMessage;
+import com.mod.loan.common.mapper.BaseServiceImpl;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
-import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
+import com.mod.loan.mapper.OrderMapper;
+import com.mod.loan.mapper.OrderPayMapper;
+import com.mod.loan.mapper.OrderPhoneMapper;
 import com.mod.loan.mapper.TbDecisionResDetailMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
@@ -25,14 +23,12 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
-
-import com.mod.loan.common.mapper.BaseServiceImpl;
-import com.mod.loan.mapper.OrderMapper;
-import com.mod.loan.mapper.OrderPayMapper;
-import com.mod.loan.mapper.OrderPhoneMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 
 @Slf4j
@@ -80,12 +76,14 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         log.info("还款Merchant(" + Constant.merchant + "): " + JSONObject.toJSONString(merchant));
 
         OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
-        if (orderRepay.getRepayStatus() == 0 && orderRepay.getRepayType() == 7) {
-            throw new BizException("系统正在自动扣款，请勿重复提交");
-        } else if (orderRepay.getRepayStatus() == 0) {
-            throw new BizException("订单正在自动扣款，请勿重复提交");
-        } else if (orderRepay.getRepayStatus() == 3 && orderRepay.getRepayType() == 7) {
-            throw new BizException("已经还款了，请刷新页面");
+        if (orderRepay != null) {
+            if (orderRepay.getRepayStatus() == 0 && orderRepay.getRepayType() == 7) {
+                throw new BizException("系统正在自动扣款，请勿重复提交");
+            } else if (orderRepay.getRepayStatus() == 0) {
+                throw new BizException("订单正在自动扣款，请勿重复提交");
+            } else if (orderRepay.getRepayStatus() == 3 && orderRepay.getRepayType() == 7) {
+                throw new BizException("已经还款了，请刷新页面");
+            }
         }
 
         if (merchant != null) {
