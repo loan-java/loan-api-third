@@ -257,7 +257,7 @@ public class TbDecisionResDetail {
 
     public TbDecisionResDetail(Long order_id, String orderNo, String decisionNo, String transId, String orderStatus) {
         this.setOrderId(order_id);
-        this.setDecisionNo(orderNo);
+        this.setOrderNo(orderNo);
         this.setDecisionNo(decisionNo);
         this.setTransId(transId);
         this.setOrderStatus(orderStatus);
