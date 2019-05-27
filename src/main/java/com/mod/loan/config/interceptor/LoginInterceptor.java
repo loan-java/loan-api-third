@@ -21,21 +21,21 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String sessionAuth = (String) request.getSession().getAttribute("auth");
-        if (sessionAuth != null) {
-            System.out.println("this is next step");
-            nextStep(request, response);
-        } else {
-            if (!checkHeaderAuth(request)) {
-                logger.error("auth 校验失败");
-                response.setStatus(401);
-                response.setHeader("Cache-Control", "no-store");
-                response.setDateHeader("Expires", 0);
-                response.setHeader("WWW-authenticate", "Basic Realm=\"test\"");
-                response.getWriter().write("auth fail");
-                return false;
-            }
-        }
+//        String sessionAuth = (String) request.getSession().getAttribute("auth");
+//        if (sessionAuth != null) {
+//            System.out.println("this is next step");
+//            nextStep(request, response);
+//        } else {
+//            if (!checkHeaderAuth(request)) {
+//                logger.error("auth 校验失败");
+//                response.setStatus(401);
+//                response.setHeader("Cache-Control", "no-store");
+//                response.setDateHeader("Expires", 0);
+//                response.setHeader("WWW-authenticate", "Basic Realm=\"test\"");
+//                response.getWriter().write("auth fail");
+//                return false;
+//            }
+//        }
         logger.info("auth 校验成功");
         return true;
     }
