@@ -237,6 +237,8 @@ public class TbDecisionResDetail {
         this.id = id;
     }
 
+    public TbDecisionResDetail() {
+    }
 
     public TbDecisionResDetail(DecisionResDetailDTO decisionResDetailDTO) {
         this.decisionNo = decisionResDetailDTO.getDecision_no();
