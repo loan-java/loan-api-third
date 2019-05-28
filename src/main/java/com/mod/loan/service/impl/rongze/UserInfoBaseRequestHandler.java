@@ -106,7 +106,7 @@ public class UserInfoBaseRequestHandler {
             addressList.setUid(user.getId());
             addressList.setCreateTime(new Date());
             n = addressListMapper.insertSelective(addressList);
-            if (n == 0) throw new RuntimeException("推送用户基本信息:新增用户地址信息失败");
+            if (n == 0) throw new RuntimeException("推送用户基本信息:新增通讯录信息失败");
             UserInfo userInfo = new UserInfo();
             userInfo.setEducation(userEducation);
             userInfo.setUid(user.getId());

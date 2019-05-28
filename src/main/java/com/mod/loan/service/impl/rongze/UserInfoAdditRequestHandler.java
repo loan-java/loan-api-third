@@ -1,5 +1,6 @@
 package com.mod.loan.service.impl.rongze;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
@@ -41,8 +42,9 @@ public class UserInfoAdditRequestHandler {
     @Resource
     UserInfoMapper userInfoMapper;
     @Resource
-    private MoxieMobileMapper moxieMobileMapper;
-
+    MoxieMobileMapper moxieMobileMapper;
+    @Autowired
+    UserAddressListMapper addressListMapper;
 
     //推送用户补充信息
     @Transactional
@@ -84,6 +86,7 @@ public class UserInfoAdditRequestHandler {
         //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null) throw new BizException("推送用户补充信息:用户不存在");
+        this.addressList(bizData, user);
         this.deleteUpLoadFile(user);
         this.upLoadUserIdcard(orderNo,user,ID_Positive,ID_Negative,photo_assay,"");
         this.checkPhone(orderNo,user);
@@ -162,6 +165,43 @@ public class UserInfoAdditRequestHandler {
     }
 
     /**
+     * 填充通讯录
+     * @param param
+     * @return
+     * @throws BizException
+     */
+    public void addressList(JSONObject param,User user) throws BizException {
+        try {
+            UserAddressList addressList = addressListMapper.selectByPrimaryKey(user.getId());
+            if(addressList == null){
+                addressList = new UserAddressList();
+                addressList.setUid(user.getId());
+                addressList.setCreateTime(new Date());
+                addressListMapper.insertSelective(addressList);
+            }
+            JSONObject contacts = param.getJSONObject("contacts");
+            JSONArray jsonArray = contacts.getJSONArray("phone_list");
+            JSONArray addArray = new JSONArray();
+            for (int i = 0; i < jsonArray.size() ; i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String phone = jsonObject.getString("phone");
+                String name = jsonObject.getString("name");
+                JSONObject addJson = new JSONObject();
+                addJson.put("mobile",phone);
+                addJson.put("userName",name);
+                addArray.add(addJson);
+            }
+            addressList.setAddressList(addArray.toJSONString());
+            int n=addressListMapper.updateByPrimaryKey(addressList);
+            if(n == 0){
+                throw new BizException("通讯录更新失败!");
+            }
+        }catch (Exception e){
+            log.error("填充通讯录失败!",e);
+        }
+    }
+
+    /**
      * 上传身份证文件，并保存到user上
      * @param orderNo
      * @param user
@@ -175,47 +215,54 @@ public class UserInfoAdditRequestHandler {
     public boolean upLoadUserIdcard(String orderNo,User user,String str1,String str2,String str3,String str4) throws BizException {
         boolean flag = false;
         try {
-            JSONObject jsonObject1=new JSONObject();
-            jsonObject1.put("order_no",orderNo);
-            jsonObject1.put("fileid",str1);
-            String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
-            JSONObject resultJson1 = JSONObject.parseObject(result1);
-            if(!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200){
-                throw new BizException("推送用户补充信息:身份证正面信息解析失败"  + result1);
+            if(StringUtils.isNotBlank(str1)) {
+                JSONObject jsonObject1=new JSONObject();
+                jsonObject1.put("order_no",orderNo);
+                jsonObject1.put("fileid",str1);
+                String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
+                JSONObject resultJson1 = JSONObject.parseObject(result1);
+                if(!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200){
+                    throw new BizException("推送用户补充信息:身份证正面信息解析失败"  + result1);
+                }
+                JSONObject data = resultJson1.getJSONObject("data");
+                String base64str = data.getString("filestr");
+                String filesuffix = data.getString("filesuffix");
+                String imgCertFront = OSSUtil.uploadImage(base64str,filesuffix);
+                user.setImgCertFront(imgCertFront);
             }
-            JSONObject data = resultJson1.getJSONObject("data");
-            String base64str = data.getString("filestr");
-            String filesuffix = data.getString("filesuffix");
-            String imgCertFront = OSSUtil.uploadImage(base64str,filesuffix);
-            user.setImgCertFront(imgCertFront);
 
-            JSONObject jsonObject2=new JSONObject();
-            jsonObject2.put("order_no",orderNo);
-            jsonObject2.put("fileid",str2);
-            String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
-            JSONObject resultJson2 = JSONObject.parseObject(result2);
-            if(!resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200){
-                throw new BizException("推送用户补充信息:身份证背面信息解析失败" + result2);
+            if(StringUtils.isNotBlank(str2)) {
+                JSONObject jsonObject2=new JSONObject();
+                jsonObject2.put("order_no",orderNo);
+                jsonObject2.put("fileid",str2);
+                String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
+                JSONObject resultJson2 = JSONObject.parseObject(result2);
+                if(!resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200){
+                    throw new BizException("推送用户补充信息:身份证背面信息解析失败" + result2);
+                }
+                JSONObject data2 = resultJson2.getJSONObject("data");
+                String base64str2 = data2.getString("filestr");
+                String filesuffix2 = data2.getString("filesuffix");
+                String imgCertBack = OSSUtil.uploadImage(base64str2,filesuffix2);
+                user.setImgCertBack(imgCertBack);
             }
-            JSONObject data2 = resultJson1.getJSONObject("data");
-            String base64str2 = data2.getString("filestr");
-            String filesuffix2 = data2.getString("filesuffix");
-            String imgCertBack = OSSUtil.uploadImage(base64str2,filesuffix2);
-            user.setImgCertBack(imgCertBack);
 
-            JSONObject jsonObject3=new JSONObject();
-            jsonObject3.put("order_no",orderNo);
-            jsonObject3.put("fileid",str1);
-            String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
-            JSONObject resultJson3 = JSONObject.parseObject(result3);
-            if(!resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200){
-                throw new BizException("推送用户补充信息:身份证活体信息解析失败" + result3);
+            if(StringUtils.isNotBlank(str3)) {
+                JSONObject jsonObject3=new JSONObject();
+                jsonObject3.put("order_no",orderNo);
+                jsonObject3.put("fileid",str3);
+                String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
+                JSONObject resultJson3 = JSONObject.parseObject(result3);
+                if(!resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200){
+                    throw new BizException("推送用户补充信息:身份证活体信息解析失败" + result3);
+                }
+                JSONObject data3 = resultJson3.getJSONObject("data");
+                String base64str3 = data3.getString("filestr");
+                String filesuffix3 = data3.getString("filesuffix");
+                String imgFace = OSSUtil.uploadImage(base64str3,filesuffix3);
+                user.setImgFace(imgFace);
             }
-            JSONObject data3 = resultJson1.getJSONObject("data");
-            String base64str3 = data3.getString("filestr");
-            String filesuffix3 = data3.getString("filesuffix");
-            String imgFace = OSSUtil.uploadImage(base64str3,filesuffix3);
-            user.setImgFace(imgFace);
+
             flag = true;
         }catch (Exception e){
             log.error("推送用户补充信息:用户不存在",e);
