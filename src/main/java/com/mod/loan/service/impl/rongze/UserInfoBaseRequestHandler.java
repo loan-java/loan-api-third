@@ -7,15 +7,9 @@ import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
-import com.mod.loan.service.BlacklistService;
-import com.mod.loan.service.OrderService;
 import com.mod.loan.service.UserService;
-import com.mod.loan.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +45,7 @@ public class UserInfoBaseRequestHandler {
     @Transactional
     public ResponseBean<Map<String, Object>> userInfoBase(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
-        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
+        JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============推送用户基本信息开始====================" + bizData.toJSONString());
         JSONObject orderInfo = bizData.getJSONObject("orderInfo");//订单基本信息
         String orderNo = orderInfo.getString("order_no");
@@ -157,15 +151,14 @@ public class UserInfoBaseRequestHandler {
     }
 
 
-
-    public static String getXLBM(String type){
-        Map<String,String> map=new HashMap<>();
-        map.put("E02","高中 / 职中");
-        map.put("E04","本科（学士）");
-        map.put("E05","研究生及以上");
-        map.put("E03","大专");
-        map.put("E01","初中及以下");
-        return  map.get(type);
+    public static String getXLBM(String type) {
+        Map<String, String> map = new HashMap<>();
+        map.put("E02", "高中/职中");
+        map.put("E04", "本科(学士)");
+        map.put("E05", "研究生及以上");
+        map.put("E03", "大专");
+        map.put("E01", "初中及以下");
+        return map.get(type);
     }
 
 
