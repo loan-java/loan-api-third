@@ -1,7 +1,5 @@
 package com.mod.loan.controller.contract;
 
-import com.mod.loan.common.enums.MerchantEnum;
-import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.OrderMapper;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.User;
@@ -42,7 +40,7 @@ public class ContractController {
      */
     @RequestMapping("/queryLoanInfo")
     public Object queryLoanInfo(long uid, int source) {
-        String JF = MerchantEnum.getDescByName(Constant.merchant); //甲方
+        String JF = "上海翼元金融信息服务有限公司"; //甲方
         String YF = ""; //乙方
         String idCardNo = ""; //乙方身份证号
         String bankCardNo = ""; //乙方收款/扣款银行卡号
