@@ -1,7 +1,5 @@
 package com.mod.loan.model;
 
-import com.mod.loan.model.dto.DecisionResDetailDTO;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -238,31 +236,6 @@ public class TbDecisionResDetail {
     }
 
     public TbDecisionResDetail() {
-    }
-
-    public TbDecisionResDetail(DecisionResDetailDTO decisionResDetailDTO) {
-        this.decisionNo = decisionResDetailDTO.getDecision_no();
-        this.transId = decisionResDetailDTO.getTrans_id();
-        this.orderStatus = decisionResDetailDTO.getOrderStatus();
-        this.orderMoney = decisionResDetailDTO.getOrder_money();
-        this.fee = decisionResDetailDTO.getFee();
-        this.customGrade = decisionResDetailDTO.getCustom_grade() != null ? decisionResDetailDTO.getCustom_grade().toString() : null;
-        this.code = decisionResDetailDTO.getCode();
-        this.descs = decisionResDetailDTO.getDesc();
-        this.resScore = decisionResDetailDTO.getResScore();
-        this.strategies = decisionResDetailDTO.getStrategies() != null ? decisionResDetailDTO.getStrategies().toString() : null;
-        this.setUpdatetime(new Date());
-    }
-
-
-    public TbDecisionResDetail(Long order_id, String orderNo, String decisionNo, String transId, String orderStatus) {
-        this.setOrderId(order_id);
-        this.setOrderNo(orderNo);
-        this.setDecisionNo(decisionNo);
-        this.setTransId(transId);
-        this.setOrderStatus(orderStatus);
-        this.setCreatetime(new Date());
-        this.setUpdatetime(new Date());
     }
 
     public Long getOrderId() {
