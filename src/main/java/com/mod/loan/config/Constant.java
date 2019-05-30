@@ -60,8 +60,19 @@ public class Constant {
 
     public static String sysDomainHost; //系统域名
 
+
+    public static String companyName;//公司名称
+
+
+    @Value("${company.name}")
+    public static void setCompanyName(String companyName) {
+        Constant.companyName = companyName;
+    }
+
     @Value("${oss.endpoint.in}")
-    public void setOssEndpointIn(String ossEndpointIn) { Constant.OSS_ENDPOINT_IN = ossEndpointIn; }
+    public void setOssEndpointIn(String ossEndpointIn) {
+        Constant.OSS_ENDPOINT_IN = ossEndpointIn;
+    }
 
     @Value("${sys.domain.host}")
     public void setSysDomainHost(String sysDomainHost) {
