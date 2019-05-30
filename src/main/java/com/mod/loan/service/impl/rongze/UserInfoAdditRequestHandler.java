@@ -94,19 +94,21 @@ public class UserInfoAdditRequestHandler {
 
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
         if (userInfo == null) throw new BizException("推送用户补充信息:用户详细信息不存在");
+        userInfo.setLiveAddress(addr_detail);
         if (addr_detail.split(" ").length >= 3) {
             userInfo.setLiveProvince(addr_detail.split(" ")[0]);
             userInfo.setLiveCity(addr_detail.split(" ")[1]);
             userInfo.setLiveDistrict(addr_detail.split(" ")[2]);
+            userInfo.setLiveAddress(addr_detail.split(" ")[3]);
         }
-        userInfo.setLiveAddress(addr_detail);
         userInfo.setLiveMarry(this.getHYZK(user_marriage));
+        userInfo.setWorkAddress(company_addr_detail);
         if (company_addr_detail.split(" ").length >= 3) {
             userInfo.setWorkCompanyProvince(company_addr_detail.split(" ")[0]);
             userInfo.setWorkCompanyCity(company_addr_detail.split(" ")[1]);
             userInfo.setWorkCompanyArea(company_addr_detail.split(" ")[2]);
+            userInfo.setWorkAddress(company_addr_detail.split(" ")[3]);
         }
-        userInfo.setWorkAddress(company_addr_detail);
         userInfo.setWorkCompany(company_name);
         userInfo.setWorkCompanyPhone(company_number);
         userInfo.setWorkType(this.getSrly(industry_type));
