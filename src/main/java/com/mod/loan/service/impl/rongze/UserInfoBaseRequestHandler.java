@@ -99,12 +99,14 @@ public class UserInfoBaseRequestHandler {
             UserAddressList addressList = new UserAddressList();
             addressList.setUid(user.getId());
             addressList.setCreateTime(new Date());
+            addressList.setUpdateTime(new Date());
             n = addressListMapper.insertSelective(addressList);
             if (n == 0) throw new RuntimeException("推送用户基本信息:新增通讯录信息失败");
             UserInfo userInfo = new UserInfo();
             userInfo.setEducation(this.getXLBM(userEducation));
             userInfo.setUid(user.getId());
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
+            userInfo.setCreateTime(new Date());
             n = userInfoMapper.insertSelective(userInfo);
             if (n == 0) throw new RuntimeException("推送用户基本信息:新增用户详情信息失败");
         } else {
@@ -124,6 +126,7 @@ public class UserInfoBaseRequestHandler {
             UserInfo userInfo = userInfoMapper.selectByPrimaryKey(user.getId());
             userInfo.setEducation(this.getXLBM(userEducation));
             userInfo.setIncomeMonthlyYuan(new BigDecimal(userIncomeByCard));
+            userInfo.setUpdateTime(new Date());
             n = userInfoMapper.updateByPrimaryKey(userInfo);
             if (n == 0) throw new RuntimeException("推送用户基本信息:更新用户详情信息失败");
         }

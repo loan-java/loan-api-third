@@ -56,6 +56,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
         UserAddressList addressList = new UserAddressList();
         addressList.setUid(user.getId());
         addressList.setCreateTime(new Date());
+        addressList.setUpdateTime(new Date());
         addressListMapper.insertSelective(addressList);
         UserInfo userInfo = new UserInfo();
         userInfo.setUid(user.getId());
