@@ -65,7 +65,7 @@ public class Constant {
 
 
     @Value("${company.name}")
-    public static void setCompanyName(String companyName) {
+    public void setCompanyName(String companyName) {
         Constant.companyName = companyName;
     }
 
