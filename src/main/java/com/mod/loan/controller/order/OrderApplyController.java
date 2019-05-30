@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.annotation.Api;
 import com.mod.loan.common.annotation.LoginRequired;
+import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.enums.RiskAuditSourceEnum;
+import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -97,6 +100,9 @@ public class OrderApplyController {
 
     @Autowired
     private KuaiQianService kuaiQianService;
+
+    @Resource
+    private BaofooService baofooService;
 
     @Autowired
     private MerchantService merchantService;
@@ -257,7 +263,7 @@ public class OrderApplyController {
     @LoginRequired()
     @RequestMapping(value = "/repayment")
     @Api
-    public JSONObject repayment(HttpServletRequest request, @RequestBody JSONObject param) {
+    public JSONObject repayment(HttpServletRequest request, @RequestBody JSONObject param) throws BizException {
         logger.info("=====还款=====");
         logger.info("请求参数：" + JSON.toJSONString(param));
         logger.info("===============================");
@@ -267,7 +273,7 @@ public class OrderApplyController {
         }
 
         String orderNo = param.getString("orderNo");
-
+        Order order = orderService.repayOrder(orderNo, OrderSourceEnum.JUHE.getSoruce());
         ResultMessage message = null;
         logger.info("还款Constant.merchant参数：" + Constant.merchant);
         logger.info("============================================================");
@@ -277,16 +283,16 @@ public class OrderApplyController {
             logger.info("===============================");
             switch (merchant.getBindType()) {
                 case 4:
-                    message = repay(orderNo);
+                    message = baofooService.repay(order);
                     break;
                 case 5:
-                    message = kuaiQianService.repay(orderNo);
+                    message = kuaiQianService.repay(order);
                     break;
                 default:
                     return ResultMap.fail(ResponseEnum.M4000.getCode(), "支付渠道异常");
             }
         } else {
-            message = kuaiQianService.repay(orderNo);
+            message = kuaiQianService.repay(order);
         }
         logger.info("还款ResultMessage参数：" + (message != null ? message.toString() : null));
         logger.info("===============================");

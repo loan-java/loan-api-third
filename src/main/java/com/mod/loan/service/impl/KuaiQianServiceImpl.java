@@ -239,18 +239,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
                 respXml.get("responseTextMessage").toString());
     }
 
-    /**
-     * 还款
-     *
-     * @param orderNo 订单号
-     * @return ResultMessage
-     */
-    @Override
-    public ResultMessage repay(String orderNo) {
-        Long uid = RequestThread.getUid();
-        Order order = orderMapper.findByOrderNoAndUid(orderNo, uid);
-        return repay(order);
-    }
+
 
     @Override
     public ResultMessage repay(Order order) {
