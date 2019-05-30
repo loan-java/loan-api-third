@@ -6,10 +6,13 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
-import com.mod.loan.model.*;
-import com.mod.loan.service.*;
+import com.mod.loan.model.Blacklist;
+import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderUser;
+import com.mod.loan.model.User;
+import com.mod.loan.service.BlacklistService;
+import com.mod.loan.service.OrderService;
 import com.mod.loan.util.DateUtil;
-import com.mod.loan.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -82,7 +85,7 @@ public class CertRequestHandler {
                     // 是否有正在借款中的订单
                     Order orderIng = orderService.findUserLatestOrder(user.getId());
                     if (null != orderIng) {
-                        if (orderIng.getStatus() < 40) {
+                        if (orderIng.getStatus() < 40 && orderIng.getStatus() != 23) {
                             log.info(user.getId() + "订单进行中，无法提单");
                             log.info("==================================================================");
                             userType = "1";
