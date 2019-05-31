@@ -99,7 +99,7 @@ public class UserInfoAdditRequestHandler {
             userInfo.setLiveProvince(addr_detail.split(" ")[0]);
             userInfo.setLiveCity(addr_detail.split(" ")[1]);
             userInfo.setLiveDistrict(addr_detail.split(" ")[2]);
-            userInfo.setLiveAddress(addr_detail.split(" ")[3]);
+            //userInfo.setLiveAddress(addr_detail.split(" ")[3]);
         }
         userInfo.setLiveMarry(this.getHYZK(user_marriage));
         userInfo.setWorkAddress(company_addr_detail);
@@ -107,7 +107,7 @@ public class UserInfoAdditRequestHandler {
             userInfo.setWorkCompanyProvince(company_addr_detail.split(" ")[0]);
             userInfo.setWorkCompanyCity(company_addr_detail.split(" ")[1]);
             userInfo.setWorkCompanyArea(company_addr_detail.split(" ")[2]);
-            userInfo.setWorkAddress(company_addr_detail.split(" ")[3]);
+            //userInfo.setWorkAddress(company_addr_detail.split(" ")[3]);
         }
         userInfo.setWorkCompany(company_name);
         userInfo.setWorkCompanyPhone(company_number);
