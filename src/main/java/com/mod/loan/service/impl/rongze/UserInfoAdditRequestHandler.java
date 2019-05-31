@@ -95,7 +95,7 @@ public class UserInfoAdditRequestHandler {
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
         if (userInfo == null) throw new BizException("推送用户补充信息:用户详细信息不存在");
         userInfo.setLiveAddress(addr_detail);
-        if (addr_detail.split(" ").length >= 3) {
+        if (addr_detail.split(" ").length >= 2) {
             userInfo.setLiveProvince(addr_detail.split(" ")[0]);
             userInfo.setLiveCity(addr_detail.split(" ")[1]);
             userInfo.setLiveDistrict(addr_detail.split(" ")[2]);
