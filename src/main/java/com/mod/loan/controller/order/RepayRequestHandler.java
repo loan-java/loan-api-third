@@ -73,8 +73,8 @@ public class RepayRequestHandler extends BaseRequestHandler {
 
         BigDecimal amount = order.getHadRepay() == null ? order.getShouldRepay() : order.getShouldRepay().subtract(order.getHadRepay());
         repay.put("amount", amount);
-        // 已还款金额，单位元，保留小数点后两位
-        repay.put("paid_amount", order.getHadRepay().toPlainString());
+        // 已还款金额+减免金额，单位元，保留小数点后两位
+        repay.put("paid_amount", (order.getHadRepay().add(order.getReduceMoney())).toPlainString());
         // 逾期费用，单位元，保留小数点后两位
         repay.put("overdue_fee", order.getOverdueFee().toPlainString());
         // 还款成功的时间
