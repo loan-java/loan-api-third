@@ -185,14 +185,16 @@ public class UserInfoAdditRequestHandler {
             JSONObject contacts = param.getJSONObject("contacts");
             JSONArray jsonArray = contacts.getJSONArray("phone_list");
             JSONArray addArray = new JSONArray();
-            for (int i = 0; i < jsonArray.size(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String phone = jsonObject.getString("phone");
-                String name = jsonObject.getString("name");
-                JSONObject addJson = new JSONObject();
-                addJson.put("mobile", phone);
-                addJson.put("userName", name);
-                addArray.add(addJson);
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String phone = jsonObject.getString("phone");
+                    String name = jsonObject.getString("name");
+                    JSONObject addJson = new JSONObject();
+                    addJson.put("mobile", phone);
+                    addJson.put("userName", name);
+                    addArray.add(addJson);
+                }
             }
             addressList.setAddressList(addArray.toJSONString());
             addressList.setUpdateTime(new Date());
