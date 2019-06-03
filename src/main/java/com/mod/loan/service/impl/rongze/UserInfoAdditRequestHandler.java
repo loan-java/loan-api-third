@@ -270,7 +270,7 @@ public class UserInfoAdditRequestHandler {
 
             flag = true;
         } catch (Exception e) {
-            log.error("推送用户补充信息:用户不存在", e);
+            log.error("推送用户补充信息：上传身份证文件信息出错", e);
         }
         return flag;
     }

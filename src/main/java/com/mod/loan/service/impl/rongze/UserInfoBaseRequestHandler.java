@@ -140,13 +140,6 @@ public class UserInfoBaseRequestHandler {
             orderUser.setUid(user.getId());
             int m = orderUserMapper.insert(orderUser);
             if (m == 0) throw new RuntimeException("推送用户基本信息:新增用户订单关联信息");
-        } else {
-            orderUser.setCreateTime(new Date());
-            orderUser.setOrderNo(orderNo);
-            orderUser.setSource(Integer.valueOf(UserOriginEnum.RZ.getCode()));
-            orderUser.setUid(user.getId());
-            int m = orderUserMapper.insert(orderUser);
-            if (m == 0) throw new RuntimeException("推送用户基本信息:更新用户订单关联信息");
         }
 
         log.info("===============推送用户基本信息结束====================");
