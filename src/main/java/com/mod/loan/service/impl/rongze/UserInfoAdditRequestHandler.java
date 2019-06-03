@@ -198,7 +198,7 @@ public class UserInfoAdditRequestHandler {
             addressList.setUpdateTime(new Date());
             int n = addressListMapper.updateByPrimaryKey(addressList);
             if (n == 0) {
-                throw new BizException("通讯录更新失败!");
+                throw new BizException("通讯录更新失败!" + addArray.toJSONString());
             }
         } catch (Exception e) {
             log.error("填充通讯录失败!", e);
