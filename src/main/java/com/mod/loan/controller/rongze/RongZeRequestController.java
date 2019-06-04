@@ -67,6 +67,8 @@ public class RongZeRequestController {
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
+        long s = System.currentTimeMillis();
+
         log.warn(logPre + "=============================================" + param.toJSONString());
 
         Object result;
@@ -141,7 +143,7 @@ public class RongZeRequestController {
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
 
-        log.info(logPre + "结束返回, result: " + JSON.toJSONString(result) + ", method: " + method);
+        log.info(logPre + "结束返回, result: " + JSON.toJSONString(result) + ", method: " + method + ", costTime: " + (System.currentTimeMillis() - s) + " ms");
         return result;
     }
 
