@@ -1,7 +1,9 @@
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.config.Constant;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.util.aliyun.OSSUtil;
@@ -13,6 +15,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ControllerTest extends BaseSpringBootJunitTest {
 
     @Autowired
@@ -23,6 +29,9 @@ public class ControllerTest extends BaseSpringBootJunitTest {
 
     @Autowired
     private OrderUserMapper orderUserMapper;
+
+    @Resource
+    private RedisMapper redisMapper;
 
     @Test
     public void md5PhoneAndIdcard() throws Exception {
@@ -151,6 +160,44 @@ public class ControllerTest extends BaseSpringBootJunitTest {
     @Test
     public void deleteOSSfile() throws Exception {
         OSSUtil.deleteFile("2019/0524/ce461a4693ae43d690c3cc212d95c2df.jpg",Constant.OSS_STATIC_BUCKET_NAME);
+    }
+
+    /**
+     * 多线程简单测试
+     * @throws Exception
+     */
+    @Test
+    public void redisMap1() throws Exception {
+        ExecutorService service = Executors.newFixedThreadPool(100);
+        for (int i = 0; i < 10000 ; i++) {
+            int finalI = i;
+            service.execute(()->{
+                Long uid =0l;
+                String key=redisMapper.getOrderUserKey("1661361583869370368", UserOriginEnum.RZ.getCode());
+                if(redisMapper.hasKey(key)) {
+                    uid = Long.parseLong(redisMapper.get(key));
+                }else{
+                    uid = orderUserMapper.getUidByOrderNoAndSource("1661361583869370368", Integer.parseInt(UserOriginEnum.RZ.getCode()));
+                    redisMapper.set(key,uid);
+                }
+                System.out.println(finalI + "++++++++++++++++redis的缓存key值:" + key+"++++++++++++++++++用户的id：" + uid + "++++++++++++++++");
+            });
+
+        }
+    }
+    @Test
+    public void redisMap2() throws Exception {
+        for (int i = 0; i < 10000 ; i++) {
+            Long uid =0l;
+            String key=redisMapper.getOrderUserKey("1661361583869370368", UserOriginEnum.RZ.getCode());
+            if(redisMapper.hasKey(key)) {
+                uid = Long.parseLong(redisMapper.get(key));
+            }else{
+                uid = orderUserMapper.getUidByOrderNoAndSource("1661361583869370368", Integer.parseInt(UserOriginEnum.RZ.getCode()));
+                redisMapper.set(key,uid);
+            }
+            System.out.println(i + "++++++++++++++++redis的缓存key值:" + key+"++++++++++++++++++用户的id：" + uid + "++++++++++++++++");
+        }
     }
 
     //占用内存笔数
