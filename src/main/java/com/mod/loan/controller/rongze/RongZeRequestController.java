@@ -67,7 +67,7 @@ public class RongZeRequestController {
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
-//        log.info(logPre + "=============================================");
+        log.warn(logPre + "=============================================" + param.toJSONString());
 
         Object result;
         String method = param.getString("method");
@@ -83,7 +83,7 @@ public class RongZeRequestController {
                 String bizDataStr = param.getString("biz_data");
                 String bizData = BizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
                 param.put("biz_data", bizData);
-//                log.info("========================" + method + "解密后的数据：" + param.toJSONString());
+                log.warn("========================" + method + "解密后的数据：" + param.toJSONString());
             }
 
             //绑定线程变量

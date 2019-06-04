@@ -4,6 +4,7 @@
 	<property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/" />  <!-- 日志路径 -->
 	<property name="LOG_PATH_INFO" value="${LOG_PATH}/${PROJECT}-info.log" />
 	<property name="LOG_PATH_ERROR" value="${LOG_PATH}/${PROJECT}-error.log" />
+	<property name="LOG_PATH_WARN" value="${LOG_PATH}/${PROJECT}-warn.log" />
 
 	<property name="PATTERN" value="%d %p ${PID:- } --- [%thread] %c[%L]  : %m%n" />
 	<property name="LOG_LEVEL" value="INFO" />
@@ -68,9 +69,27 @@
 		</filter>
 	</appender>
 
+	<appender name="WARN-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH_WARN}</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_PATH_WARN}.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${PATTERN}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+		<!-- 日志级别过滤 -->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>WARN</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
 	<root level="${LOG_LEVEL}">
 		<appender-ref ref="CONSOLE"/>
-		<!--<appender-ref ref="FILE"></appender-ref>-->
+		<appender-ref ref="WARN-OUT"/>
 		<appender-ref ref="INFO-OUT"/>
 		<appender-ref ref="ERROR-OUT"/>
 	</root>
