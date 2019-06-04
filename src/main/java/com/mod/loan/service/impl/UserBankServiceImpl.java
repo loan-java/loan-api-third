@@ -163,7 +163,7 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
     @Override
     public ResultMessage bindBaoFooSms(String validateCode, Long uid, String bindInfo, String cardNo,
                                        String cardPhone, String bankCode, String bankName) {
-        ResultMessage message;
+        ResultMessage message = null;
         ReadySignVO readySignVO = JSONObject.parseObject(bindInfo, ReadySignVO.class);
         try {
             //报文发送日期时间
