@@ -186,6 +186,9 @@ public class BankRequestHandler extends BaseRequestHandler {
             default:
                 throw new BizException("支付渠道异常");
         }
+        if(message == null) {
+            throw new BizException("绑定银行卡的message为null");
+        }
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             map.put("deal_result", "1");
         } else {
