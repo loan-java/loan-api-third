@@ -159,6 +159,7 @@ public class RongZeRequestController {
             default:
                 orderNo = bizData.containsKey("order_no") ? bizData.getString("order_no") : null;
         }
+        log.info("订单编号:" + orderNo);
         if (orderNo != null) {
             uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
         }
