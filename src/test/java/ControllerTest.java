@@ -200,6 +200,11 @@ public class ControllerTest extends BaseSpringBootJunitTest {
         }
     }
 
+    @Test
+    public void redisMap3() throws Exception {
+        redisMapper.removeKeyPrev("ORDER_USER");
+    }
+
     //占用内存笔数
     public static void main(String[] args) {
         testMap();

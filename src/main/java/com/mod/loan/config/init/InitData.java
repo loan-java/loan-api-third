@@ -33,6 +33,7 @@ public class InitData implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        redisMapper.removeKeyPrev("ORDER_USER");
         List<OrderUser> list= orderUserMapper.getList();
         list.forEach(action->{
             redisMapper.set(redisMapper.getOrderUserKey(action.getOrderNo(), action.getSource().toString()),action.getUid(),1000*60*24*10);
