@@ -163,7 +163,7 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
     @Override
     public ResultMessage bindBaoFooSms(String validateCode, Long uid, String bindInfo, String cardNo,
                                        String cardPhone, String bankCode, String bankName) {
-        ResultMessage message = null;
+        ResultMessage message;
         ReadySignVO readySignVO = JSONObject.parseObject(bindInfo, ReadySignVO.class);
         try {
             //报文发送日期时间
@@ -252,10 +252,6 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
                 userService.insertUserBank(uid, userBank);
                 redisMapper.remove(RedisConst.user_bank_bind + uid);
                 return new ResultMessage(ResponseEnum.M2000, userBank.getId());
-            } else if ("I".equals(returnData.get("resp_code"))) {
-                log.info("处理中！");
-            } else if ("F".equals(returnData.get("resp_code"))) {
-                log.info("失败！");
             } else {
                 //异常不得做为订单状态。
                 log.error("宝付鉴权绑卡失败，请求参数为={},响应参数为={}",
