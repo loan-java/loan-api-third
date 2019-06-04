@@ -25,6 +25,7 @@ public class RongZeRequestUtil {
 //        String reqParamsStr = "{\"app_id\":\"appid1000000\",\"biz_data\":\"pGBul5nSR6ufWBMs/VRBPmduZhorhdfG8JEvIeikTgm4pvPdo/+qeB28lHw/G+NT2ZqXRMfn51LhsMutNWCzrSC06C35jFiOkQb3b4in1U3DS0jOxeN3AGbuF/7EzwA6ThlQTm1HkMw=\",\"biz_enc\":\"1\",\"des_key\":\"MDuA8iX/SIIxJRJRn8IAJ2+OZDZbAyZCGhhMU/oG5bOK51HypaLTIo9LKyKCRwbtqh0mJOP2ZS19o3lZNFCCexxOu4lFwnRWfOes+crDF8ppb4Z90W826GiNhtN3zk8UlXI0d3epCMIXLcHg3niXJu9O+ikAo9ycgM0u2EnXyPs=\",\"format\":\"json\",\"method\":\"api.bank.result\",\"return_url\":\"\",\"sign\":\"nhab1zczyG5t2PEhK0ztmttTm+5wcHFjekreSSRBOs8c19WVkl4ajO1nCXojPqxI34AlhdTQOkb/YMnOxHX3qX9n4jZ3W2qEdCnz2QcDBhvKrAqUbCD1Wty+iPltN+u+D41h0FmPvKuculPLGKDdINMkIPQjERVs9T49L5semF4=\",\"sign_type\":\"RSA\",\"timestamp\":\"1543396830799\",\"version\":\"1.0\"}";
         log.info("融泽接口请求开始, param: " + reqParamsStr);
         String result = HttpClientUtils.sendPost(url, reqParamsStr.getBytes());
+        //log.info("融泽接口请求结束, result: " + result);
         log.info("融泽接口请求结束, result: " + result);
         return result;
     }
