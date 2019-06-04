@@ -67,8 +67,8 @@ public class RongZeRequestController {
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
-        log.info(logPre + "收到, param: " + param.toJSONString());
-        log.info(logPre + "=============================================");
+        log.info(logPre + "收到 ");
+//        log.info(logPre + "=============================================");
 
         Object result;
 
@@ -84,7 +84,7 @@ public class RongZeRequestController {
                 String bizDataStr = param.getString("biz_data");
                 String bizData = BizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
                 param.put("biz_data", bizData);
-                log.info("========================" + method + "解密后的数据：" + param.toJSONString());
+//                log.info("========================" + method + "解密后的数据：" + param.toJSONString());
             }
 
             //绑定线程变量
@@ -138,11 +138,11 @@ public class RongZeRequestController {
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
         } catch (Exception e) {
-            logFail(e);
+            logFail(e, "【"+method+"】方法出错：" + param.toJSONString());
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
 
-        log.info(logPre + "返回, result: " + JSON.toJSONString(result) + ", method: " + method);
+        log.info(logPre + "结束返回, result: " + JSON.toJSONString(result) + ", method: " + method);
         return result;
     }
 
@@ -191,11 +191,11 @@ public class RongZeRequestController {
         }
     }
 
-    private void logFail(Exception e) {
+    private void logFail(Exception e,String info) {
         if (e instanceof BizException)
-            log.info(getPreLog() + e.getMessage());
+            log.info(getPreLog() + e.getMessage() + "||相关数据：" + info);
         else
-            log.error("融泽入口请求系统异常, " + getPreLog() + e.getMessage(), e);
+            log.error("融泽入口请求系统异常, " + getPreLog() + e.getMessage() + "||相关数据：" + info, e);
     }
 
     private String getPreLog() {
