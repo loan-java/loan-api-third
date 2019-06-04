@@ -79,6 +79,7 @@ public class RongZeRequestController {
         String method = param.getString("method");
         log.info(logPre + "收到, method: " + method);
 
+        //redis的key
         String key = null;
         try {//校验 sig
 
@@ -94,11 +95,11 @@ public class RongZeRequestController {
                 log.warn("========================" + method + "解密后的数据：" + param.toJSONString());
             }
 
-            //绑定线程变量
-            key = this.binRequestThread(request, param, method);
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
             //锁住每个请求
-            if(key != null && redisMapper.lock(key, 3000)) {
+            //redis的key
+            key = this.binRequestThread(request, param, method);
+//            if(key != null && redisMapper.lock(key, 3000)) {
                 switch (method) {
                     case "fund.withdraw.req": //提交用户确认收款信息
                         result = rongZeRequestHandler.handleOrderSubmit(param);
@@ -144,16 +145,16 @@ public class RongZeRequestController {
                     default:
                         throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
                 }
-            }
+//            }
 
 
         } catch (Exception e) {
             logFail(e, "【" + method + "】方法出错：" + param.toJSONString());
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         } finally {
-            if(key != null) {
-                redisMapper.unlock(key);
-            }
+//            if(key != null) {
+//                redisMapper.unlock(key);
+//            }
         }
 
         log.info(logPre + "结束返回, result: " + JSON.toJSONString(result) + ", method: " + method + ", costTime: " + (System.currentTimeMillis() - s) + " ms");
