@@ -5,11 +5,22 @@ import com.mod.loan.util.rongze.SignUtil;
 import com.mod.loan.util.rongze.StandardDesUtils;
 import org.junit.Test;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+
 /**
  * @ author liujianjian
  * @ date 2019/5/15 13:56
  */
 public class CommonTest extends BaseSpringBootJunitTest {
+
+    @Resource
+    private DataSource dataSource;
+
+    @Test
+    public void t() {
+        System.out.println(dataSource);
+    }
 
     @Test
     public void req() throws Exception {

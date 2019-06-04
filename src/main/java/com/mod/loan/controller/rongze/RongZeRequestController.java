@@ -21,6 +21,7 @@ import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 /**
  * @ author liujianjian
@@ -36,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequestMapping("/rongze")
-public class RongZeRequestController {
+public class RongZeRequestController implements InitializingBean {
 
     @Resource
     private UserService userService;
@@ -211,5 +213,13 @@ public class RongZeRequestController {
             phone = user.getUserPhone();
         }
         return String.format(pre, uid, username, phone);
+    }
+
+    @Resource
+    private DataSource dataSource;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        log.info("current data source: " + dataSource);
     }
 }
