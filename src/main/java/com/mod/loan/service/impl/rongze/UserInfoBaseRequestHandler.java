@@ -142,7 +142,7 @@ public class UserInfoBaseRequestHandler {
             int m = orderUserMapper.insert(orderUser);
             if (m == 0) throw new RuntimeException("推送用户基本信息:新增用户订单关联信息");
             //设置缓存
-            String key=orderNo+UserOriginEnum.RZ.getCode();
+            String key=redisMapper.getOrderUserKey(orderNo,UserOriginEnum.RZ.getCode());
             redisMapper.set(key, user.getId());
         }
 
