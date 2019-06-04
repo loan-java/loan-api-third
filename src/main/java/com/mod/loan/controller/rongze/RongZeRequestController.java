@@ -67,12 +67,11 @@ public class RongZeRequestController {
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
 
-        log.info(logPre + "收到 ");
 //        log.info(logPre + "=============================================");
 
         Object result;
-
         String method = param.getString("method");
+        log.info(logPre + "收到, method: " + method);
 
         try {//校验 sig
             String sign = param.getString("sign");
@@ -138,7 +137,7 @@ public class RongZeRequestController {
                     throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
             }
         } catch (Exception e) {
-            logFail(e, "【"+method+"】方法出错：" + param.toJSONString());
+            logFail(e, "【" + method + "】方法出错：" + param.toJSONString());
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
         }
 
@@ -191,7 +190,7 @@ public class RongZeRequestController {
         }
     }
 
-    private void logFail(Exception e,String info) {
+    private void logFail(Exception e, String info) {
         if (e instanceof BizException)
             log.info(getPreLog() + e.getMessage() + "||相关数据：" + info);
         else
