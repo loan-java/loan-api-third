@@ -103,4 +103,8 @@ public class RedisMapper {
         }
     }
 
+    public String getOrderUserKey(String orderNo, String source) {
+       return "ORDER_USER:" +orderNo + source;
+    }
+
 }

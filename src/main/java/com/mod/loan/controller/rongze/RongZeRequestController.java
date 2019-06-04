@@ -169,7 +169,7 @@ public class RongZeRequestController {
         if(StringUtils.isEmpty(orderNo)) {
             throw new BizException("订单编号不存在");
         }
-        String key=orderNo+UserOriginEnum.RZ.getCode();
+        String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
         try {
             //同一个用户锁6秒
             if(redisMapper.lock(key, 6000)) {

@@ -115,7 +115,7 @@ public class CertRequestHandler {
                                 ou.setUid(user.getId());
                                 orderUserMapper.insertSelective(ou);
                                 //设置缓存
-                                String key=orderNo+UserOriginEnum.RZ.getCode();
+                                String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
                                 redisMapper.set(key, user.getId());
                             }
                         }
