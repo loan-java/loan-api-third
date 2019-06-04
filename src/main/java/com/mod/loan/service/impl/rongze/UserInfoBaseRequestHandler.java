@@ -5,6 +5,7 @@ import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,20 +28,19 @@ import java.util.Map;
 public class UserInfoBaseRequestHandler {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    OrderUserMapper orderUserMapper;
+    private OrderUserMapper orderUserMapper;
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
     @Autowired
-    UserIdentMapper userIdentMapper;
+    private UserIdentMapper userIdentMapper;
     @Autowired
-    UserAddressListMapper addressListMapper;
+    private UserAddressListMapper addressListMapper;
     @Autowired
-    UserInfoMapper userInfoMapper;
-    @Autowired
-    UserBankMapper userBankMapper;
-
+    private UserInfoMapper userInfoMapper;
+    @Resource
+    private RedisMapper redisMapper;
 
     //推送用户基本信息
     @Transactional
@@ -140,6 +141,9 @@ public class UserInfoBaseRequestHandler {
             orderUser.setUid(user.getId());
             int m = orderUserMapper.insert(orderUser);
             if (m == 0) throw new RuntimeException("推送用户基本信息:新增用户订单关联信息");
+            //设置缓存
+            String key=orderNo+UserOriginEnum.RZ.getCode();
+            redisMapper.set(key, user.getId());
         }
 
         log.info("===============推送用户基本信息结束====================");

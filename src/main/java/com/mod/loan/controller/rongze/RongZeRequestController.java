@@ -8,6 +8,7 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.bank.BankRequestHandler;
 import com.mod.loan.controller.order.RepayRequestHandler;
 import com.mod.loan.mapper.OrderUserMapper;
@@ -38,6 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/rongze")
 public class RongZeRequestController {
 
+
+    @Resource
+    private RedisMapper redisMapper;
     @Resource
     private UserService userService;
     @Resource
@@ -162,35 +166,44 @@ public class RongZeRequestController {
                 orderNo = bizData.containsKey("order_no") ? bizData.getString("order_no") : null;
         }
         log.info("订单编号:" + orderNo);
-        if (orderNo != null) {
-            uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if(StringUtils.isEmpty(orderNo)) {
+            throw new BizException("订单编号不存在");
         }
-//        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
-//        String clientVersion = obj.getString("version");
-//        String clientType = obj.getString("terminalId");
-//        RequestThread.setClientVersion(clientVersion);
-//        RequestThread.setClientType(clientType);
-        String sourceId = param.getString("source_id"); //标志用户来源的app
-        String clientAlias = Constant.merchant;
-        String sign = param.getString("sign");
-//        String deviceCode = param.getString("deviceCode");
-        String token = param.getString("token");
-        RequestThread.setClientAlias(clientAlias);
-        RequestThread.setIp(HttpUtils.getIpAddr(request, "."));
-        RequestThread.setRequestTime(System.currentTimeMillis());
-//        RequestThread.setDeviceCode(deviceCode);
-        RequestThread.setToken(token);
-        RequestThread.setSign(sign);
-        RequestThread.setSourceId(sourceId);
-
-        RequestThread.setUid(uid);
-
-        //判断商户是否配置好
-        Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
-        if (merchant == null) {
-            log.info("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
-            throw new BizException("商户不存在");
+        String key=orderNo+UserOriginEnum.RZ.getCode();
+        try {
+            //同一个用户锁6秒
+            if(redisMapper.lock(key, 6000)) {
+                if(redisMapper.hasKey(key)) {
+                    uid = Long.parseLong(redisMapper.get(key));
+                }else{
+                    uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+                    redisMapper.set(key,uid);
+                }
+                String sourceId = param.getString("source_id"); //标志用户来源的app
+                String clientAlias = Constant.merchant;
+                String sign = param.getString("sign");
+                String token = param.getString("token");
+                RequestThread.setClientAlias(clientAlias);
+                RequestThread.setIp(HttpUtils.getIpAddr(request, "."));
+                RequestThread.setRequestTime(System.currentTimeMillis());
+                RequestThread.setToken(token);
+                RequestThread.setSign(sign);
+                RequestThread.setSourceId(sourceId);
+                RequestThread.setUid(uid);
+                //判断商户是否配置好
+                Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
+                if (merchant == null) {
+                    log.info("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
+                    throw new BizException("商户不存在");
+                }
+            }
+        }catch (Exception e) {
+            log.error("binRequestThread异常错误", e);
+            throw new BizException(e.getMessage());
+        }finally {
+            redisMapper.unlock(key);
         }
+
     }
 
     private void logFail(Exception e, String info) {
