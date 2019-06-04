@@ -63,7 +63,7 @@ public class BankRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> bankCardCode(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
-        log.info("===============银行卡鉴权发送验证码开始====================" + data.toJSONString());
+        log.info("===============银行卡鉴权发送验证码开始====================");
 
         //订单编号
         String orderNo = data.getString("order_no");
@@ -133,7 +133,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         Map<String, Object> map = new HashMap<>();
         map.put("deal_result", "0");
         JSONObject data = parseAndCheckBizData(param);
-        log.info("======================绑定银行卡开始===========" + data.toJSONString());
+        log.info("======================绑定银行卡开始===========");
         //订单编号
         String orderNo = data.getString("order_no");
         //绑卡卡号

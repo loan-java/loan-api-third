@@ -51,7 +51,7 @@ public class AuditResultRequestHandler {
 
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============查询审批结论开始====================" + bizData.toJSONString());
+        log.info("===============查询审批结论开始====================");
 
         String orderNo = bizData.getString("order_no");
         User user = userService.selectByPrimaryKey(RequestThread.getUid());

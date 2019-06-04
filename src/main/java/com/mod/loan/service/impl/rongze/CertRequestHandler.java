@@ -50,7 +50,7 @@ public class CertRequestHandler {
         Map<String, Object> map = new HashMap<>();
         String message = "成功";
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============查询复贷和黑名单信息开始====================" + bizData.toJSONString());
+        log.info("===============查询复贷和黑名单信息开始====================");
         String md5 = bizData.getString("md5");
         String orderNo = bizData.getString("order_no");
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户

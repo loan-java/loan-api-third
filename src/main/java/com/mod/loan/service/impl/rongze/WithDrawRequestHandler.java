@@ -43,7 +43,7 @@ public class WithDrawRequestHandler {
     public ResponseBean<Map<String, Object>> withdrawTria(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
         JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============试算接口开始====================" + bizData.toJSONString());
+        log.info("===============试算接口开始====================");
         String loanAmount = bizData.getString("loan_amount");
         Integer loanTerm = bizData.getInteger("loan_term");
         //====================================================

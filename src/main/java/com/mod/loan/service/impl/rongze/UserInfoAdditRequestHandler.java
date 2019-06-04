@@ -48,7 +48,7 @@ public class UserInfoAdditRequestHandler {
         Map<String, Object> map = new HashMap<>();
         String message = "成功";
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============推送用户补充信息开始====================" + bizData.toJSONString());
+        log.info("===============推送用户补充信息开始====================");
         //机构定制信息
         String orderNo = bizData.getString("order_no");
         String ID_Positive = bizData.getJSONArray("ID_Positive").getString(0);
