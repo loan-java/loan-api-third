@@ -20,6 +20,7 @@ import com.mod.loan.service.impl.rongze.*;
 import com.mod.loan.util.HttpUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.SignUtil;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @ author liujianjian
@@ -168,18 +170,18 @@ public class RongZeRequestController implements InitializingBean {
                 orderNo = bizData.containsKey("order_no") ? bizData.getString("order_no") : null;
         }
         log.info("订单编号:" + orderNo);
-        if(StringUtils.isEmpty(orderNo)) {
+        if (StringUtils.isEmpty(orderNo)) {
             throw new BizException("订单编号不存在");
         }
-        String key=orderNo+UserOriginEnum.RZ.getCode();
+        String key = orderNo + UserOriginEnum.RZ.getCode();
         try {
             //同一个用户锁6秒
-            if(redisMapper.lock(key, 6000)) {
-                if(redisMapper.hasKey(key)) {
+            if (redisMapper.lock(key, 6000)) {
+                if (redisMapper.hasKey(key)) {
                     uid = Long.parseLong(redisMapper.get(key));
-                }else{
+                } else {
                     uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
-                    redisMapper.set(key,uid);
+                    redisMapper.set(key, uid);
                 }
                 String sourceId = param.getString("source_id"); //标志用户来源的app
                 String clientAlias = Constant.merchant;
@@ -199,10 +201,10 @@ public class RongZeRequestController implements InitializingBean {
                     throw new BizException("商户不存在");
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("binRequestThread异常错误", e);
             throw new BizException(e.getMessage());
-        }finally {
+        } finally {
             redisMapper.unlock(key);
         }
 
@@ -233,6 +235,19 @@ public class RongZeRequestController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        log.info("current data source: " + dataSource);
+        try {
+            String s = dataSource.toString();
+            HikariDataSource ds;
+            int max = -1;
+            long connectionTimeout = -1;
+            if (s.contains("HikariDataSource")) {
+                ds = (HikariDataSource) dataSource;
+                max = ds.getMaximumPoolSize();
+                connectionTimeout = ds.getConnectionTimeout();
+            }
+            log.info("当前数据源: " + dataSource + ", 最大连接数: " + max + ", connectionTimeout: " + connectionTimeout + " ms");
+        } catch (Throwable e) {
+
+        }
     }
 }
