@@ -19,7 +19,7 @@ import java.util.Map;
 @Slf4j
 public class DruidConfiguration {
 
-    @Bean
+//    @Bean
     public ServletRegistrationBean druidServlet() {
         log.info("init Druid Servlet Configuration ");
         ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
@@ -35,7 +35,7 @@ public class DruidConfiguration {
         return servletRegistrationBean;
     }
 
-    @Bean
+//    @Bean
     public FilterRegistrationBean filterRegistrationBean() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(new WebStatFilter());
