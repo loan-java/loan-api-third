@@ -224,7 +224,7 @@ public class UserInfoAdditRequestHandler {
      */
     public boolean upLoadUserIdcard(String orderNo, User user, String str1, String str2, String str3, String str4) throws BizException {
         boolean flag = false;
-        if (user.getId() != null && StringUtils.isNotEmpty(orderNo) && StringUtils.isNotBlank(str1) && StringUtils.isNotBlank(str2) && StringUtils.isNotBlank(str3)) {
+        if (user.getId() != null && StringUtils.isNotBlank(orderNo) && StringUtils.isNotBlank(str1) && StringUtils.isNotBlank(str2) && StringUtils.isNotBlank(str3)) {
             UserAuthInfo info = userAuthInfoMapper.selectByUid(user.getId());
             if (info != null) {
                 info.setOrderNo(orderNo);
