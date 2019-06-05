@@ -181,10 +181,17 @@ public class RongZeRequestController {
         }
         String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
         if(redisMapper.hasKey(key)) {
-            uid = Long.parseLong(redisMapper.get(key));
+            String value=redisMapper.get(key);
+            if(!"null".equals(value)) {
+                uid = Long.parseLong(redisMapper.get(key));
+            }else{
+                redisMapper.remove(key);
+            }
         }else{
             uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
-            redisMapper.set(key,uid);
+            if(uid != null) {
+                redisMapper.set(key,uid);
+            }
         }
         String sourceId = param.getString("source_id"); //标志用户来源的app
         String clientAlias = Constant.merchant;

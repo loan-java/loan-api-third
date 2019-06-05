@@ -8,6 +8,7 @@ import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.util.aliyun.OSSUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -203,6 +204,25 @@ public class ControllerTest extends BaseSpringBootJunitTest {
     @Test
     public void redisMap3() throws Exception {
         redisMapper.removeKeyPrev("ORDER_USER");
+    }
+
+    @Test
+    public void redisMap4() throws Exception {
+        Long uid =0l;
+        String key="16613615838693703681";
+        if(redisMapper.hasKey(key)) {
+            String value=redisMapper.get(key);
+            if(!"null".equals(value)) {
+                uid = Long.parseLong(redisMapper.get(key));
+            }else{
+                redisMapper.remove(key);
+            }
+        }else{
+            uid = orderUserMapper.getUidByOrderNoAndSource("1661361583869370368", Integer.parseInt(UserOriginEnum.RZ.getCode()));
+            if(uid != null) {
+                redisMapper.set(key,uid);
+            }
+        }
     }
 
     //占用内存笔数
