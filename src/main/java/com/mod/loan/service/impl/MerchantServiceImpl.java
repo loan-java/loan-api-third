@@ -24,7 +24,7 @@ public class MerchantServiceImpl extends BaseServiceImpl<Merchant, String> imple
             merchant = redisMapper.get("merchant:" + merchantAlias, new TypeReference<Merchant>() {
             });
         }
-        if (merchant == null) {
+        if (merchant == null || merchant.getBindType() == null) {
             merchant = merchantMapper.selectByPrimaryKey(merchantAlias);
             if (merchant != null) {
                 redisMapper.set("merchant:" + merchantAlias, merchant, 600);
