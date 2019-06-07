@@ -40,7 +40,7 @@ public class ContractController {
      * @return
      */
     @RequestMapping("/queryLoanInfo")
-    public Object queryLoanInfo(long uid, int source) {
+    public Object queryLoanInfo(long uid, String orderNo, int source) {
         String JF = Constant.companyName; //甲方
         String YF = ""; //乙方
         String idCardNo = ""; //乙方身份证号
@@ -66,7 +66,7 @@ public class ContractController {
                 bankName = userBank.getCardName();
             }
 
-            Order order = orderMapper.findUserFirstOrder(uid, source);
+            Order order = orderMapper.findByOrderNoAndUid(orderNo, uid,source);
             if (order != null) {
                 if (order.getCreateTime() != null) {
                     signTime = DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss");

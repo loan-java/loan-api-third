@@ -61,7 +61,7 @@ public class RongZeRequestHandler {
         String orderNo = getOrderNo(param);
 
         Map<String, Object> map = new HashMap<>();
-        map.put("contract_url", Constant.sysDomainHost + "/static/loan-contract.html?uid=" + checkAndGetUserId(orderNo) + "&source=" + OrderSourceEnum.RONGZE.getSoruce());
+        map.put("contract_url", Constant.sysDomainHost + "/static/loan-contract.html?uid=" + checkAndGetUserId(orderNo) + "&orderNo=" + orderNo + "&source=" + OrderSourceEnum.RONGZE.getSoruce());
         return ResponseBean.success(map);
     }
 
