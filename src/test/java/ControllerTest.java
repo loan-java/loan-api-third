@@ -1,13 +1,11 @@
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
-import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.config.Constant;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
-import com.mod.loan.model.User;
-import com.mod.loan.util.Base64Util;
-import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.aliyun.OSSUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import org.apache.commons.lang.StringUtils;
@@ -17,8 +15,10 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import sun.nio.cs.US_ASCII;
 
+import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ControllerTest extends BaseSpringBootJunitTest {
 
@@ -30,6 +30,9 @@ public class ControllerTest extends BaseSpringBootJunitTest {
 
     @Autowired
     private OrderUserMapper orderUserMapper;
+
+    @Resource
+    private RedisMapper redisMapper;
 
     @Test
     public void md5PhoneAndIdcard() throws Exception {
@@ -158,6 +161,102 @@ public class ControllerTest extends BaseSpringBootJunitTest {
     @Test
     public void deleteOSSfile() throws Exception {
         OSSUtil.deleteFile("2019/0524/ce461a4693ae43d690c3cc212d95c2df.jpg",Constant.OSS_STATIC_BUCKET_NAME);
+    }
+
+    /**
+     * 多线程简单测试
+     * @throws Exception
+     */
+    @Test
+    public void redisMap1() throws Exception {
+        ExecutorService service = Executors.newFixedThreadPool(100);
+        for (int i = 0; i < 10000 ; i++) {
+            int finalI = i;
+            service.execute(()->{
+                Long uid =0l;
+                String key=redisMapper.getOrderUserKey("1661361583869370368", UserOriginEnum.RZ.getCode());
+                if(redisMapper.hasKey(key)) {
+                    uid = Long.parseLong(redisMapper.get(key));
+                }else{
+                    uid = orderUserMapper.getUidByOrderNoAndSource("1661361583869370368", Integer.parseInt(UserOriginEnum.RZ.getCode()));
+                    redisMapper.set(key,uid);
+                }
+                System.out.println(finalI + "++++++++++++++++redis的缓存key值:" + key+"++++++++++++++++++用户的id：" + uid + "++++++++++++++++");
+            });
+
+        }
+    }
+    @Test
+    public void redisMap2() throws Exception {
+        for (int i = 0; i < 10000 ; i++) {
+            Long uid =0l;
+            String key=redisMapper.getOrderUserKey("1661361583869370368", UserOriginEnum.RZ.getCode());
+            if(redisMapper.hasKey(key)) {
+                uid = Long.parseLong(redisMapper.get(key));
+            }else{
+                uid = orderUserMapper.getUidByOrderNoAndSource("1661361583869370368", Integer.parseInt(UserOriginEnum.RZ.getCode()));
+                redisMapper.set(key,uid);
+            }
+            System.out.println(i + "++++++++++++++++redis的缓存key值:" + key+"++++++++++++++++++用户的id：" + uid + "++++++++++++++++");
+        }
+    }
+
+    @Test
+    public void redisMap3() throws Exception {
+        redisMapper.removeKeyPrev("ORDER_USER");
+    }
+
+    @Test
+    public void redisMap4() throws Exception {
+        Long uid =0l;
+        String key="16613615838693703681";
+        if(redisMapper.hasKey(key)) {
+            String value=redisMapper.get(key);
+            if(!"null".equals(value)) {
+                uid = Long.parseLong(redisMapper.get(key));
+            }else{
+                redisMapper.remove(key);
+            }
+        }else{
+            uid = orderUserMapper.getUidByOrderNoAndSource("1661361583869370368", Integer.parseInt(UserOriginEnum.RZ.getCode()));
+            if(uid != null) {
+                redisMapper.set(key,uid);
+            }
+        }
+    }
+
+    //占用内存笔数
+    public static void main(String[] args) {
+        testMap();
+    }
+
+    /**
+     * 测试占用内存大小
+     */
+    public static void testMap(){
+//        Integer a = 1;
+//        long start = 0;
+//        long end = 0;
+//        // 先垃圾回收
+//        System.gc();
+//        start = Runtime.getRuntime().freeMemory();
+//        ConcurrentHashMap<String,Long> map = new ConcurrentHashMap<String,Long>(100000);
+//        for (int i = 0; i < 1000000; i++) {
+//            map.put(i+"", 1111l);
+//        }
+//        // 快要计算的时,再清理一次
+//        System.gc();
+//        end = Runtime.getRuntime().freeMemory();
+//        System.out.println("一个ConcurrentHashMap对象占内存:" + (end - start));
+//        //计算指定对象及其引用树上的所有对象的综合大小，单位字节
+//        long l = RamUsageEstimator.sizeOf(map);
+//        System.out.println("计算指定对象及其引用树上的所有对象的综合大小，单位字节:" + l);
+//        //计算指定对象本身在堆空间的大小，单位字节
+//        long l1 = RamUsageEstimator.shallowSizeOf(map);
+//        System.out.println("计算指定对象本身在堆空间的大小，单位字节:" + l1);
+//        //计算指定对象及其引用树上的所有对象的综合大小，返回可读的结果，如：2KB
+//        String s = RamUsageEstimator.humanSizeOf(map);
+//        System.out.println("计算指定对象及其引用树上的所有对象的综合大小，返回可读的结果:" + s);
     }
 
 

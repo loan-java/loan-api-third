@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -36,6 +37,11 @@ public class RedisMapper {
 
     public void remove(String key) {
         redisTemplate.delete(key);
+    }
+
+    public void removeKeyPrev(String key) {
+        Set<String> keys = redisTemplate.keys(key + "*");
+        redisTemplate.delete(keys);
     }
 
     public void set(String key, Object value) {
@@ -101,6 +107,10 @@ public class RedisMapper {
         } catch (Exception e) {
             throw new RuntimeException("Could not write JSON: " + e.getMessage(), e);
         }
+    }
+
+    public String getOrderUserKey(String orderNo, String source) {
+       return "ORDER_USER:" +orderNo + source;
     }
 
 }

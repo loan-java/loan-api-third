@@ -42,6 +42,9 @@ public class UserInfoAdditRequestHandler {
     @Autowired
     UserAddressListMapper addressListMapper;
 
+    @Autowired
+    UserAuthInfoMapper userAuthInfoMapper;
+
     //推送用户补充信息
     @Transactional
     public ResponseBean<Map<String, Object>> userInfoAddit(JSONObject param) throws BizException {
@@ -221,6 +224,27 @@ public class UserInfoAdditRequestHandler {
      */
     public boolean upLoadUserIdcard(String orderNo, User user, String str1, String str2, String str3, String str4) throws BizException {
         boolean flag = false;
+        if (user.getId() != null && StringUtils.isNotBlank(orderNo) && StringUtils.isNotBlank(str1) && StringUtils.isNotBlank(str2) && StringUtils.isNotBlank(str3)) {
+            UserAuthInfo info = userAuthInfoMapper.selectByUid(user.getId());
+            if (info != null) {
+                info.setOrderNo(orderNo);
+                info.setIdPositive(str1);
+                info.setIdNegative(str2);
+                info.setPhotoAssay(str3);
+                info.setUpdateTime(new Date());
+                userAuthInfoMapper.updateByPrimaryKeySelective(info);
+            } else {
+                UserAuthInfo userAuthInfo = new UserAuthInfo();
+                userAuthInfo.setUid(user.getId());
+                userAuthInfo.setOrderNo(orderNo);
+                userAuthInfo.setIdPositive(str1);
+                userAuthInfo.setIdNegative(str2);
+                userAuthInfo.setPhotoAssay(str3);
+                userAuthInfo.setCreateTime(new Date());
+                userAuthInfo.setUpdateTime(new Date());
+                userAuthInfoMapper.insertSelective(userAuthInfo);
+            }
+        }
         try {
             if (StringUtils.isNotBlank(str1)) {
                 JSONObject jsonObject1 = new JSONObject();

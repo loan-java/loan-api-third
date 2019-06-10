@@ -6,6 +6,7 @@ import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectResult;
 import com.mod.loan.config.Constant;
 import com.mod.loan.controller.UploadController;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,8 @@ import sun.misc.BASE64Decoder;
 import java.io.*;
 import java.util.UUID;
 
+@Slf4j
 public class OSSUtil {
-
-    private static Logger logger = LoggerFactory.getLogger(UploadController.class);
 
 
     public static String upload(MultipartFile file) {
@@ -32,7 +32,7 @@ public class OSSUtil {
             ossClient.putObject(Constant.OSS_STATIC_BUCKET_NAME, filepath, file.getInputStream());
             return filepath;
         } catch (Exception e) {
-            logger.error("文件上传失败", e);
+            log.error("文件上传失败", e);
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();
@@ -52,7 +52,7 @@ public class OSSUtil {
             ossClient.putObject(Constant.OSS_STATIC_BUCKET_NAME_MOBILE, filepath, new ByteArrayInputStream(str.getBytes()));
             return filepath;
         } catch (Exception e) {
-            logger.error("文件上传失败", e);
+            log.error("文件上传失败", e);
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();
@@ -82,10 +82,10 @@ public class OSSUtil {
             String newFileName = UUID.randomUUID().toString().replaceAll("-", "") + fileType;
             filepath = new DateTime().getYear() + "/" + new DateTime().toString("MMdd") + "/" + newFileName;
             PutObjectResult result = ossClient.putObject(Constant.OSS_STATIC_BUCKET_NAME, filepath, new ByteArrayInputStream(bytes1));
-            logger.info("上传照片：" + JSONObject.toJSONString(result));
+            log.info("上传照片：" + JSONObject.toJSONString(result));
         }catch (Exception e) {
             e.printStackTrace();
-            logger.error("文件上传失败", e);
+            log.error("文件上传失败", e);
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();
@@ -117,7 +117,7 @@ public class OSSUtil {
             ossClient.shutdown();
         }catch (Exception e) {
             e.printStackTrace();
-            logger.error("文件上传失败", e);
+            log.error("文件上传失败", e);
         } finally {
             if (ossClient != null) {
                 ossClient.shutdown();

@@ -8,6 +8,7 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.bank.BankRequestHandler;
 import com.mod.loan.controller.order.RepayRequestHandler;
 import com.mod.loan.mapper.OrderUserMapper;
@@ -38,6 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/rongze")
 public class RongZeRequestController {
 
+
+    @Resource
+    private RedisMapper redisMapper;
     @Resource
     private UserService userService;
     @Resource
@@ -71,11 +75,14 @@ public class RongZeRequestController {
 
         log.warn(logPre + "=============================================" + param.toJSONString());
 
-        Object result;
+        Object result = null;
         String method = param.getString("method");
         log.info(logPre + "收到, method: " + method);
 
+        //redis的key
+        String key = null;
         try {//校验 sig
+
             String sign = param.getString("sign");
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
             if (!check) throw new BizException(ResponseEnum.M4006);
@@ -88,66 +95,73 @@ public class RongZeRequestController {
                 log.warn("========================" + method + "解密后的数据：" + param.toJSONString());
             }
 
-            //绑定线程变量
-            this.binRequestThread(request, param, method);
-
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
+            //锁住每个请求
+            //redis的key
+            key = this.binRequestThread(request, param, method);
+//            if(key != null && redisMapper.lock(key, 3000)) {
+                switch (method) {
+                    case "fund.withdraw.req": //提交用户确认收款信息
+                        result = rongZeRequestHandler.handleOrderSubmit(param);
+                        break;
+                    case "fund.deal.contract": //查询借款合同
+                        result = rongZeRequestHandler.handleQueryContract(param);
+                        break;
+                    case "fund.order.status": //查询订单状态
+                        result = rongZeRequestHandler.handleQueryOrderStatus(param);
+                        break;
+                    case "fund.payment.req": //用户还款
+                        result = rongZeRequestHandler.handleRepayment(param);
+                        break;
+                    case "fund.bank.bind": //用户验证银行卡
+                        result = bankRequestHandler.bankCardCode(param);
+                        break;
+                    case "fund.bank.verify": //用户绑定银行卡
+                        result = bankRequestHandler.bankBind(param);
+                        break;
+                    case "fund.payment.plan": //查询还款计划
+                        result = repayRequestHandler.getRepayPlan(param);
+                        break;
+                    case "fund.payment.result": //查询还款状态
+                        result = repayRequestHandler.getRepayStatus(param);
+                        break;
 
-            switch (method) {
-                case "fund.withdraw.req": //提交用户确认收款信息
-                    result = rongZeRequestHandler.handleOrderSubmit(param);
-                    break;
-                case "fund.deal.contract": //查询借款合同
-                    result = rongZeRequestHandler.handleQueryContract(param);
-                    break;
-                case "fund.order.status": //查询订单状态
-                    result = rongZeRequestHandler.handleQueryOrderStatus(param);
-                    break;
-                case "fund.payment.req": //用户还款
-                    result = rongZeRequestHandler.handleRepayment(param);
-                    break;
-                case "fund.bank.bind": //用户验证银行卡
-                    result = bankRequestHandler.bankCardCode(param);
-                    break;
-                case "fund.bank.verify": //用户绑定银行卡
-                    result = bankRequestHandler.bankBind(param);
-                    break;
-                case "fund.payment.plan": //查询还款计划
-                    result = repayRequestHandler.getRepayPlan(param);
-                    break;
-                case "fund.payment.result": //查询还款状态
-                    result = repayRequestHandler.getRepayStatus(param);
-                    break;
+                    case "fund.cert.auth": //查询复贷黑名单信息
+                        result = certRequestHandler.certAuth(param);
+                        break;
+                    case "fund.userinfo.base": //提交用户基本信息
+                        result = userInfoBaseRequestHandler.userInfoBase(param);
+                        break;
+                    case "fund.userinfo.addit": //查询用户补充信息
+                        result = userInfoAdditRequestHandler.userInfoAddit(param);
+                        break;
+                    case "fund.audit.result": //查询审批结论
+                        result = auditResultRequestHandler.auditResult(param);
+                        break;
+                    case "fund.withdraw.trial": //试算接口
+                        result = withDrawRequestHandler.withdrawTria(param);
+                        break;
+                    // TODO: 2019/5/15 其它 method
+                    default:
+                        throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
+                }
+//            }
 
-                case "fund.cert.auth": //查询复贷黑名单信息
-                    result = certRequestHandler.certAuth(param);
-                    break;
-                case "fund.userinfo.base": //提交用户基本信息
-                    result = userInfoBaseRequestHandler.userInfoBase(param);
-                    break;
-                case "fund.userinfo.addit": //查询用户补充信息
-                    result = userInfoAdditRequestHandler.userInfoAddit(param);
-                    break;
-                case "fund.audit.result": //查询审批结论
-                    result = auditResultRequestHandler.auditResult(param);
-                    break;
-                case "fund.withdraw.trial": //试算接口
-                    result = withDrawRequestHandler.withdrawTria(param);
-                    break;
-                // TODO: 2019/5/15 其它 method
-                default:
-                    throw new BizException(ResponseEnum.M5000.getCode(), "method not found");
-            }
+
         } catch (Exception e) {
             logFail(e, "【" + method + "】方法出错：" + param.toJSONString());
             result = e instanceof BizException ? ResponseBean.fail(((BizException) e)) : ResponseBean.fail(e.getMessage());
+        } finally {
+//            if(key != null) {
+//                redisMapper.unlock(key);
+//            }
         }
 
         log.info(logPre + "结束返回, result: " + JSON.toJSONString(result) + ", method: " + method + ", costTime: " + (System.currentTimeMillis() - s) + " ms");
         return result;
     }
 
-    private void binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
+    private String binRequestThread(HttpServletRequest request, JSONObject param, String method) throws BizException {
         RequestThread.remove();// 移除本地线程变量
 
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
@@ -162,35 +176,42 @@ public class RongZeRequestController {
                 orderNo = bizData.containsKey("order_no") ? bizData.getString("order_no") : null;
         }
         log.info("订单编号:" + orderNo);
-        if (orderNo != null) {
-            uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if(StringUtils.isEmpty(orderNo)) {
+            throw new BizException("订单编号不存在");
         }
-//        String merchantId = param.getString("merchant_id"); //给融泽分配的merchant_id
-//        String clientVersion = obj.getString("version");
-//        String clientType = obj.getString("terminalId");
-//        RequestThread.setClientVersion(clientVersion);
-//        RequestThread.setClientType(clientType);
+        String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
+        if(redisMapper.hasKey(key)) {
+            String value=redisMapper.get(key);
+            if(!"null".equals(value)) {
+                uid = Long.parseLong(redisMapper.get(key));
+            }else{
+                redisMapper.remove(key);
+            }
+        }else{
+            uid = orderUserMapper.getUidByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+            if(uid != null) {
+                redisMapper.set(key,uid);
+            }
+        }
         String sourceId = param.getString("source_id"); //标志用户来源的app
         String clientAlias = Constant.merchant;
         String sign = param.getString("sign");
-//        String deviceCode = param.getString("deviceCode");
         String token = param.getString("token");
         RequestThread.setClientAlias(clientAlias);
         RequestThread.setIp(HttpUtils.getIpAddr(request, "."));
         RequestThread.setRequestTime(System.currentTimeMillis());
-//        RequestThread.setDeviceCode(deviceCode);
         RequestThread.setToken(token);
         RequestThread.setSign(sign);
         RequestThread.setSourceId(sourceId);
-
         RequestThread.setUid(uid);
-
         //判断商户是否配置好
         Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
         if (merchant == null) {
             log.info("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
             throw new BizException("商户不存在");
         }
+        log.info("++++++++++++++++" + method + "++++++++++++++++redis的缓存key值:" + key+"++++++++++++++++++用户的id：" + uid + "++++++++++++++++");
+        return key;
     }
 
     private void logFail(Exception e, String info) {

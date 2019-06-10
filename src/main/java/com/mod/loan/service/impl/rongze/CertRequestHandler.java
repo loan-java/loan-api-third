@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.model.Blacklist;
@@ -32,18 +33,16 @@ import java.util.Map;
 @Component
 public class CertRequestHandler {
 
-
     @Resource
     private UserMapper userMapper;
-
     @Autowired
     private OrderService orderService;
-
     @Autowired
     private BlacklistService blacklistService;
     @Resource
     private OrderUserMapper orderUserMapper;
-
+    @Resource
+    private RedisMapper redisMapper;
 
     //复贷黑名单信息
     public ResponseBean<Map<String, Object>> certAuth(JSONObject param) throws BizException {
@@ -115,6 +114,9 @@ public class CertRequestHandler {
                                 ou.setSource(Integer.valueOf(UserOriginEnum.RZ.getCode()));
                                 ou.setUid(user.getId());
                                 orderUserMapper.insertSelective(ou);
+                                //设置缓存
+                                String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
+                                redisMapper.set(key, user.getId());
                             }
                         }
                     }

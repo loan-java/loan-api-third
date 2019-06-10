@@ -215,11 +215,12 @@
         var loanNo = ''; //贷款协议号
 
         var uid = getQueryString('uid');
+        var orderNo = getQueryString('orderNo');
         var source = getQueryString('source');
 
         $.ajax({
             type: "GET",
-            url: "/contract/queryLoanInfo?uid=" + uid + "&source=" + source,
+            url: "/contract/queryLoanInfo?uid=" + uid + "&orderNo=" + orderNo + "&source=" + source,
             dataType: "json",
             success: function (data) {
                 JF = data.JF;
