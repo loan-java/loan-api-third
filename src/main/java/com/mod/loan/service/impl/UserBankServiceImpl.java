@@ -255,8 +255,8 @@ public class UserBankServiceImpl extends BaseServiceImpl<UserBank, Long> impleme
             } else {
                 //异常不得做为订单状态。
                 log.error("宝付鉴权绑卡失败，请求参数为={},响应参数为={}",
-                        JSON.toJSONString(dateArray), JSON.toJSONString(readySignVO));
-                return new ResultMessage(ResponseEnum.M4000.getCode(), readySignVO.getBiz_resp_msg());
+                        JSON.toJSONString(dateArray), JSON.toJSONString(returnData));
+                return new ResultMessage(ResponseEnum.M4000.getCode(), returnData.get("biz_resp_msg"));
             }
         } catch (Exception e) {
             log.error("宝付绑卡异常", e);
