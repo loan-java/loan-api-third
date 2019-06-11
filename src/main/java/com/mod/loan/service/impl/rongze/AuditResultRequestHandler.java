@@ -89,7 +89,7 @@ public class AuditResultRequestHandler {
                 message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
                 message.setTimes(0);
                 try {
-                    rabbitTemplate.convertAndSend(RabbitConst.queue_risk_order_notify, message);
+                    rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
                 } catch (Exception e) {
                     log.error("消息发送异常：", e);
                 }

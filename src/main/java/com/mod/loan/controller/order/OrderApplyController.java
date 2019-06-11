@@ -228,7 +228,7 @@ public class OrderApplyController {
         message.setSource(RiskAuditSourceEnum.JU_HE.getCode());
         message.setTimes(0);
         try {
-            rabbitTemplate.convertAndSend(RabbitConst.queue_risk_order_notify, message);
+            rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
         } catch (Exception e) {
             logger.error("消息发送异常：", e);
         }

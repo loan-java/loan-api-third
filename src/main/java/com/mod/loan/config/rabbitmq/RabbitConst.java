@@ -8,7 +8,7 @@ public class RabbitConst {
     /**
      * 风控订单审核通知
      */
-    public final static String queue_risk_order_notify = "qjld_queue_risk_order_notify";
+    public final static String qjld_queue_risk_order_notify = "qjld_queue_risk_order_notify";
 
     /**
      * 还款结果查询
