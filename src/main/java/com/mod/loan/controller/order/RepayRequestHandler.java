@@ -50,7 +50,10 @@ public class RepayRequestHandler extends BaseRequestHandler {
 
         String orderNo = data.getString("order_no");
         Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.RONGZE.getSoruce());
-
+        log.info("获取订单详情:{}", JSONObject.toJSONString(order));
+        if (order == null) {
+            throw new BizException("===============订单编号不存在=" + orderNo);
+        }
         List<Map<String, Object>> repayPlan = new ArrayList<>();
         Map<String, Object> repay = new HashMap<>(11);
         // 还款计划编号  期数
