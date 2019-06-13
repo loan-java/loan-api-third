@@ -30,3 +30,40 @@ CREATE TABLE `tb_user_sms` (
 alter table tb_decision_res_detail add column order_no  varchar(30) default null comment '订单编号' after order_id;
 
 create unique index order_no on tb_decision_res_detail(order_no);
+
+
+
+#0613新增新分控表结构
+drop table tb_decision_pb_detail;
+CREATE TABLE `tb_decision_pb_detail` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` bigint(11) DEFAULT NULL COMMENT '订单id',
+  `order_no` varchar(30) DEFAULT NULL COMMENT '(融泽)订单编号',
+  `loan_no` varchar(64) DEFAULT NULL COMMENT '风控订单号',
+  `status` varchar(8) DEFAULT NULL COMMENT '订单状态',
+  `loan_money` bigint(20) DEFAULT NULL COMMENT '放款金额',
+	`loan_rate` double DEFAULT NULL COMMENT '放款利率',
+	`loan_number` tinyint(4) DEFAULT NULL COMMENT '放款期数',
+	`loan_unit` varchar(8) DEFAULT NULL COMMENT '放款单位',
+  `code` varchar(32) DEFAULT NULL COMMENT '风控状态标识',
+	`msg` varchar(32) DEFAULT NULL COMMENT '风控状态描述',
+  `desc` varchar(32) DEFAULT NULL COMMENT '风控状态描述',
+  `score` double DEFAULT NULL COMMENT '分数',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `loanNo` (`loan_no`),
+  UNIQUE KEY `orderNo` (`order_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=282 DEFAULT CHARSET=utf8;
+
+
+
+
+
+
+
+
+
+
+
+
