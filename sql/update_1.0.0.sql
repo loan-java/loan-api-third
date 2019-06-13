@@ -46,6 +46,7 @@ CREATE TABLE `tb_decision_pb_detail` (
 	`loan_number` tinyint(4) DEFAULT NULL COMMENT '放款期数',
 	`loan_unit` varchar(8) DEFAULT NULL COMMENT '放款单位',
   `code` varchar(32) DEFAULT NULL COMMENT '风控状态标识',
+	`result` varchar(32) DEFAULT NULL COMMENT '审核结果',
 	`msg` varchar(32) DEFAULT NULL COMMENT '风控状态描述',
   `desc` varchar(32) DEFAULT NULL COMMENT '风控状态描述',
   `score` double DEFAULT NULL COMMENT '分数',
