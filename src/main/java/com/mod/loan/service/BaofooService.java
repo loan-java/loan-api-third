@@ -9,6 +9,11 @@ import com.mod.loan.model.Order;
  */
 public interface BaofooService {
 
+    ResultMessage sendBaoFooSms(Long uid, String cardNo, String cardPhone);
+
+    ResultMessage bindBaoFooSms(String validateCode, Long uid, String bindInfo, String cardNo,
+                                String cardPhone, String bankCode, String bankName);
+
     /**
      * 还款
      *

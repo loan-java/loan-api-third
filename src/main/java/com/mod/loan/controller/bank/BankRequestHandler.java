@@ -5,9 +5,7 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.common.model.ResultMap;
 import com.mod.loan.common.model.ResultMessage;
-import com.mod.loan.config.Constant;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.BaseRequestHandler;
@@ -41,13 +39,14 @@ public class BankRequestHandler extends BaseRequestHandler {
     private UserService userService;
 
     @Autowired
-    private UserBankService userBankService;
-
-    @Autowired
     private MerchantService merchantService;
 
     @Autowired
     private KuaiQianService kuaiQianService;
+
+
+    @Autowired
+    private BaofooService baofooService;
 
     @Autowired
     private OrderService orderService;
@@ -106,7 +105,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         log.info("merchant=" + JSONObject.toJSONString(merchant));
         switch (merchant.getBindType()) {
             case 4:
-                message = userBankService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile);
+                message = baofooService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile);
                 break;
             case 5:
                 message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), bankCard, userMobile);
@@ -146,7 +145,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         String verifyCode = data.getString("verify_code");
         Long uid = RequestThread.getUid();
         User user = userService.selectByPrimaryKey(uid);
-        if(user == null){
+        if (user == null) {
             throw new BizException("当前用户不存在，无法绑定银行卡");
         }
         Order order = orderService.findUserLatestOrder(uid);
@@ -178,7 +177,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         switch (merchant.getBindType()) {
             case 4:
-                message = userBankService.bindBaoFooSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
+                message = baofooService.bindBaoFooSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
                 break;
             case 5:
                 message = kuaiQianService.bindKuaiQianSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
@@ -186,7 +185,7 @@ public class BankRequestHandler extends BaseRequestHandler {
             default:
                 throw new BizException("支付渠道异常");
         }
-        if(message == null) {
+        if (message == null) {
             throw new BizException("绑定银行卡的message为null");
         }
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
