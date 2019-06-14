@@ -40,7 +40,6 @@ CREATE TABLE `tb_decision_pb_detail` (
   `order_id` bigint(11) DEFAULT NULL COMMENT '订单id',
   `order_no` varchar(30) DEFAULT NULL COMMENT '(融泽)订单编号',
   `loan_no` varchar(64) DEFAULT NULL COMMENT '风控订单号',
-  `pb_status` varchar(8) DEFAULT NULL COMMENT '订单状态',
   `loan_money` bigint(20) DEFAULT NULL COMMENT '放款金额',
 	`loan_rate`   varchar(32) DEFAULT NULL COMMENT '放款利率',
 	`loan_number` tinyint(4) DEFAULT NULL COMMENT '放款期数',
