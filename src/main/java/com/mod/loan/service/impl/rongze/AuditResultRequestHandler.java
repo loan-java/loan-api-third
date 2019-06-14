@@ -2,6 +2,7 @@ package com.mod.loan.service.impl.rongze;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.PbResultEnum;
 import com.mod.loan.common.enums.PolicyResultEnum;
 import com.mod.loan.common.enums.RiskAuditSourceEnum;
 import com.mod.loan.common.enums.UserOriginEnum;
@@ -10,7 +11,9 @@ import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.rabbitmq.RabbitConst;
+import com.mod.loan.mapper.DecisionPbDetailMapper;
 import com.mod.loan.mapper.TbDecisionResDetailMapper;
+import com.mod.loan.model.DecisionPbDetail;
 import com.mod.loan.model.TbDecisionResDetail;
 import com.mod.loan.model.User;
 import com.mod.loan.model.UserIdent;
@@ -49,6 +52,9 @@ public class AuditResultRequestHandler {
     @Autowired
     private TbDecisionResDetailMapper decisionResDetailMapper;
 
+    @Autowired
+    private DecisionPbDetailMapper decisionPbDetailMapper;
+
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
         log.info("===============查询审批结论开始====================");
@@ -71,13 +77,43 @@ public class AuditResultRequestHandler {
         int conclusion;
         String remark;
 
-        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
-        if (decisionResDetail != null && PolicyResultEnum.AGREE.getCode().equals(decisionResDetail.getCode())) {
+//        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
+//        if (decisionResDetail != null && PolicyResultEnum.AGREE.getCode().equals(decisionResDetail.getCode())) {
+//            conclusion = 10;
+//            remark = "审批成功";
+//        } else if (decisionResDetail != null && PolicyResultEnum.REJECT.getCode().equals(decisionResDetail.getCode())) {
+//            conclusion = 40;
+//            remark = "审批失败";
+//        } else {
+//            if (decisionResDetail == null) {
+//                // 通知风控
+//                RiskAuditMessage message = new RiskAuditMessage();
+//                message.setOrderNo(orderNo);
+//                message.setStatus(1);
+//                message.setMerchant(RequestThread.getClientAlias());
+//                message.setUid(user.getId());
+//                message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
+//                message.setTimes(0);
+//                try {
+//                    rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
+//                } catch (Exception e) {
+//                    log.error("消息发送异常：", e);
+//                }
+//            }
+//            conclusion = 30;
+//            remark = "审批处理中";
+//        }
+
+        DecisionPbDetail decisionResDetail = decisionPbDetailMapper.selectByOrderNo(orderNo);
+        if (decisionResDetail != null && PbResultEnum.APPROVE.getCode().equals(decisionResDetail.getResult())) {
             conclusion = 10;
             remark = "审批成功";
-        } else if (decisionResDetail != null && PolicyResultEnum.REJECT.getCode().equals(decisionResDetail.getCode())) {
+        } else if (decisionResDetail != null && PbResultEnum.MANUAL.getCode().equals(decisionResDetail.getResult())) {
             conclusion = 40;
             remark = "审批失败";
+        } else if (decisionResDetail != null && PbResultEnum.DENY.getCode().equals(decisionResDetail.getResult())) {
+            conclusion = 40;
+            remark = "审批拒绝";
         } else {
             if (decisionResDetail == null) {
                 // 通知风控
@@ -89,7 +125,7 @@ public class AuditResultRequestHandler {
                 message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
                 message.setTimes(0);
                 try {
-                    rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
+                    rabbitTemplate.convertAndSend(RabbitConst.pb_queue_risk_order_notify, message);
                 } catch (Exception e) {
                     log.error("消息发送异常：", e);
                 }
@@ -97,7 +133,6 @@ public class AuditResultRequestHandler {
             conclusion = 30;
             remark = "审批处理中";
         }
-
 
         //单期产品
         int proType = 1;

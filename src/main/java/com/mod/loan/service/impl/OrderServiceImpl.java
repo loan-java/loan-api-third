@@ -10,10 +10,7 @@ import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.mapper.OrderMapper;
-import com.mod.loan.mapper.OrderPayMapper;
-import com.mod.loan.mapper.OrderPhoneMapper;
-import com.mod.loan.mapper.TbDecisionResDetailMapper;
+import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.MoneyUtil;
@@ -22,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +61,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private BaofooService baofooService;
     @Resource
     private TbDecisionResDetailMapper decisionResDetailMapper;
+    @Autowired
+    private DecisionPbDetailMapper decisionPbDetailMapper;
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
@@ -224,12 +224,19 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setStatus(Constant.unsettledOrderStatus);
         orderMapper.updateByPrimaryKey(order);
 
-        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
+        DecisionPbDetail decisionResDetail = decisionPbDetailMapper.selectByOrderNo(orderNo);
         if (decisionResDetail != null) {
             decisionResDetail.setOrderId(order.getId());
             decisionResDetail.setUpdatetime(new Date());
-            decisionResDetailMapper.updateByTransId(decisionResDetail);
+            decisionPbDetailMapper.updateByPrimaryKey(decisionResDetail);
         }
+
+//        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
+//        if (decisionResDetail != null) {
+//            decisionResDetail.setOrderId(order.getId());
+//            decisionResDetail.setUpdatetime(new Date());
+//            decisionResDetailMapper.updateByTransId(decisionResDetail);
+//        }
 
         return order;
     }
