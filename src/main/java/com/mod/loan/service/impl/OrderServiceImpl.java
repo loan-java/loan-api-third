@@ -228,7 +228,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         if (decisionResDetail != null) {
             decisionResDetail.setOrderId(order.getId());
             decisionResDetail.setUpdatetime(new Date());
-            decisionPbDetailMapper.updateByPrimaryKey(decisionResDetail);
+            decisionPbDetailMapper.updateByPrimaryKeySelective(decisionResDetail);
         }
 
 //        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
