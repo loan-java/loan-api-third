@@ -3,6 +3,7 @@ import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import com.mod.loan.util.rongze.SignUtil;
 import com.mod.loan.util.rongze.StandardDesUtils;
+import com.mod.loan.util.yeepay.YeePayApiRequest;
 import org.junit.Test;
 
 import javax.annotation.Resource;
@@ -16,6 +17,11 @@ public class CommonTest extends BaseSpringBootJunitTest {
 
     @Resource
     private DataSource dataSource;
+
+    @Test
+    public void yeePay() throws Exception {
+        YeePayApiRequest.bindCardRequest("1", "1", "621000000", "342422", "test", "15867133397");
+    }
 
     @Test
     public void t() {
@@ -32,7 +38,7 @@ public class CommonTest extends BaseSpringBootJunitTest {
     @Test
     public void sign() throws Exception {
 
-        String con= RongZeRequestUtil.buildRequestParams("api.charge.data", "{'order_no':'111'}");
+        String con = RongZeRequestUtil.buildRequestParams("api.charge.data", "{'order_no':'111'}");
 
         String s = SignUtil.genSign(con);
         System.out.println(s);
