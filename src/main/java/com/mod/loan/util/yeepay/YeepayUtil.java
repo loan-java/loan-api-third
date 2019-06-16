@@ -9,13 +9,12 @@ import com.yeepay.g3.sdk.yop.client.YopRsaClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 @Slf4j
-public class YeepayService {
+public class YeepayUtil {
 
     static String merchantno = Config.getInstance().getValue("merchantno");
     static String appKey = Config.getInstance().getValue("appKey");

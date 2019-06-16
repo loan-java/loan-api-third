@@ -60,7 +60,7 @@ public class YeePayApiRequest {
 //        map.put("extinfos", extinfos);
 
         String authbindcardreqUri = Config.getInstance().getValue("authbindcardreqUri");
-        return YeepayService.yeepayYOP(map, authbindcardreqUri);
+        return YeepayUtil.yeepayYOP(map, authbindcardreqUri);
     }
 
     //鉴权绑卡确认
@@ -76,7 +76,7 @@ public class YeePayApiRequest {
 
         String authbindcardconfirmUri = Config.getInstance().getValue("authbindcardconfirmUri");
 
-        return YeepayService.yeepayYOP(map, authbindcardconfirmUri);
+        return YeepayUtil.yeepayYOP(map, authbindcardconfirmUri);
     }
 
     //绑卡支付请求
@@ -123,7 +123,7 @@ public class YeePayApiRequest {
 //        map.put("dividecallbackurl", dividecallbackurl);
 //        map.put("dividejstr", dividejstr);
 
-        return YeepayService.yeepayYOP(map, unibindcardpayUri);
+        return YeepayUtil.yeepayYOP(map, unibindcardpayUri);
     }
 
     //支付查询
@@ -138,7 +138,7 @@ public class YeePayApiRequest {
         map.put("yborderid", yborderid);
 
         String bindcardpayqueryUri = Config.getInstance().getValue("bindcardpayqueryUri");
-        return YeepayService.yeepayYOP(map, bindcardpayqueryUri);
+        return YeepayUtil.yeepayYOP(map, bindcardpayqueryUri);
     }
 
 }
