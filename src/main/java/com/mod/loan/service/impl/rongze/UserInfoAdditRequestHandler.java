@@ -185,10 +185,6 @@ public class UserInfoAdditRequestHandler {
     @Transactional
     public void addressList(JSONObject param, User user) throws BizException {
         try {
-            if (!redisMapper.lock(RedisConst.lock_user_address_list + user.getId(), 5)) {
-                log.error("重复的填充通讯录信息:{}", user.getId());
-                throw new BizException("重复的填充通讯录信息");
-            }
             JSONObject contacts = param.getJSONObject("contacts");
             JSONArray jsonArray = contacts.getJSONArray("phone_list");
             JSONArray addArray = new JSONArray();
@@ -218,12 +214,10 @@ public class UserInfoAdditRequestHandler {
             addressList.setAddressList(addArray.toJSONString());
             addressList.setUpdateTime(new Date());
             int n = addressListMapper.updateByPrimaryKey(addressList);
-            redisMapper.unlock(RedisConst.lock_user_address_list + user.getId());
             if (n == 0) {
                 throw new BizException("通讯录更新失败!" + addArray.toJSONString());
             }
         } catch (Exception e) {
-            redisMapper.unlock(RedisConst.lock_user_address_list + user.getId());
             log.error("填充通讯录失败!", e);
         }
     }
@@ -244,10 +238,6 @@ public class UserInfoAdditRequestHandler {
     public boolean upLoadUserIdcard(String orderNo, User user, String str1, String str2, String str3, String str4) throws BizException {
         boolean flag = false;
         if (user.getId() != null && StringUtils.isNotBlank(orderNo) && StringUtils.isNotBlank(str1) && StringUtils.isNotBlank(str2) && StringUtils.isNotBlank(str3)) {
-            if (!redisMapper.lock(RedisConst.lock_user_id_card + user.getId(), 5)) {
-                log.error("重复的用户活体认证信息{}", user.getId());
-                throw new BizException("重复的用户活体认证信息");
-            }
             UserAuthInfo info = userAuthInfoMapper.selectByUid(user.getId());
             if (info != null) {
                 info.setOrderNo(orderNo);
@@ -318,10 +308,8 @@ public class UserInfoAdditRequestHandler {
             }
             flag = true;
         } catch (Exception e) {
-            redisMapper.unlock(RedisConst.lock_user_id_card + user.getId());
             log.error("推送用户补充信息：上传身份证文件信息出错", e);
         }
-        redisMapper.unlock(RedisConst.lock_user_id_card + user.getId());
         return flag;
     }
 
