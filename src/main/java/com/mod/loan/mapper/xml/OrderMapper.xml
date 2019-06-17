@@ -64,4 +64,12 @@
     select * from tb_order where order_no = #{orderNo} and uid = #{uid}
     and source=#{source}  limit 1
   </select>
+
+
+    <select id="getDoubleLoanByUid" resultMap="BaseResultMap">
+		select *
+		from tb_order
+		where uid=#{uid} and status in(41,42)
+		order by id desc
+	</select>
 </mapper>

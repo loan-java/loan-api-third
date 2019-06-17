@@ -21,4 +21,9 @@ public interface OrderMapper extends MyBaseMapper<Order> {
     Integer countPaySuccessByUid(Long uid);
 
     Order findByOrderNoAndUid(@Param("orderNo") String orderNo, @Param("uid") Long uid,@Param("source") int source);
+
+    /**
+     * 查找用户完成订单
+     */
+    List<Order> getDoubleLoanByUid(Long uid);
 }
