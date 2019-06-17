@@ -185,7 +185,7 @@ public class UserInfoAdditRequestHandler {
     @Transactional
     public void addressList(JSONObject param, User user) throws BizException {
         try {
-            if (!redisMapper.lock(RedisConst.lock_user_address_list + user.getId(), 2)) {
+            if (!redisMapper.lock(RedisConst.lock_user_address_list + user.getId(), 10)) {
                 log.error("重复的填充通讯录信息");
                 throw new BizException("重复的填充通讯录信息");
             }
@@ -240,7 +240,7 @@ public class UserInfoAdditRequestHandler {
     public boolean upLoadUserIdcard(String orderNo, User user, String str1, String str2, String str3, String str4) throws BizException {
         boolean flag = false;
         if (user.getId() != null && StringUtils.isNotBlank(orderNo) && StringUtils.isNotBlank(str1) && StringUtils.isNotBlank(str2) && StringUtils.isNotBlank(str3)) {
-            if (!redisMapper.lock(RedisConst.lock_user_id_card + user.getId(), 2)) {
+            if (!redisMapper.lock(RedisConst.lock_user_id_card + user.getId(), 10)) {
                 log.error("重复的用户活体认证信息");
                 throw new BizException("重复的用户活体认证信息");
             }
