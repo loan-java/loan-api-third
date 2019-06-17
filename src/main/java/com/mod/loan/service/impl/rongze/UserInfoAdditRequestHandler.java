@@ -189,14 +189,6 @@ public class UserInfoAdditRequestHandler {
                 log.error("重复的填充通讯录信息");
                 throw new BizException("重复的填充通讯录信息");
             }
-            UserAddressList addressList = addressListMapper.selectByPrimaryKey(user.getId());
-            if (addressList == null) {
-                addressList = new UserAddressList();
-                addressList.setUid(user.getId());
-                addressList.setCreateTime(new Date());
-                addressList.setUpdateTime(new Date());
-                addressListMapper.insertSelective(addressList);
-            }
             JSONObject contacts = param.getJSONObject("contacts");
             JSONArray jsonArray = contacts.getJSONArray("phone_list");
             JSONArray addArray = new JSONArray();
@@ -210,6 +202,18 @@ public class UserInfoAdditRequestHandler {
                     addJson.put("userName", name);
                     addArray.add(addJson);
                 }
+            }
+
+            UserAddressList addressList = addressListMapper.selectByPrimaryKey(user.getId());
+            if (addressList == null) {
+                addressList = new UserAddressList();
+                addressList.setUid(user.getId());
+                addressList.setAddressList(addArray.toJSONString());
+                addressList.setCreateTime(new Date());
+                addressList.setUpdateTime(new Date());
+                addressListMapper.insertSelective(addressList);
+                redisMapper.unlock(RedisConst.lock_user_address_list + user.getId());
+                return;
             }
             addressList.setAddressList(addArray.toJSONString());
             addressList.setUpdateTime(new Date());
