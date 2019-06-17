@@ -185,7 +185,7 @@ public class UserInfoAdditRequestHandler {
     @Transactional
     public void addressList(JSONObject param, User user) throws BizException {
         try {
-            if (!redisMapper.lock(RedisConst.lock_user_address_list + user.getId(), 60)) {
+            if (!redisMapper.lock(RedisConst.lock_user_address_list + user.getId(), 600)) {
                 log.error("重复的填充通讯录信息");
                 throw new BizException("重复的填充通讯录信息");
             }
