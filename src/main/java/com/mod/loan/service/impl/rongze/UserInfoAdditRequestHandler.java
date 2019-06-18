@@ -11,6 +11,7 @@ import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.ThreadPoolUtils;
 import com.mod.loan.util.aliyun.OSSUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -156,23 +157,25 @@ public class UserInfoAdditRequestHandler {
      * @param user
      */
     public void deleteUpLoadFile(User user) {
-        try {
-            if (!StringUtils.isEmpty(user.getImgCertBack())) {
-                OSSUtil.deleteFile(user.getImgCertBack(), Constant.OSS_STATIC_BUCKET_NAME);
+        ThreadPoolUtils.executor.execute(() -> {
+            try {
+                if (!StringUtils.isEmpty(user.getImgCertBack())) {
+                    OSSUtil.deleteFile(user.getImgCertBack(), Constant.OSS_STATIC_BUCKET_NAME);
+                }
+                if (!StringUtils.isEmpty(user.getImgCertFront())) {
+                    OSSUtil.deleteFile(user.getImgCertFront(), Constant.OSS_STATIC_BUCKET_NAME);
+                }
+                if (!StringUtils.isEmpty(user.getImgFace())) {
+                    OSSUtil.deleteFile(user.getImgFace(), Constant.OSS_STATIC_BUCKET_NAME);
+                }
+                MoxieMobile moxieMobile = moxieMobileMapper.selectLastOne(user.getId());
+                if (moxieMobile != null && !StringUtils.isEmpty(moxieMobile.getRemark())) {
+                    OSSUtil.deleteFile(user.getImgCertFront(), Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
+                }
+            } catch (Exception e) {
+                log.error("删除照片，运营商信息失败", e);
             }
-            if (!StringUtils.isEmpty(user.getImgCertFront())) {
-                OSSUtil.deleteFile(user.getImgCertFront(), Constant.OSS_STATIC_BUCKET_NAME);
-            }
-            if (!StringUtils.isEmpty(user.getImgFace())) {
-                OSSUtil.deleteFile(user.getImgFace(), Constant.OSS_STATIC_BUCKET_NAME);
-            }
-            MoxieMobile moxieMobile = moxieMobileMapper.selectLastOne(user.getId());
-            if (moxieMobile != null && !StringUtils.isEmpty(moxieMobile.getRemark())) {
-                OSSUtil.deleteFile(user.getImgCertFront(), Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
-            }
-        } catch (Exception e) {
-            log.error("删除照片，运营商信息失败", e);
-        }
+        });
     }
 
     /**
@@ -259,53 +262,74 @@ public class UserInfoAdditRequestHandler {
             }
         }
         try {
+            JSONObject resultJson1 = null;
             if (StringUtils.isNotBlank(str1)) {
                 JSONObject jsonObject1 = new JSONObject();
                 jsonObject1.put("order_no", orderNo);
                 jsonObject1.put("fileid", str1);
                 String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
-                JSONObject resultJson1 = JSONObject.parseObject(result1);
-                if (!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200) {
+                resultJson1 = JSONObject.parseObject(result1);
+                if (resultJson1 == null || !resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200) {
                     throw new BizException("推送用户补充信息:身份证正面信息解析失败" + result1);
                 }
-                JSONObject data = resultJson1.getJSONObject("data");
-                String base64str = data.getString("filestr");
-                String filesuffix = data.getString("filesuffix");
-                String imgCertFront = OSSUtil.uploadImage(base64str, filesuffix);
-                user.setImgCertFront(imgCertFront);
             }
 
+            JSONObject resultJson2 = null;
             if (StringUtils.isNotBlank(str2)) {
                 JSONObject jsonObject2 = new JSONObject();
                 jsonObject2.put("order_no", orderNo);
                 jsonObject2.put("fileid", str2);
                 String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
-                JSONObject resultJson2 = JSONObject.parseObject(result2);
-                if (!resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200) {
+                resultJson2 = JSONObject.parseObject(result2);
+                if (resultJson2 == null || !resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200) {
                     throw new BizException("推送用户补充信息:身份证背面信息解析失败" + result2);
                 }
-                JSONObject data2 = resultJson2.getJSONObject("data");
-                String base64str2 = data2.getString("filestr");
-                String filesuffix2 = data2.getString("filesuffix");
-                String imgCertBack = OSSUtil.uploadImage(base64str2, filesuffix2);
-                user.setImgCertBack(imgCertBack);
             }
 
+            JSONObject resultJson3 = null;
             if (StringUtils.isNotBlank(str3)) {
                 JSONObject jsonObject3 = new JSONObject();
                 jsonObject3.put("order_no", orderNo);
                 jsonObject3.put("fileid", str3);
                 String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
-                JSONObject resultJson3 = JSONObject.parseObject(result3);
-                if (!resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200) {
+                resultJson3 = JSONObject.parseObject(result3);
+                if (resultJson3 == null || !resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200) {
                     throw new BizException("推送用户补充信息:身份证活体信息解析失败" + result3);
                 }
-                JSONObject data3 = resultJson3.getJSONObject("data");
-                String base64str3 = data3.getString("filestr");
-                String filesuffix3 = data3.getString("filesuffix");
-                String imgFace = OSSUtil.uploadImage(base64str3, filesuffix3);
-                user.setImgFace(imgFace);
             }
+
+            JSONObject finalResultJson1 = resultJson1;
+            JSONObject finalResultJson2 = resultJson2;
+            JSONObject finalResultJson3 = resultJson3;
+            ThreadPoolUtils.executor.execute(() -> {
+                try {
+                    if (finalResultJson1 != null) {
+                        JSONObject data = finalResultJson1.getJSONObject("data");
+                        String base64str = data.getString("filestr");
+                        String fileSuffix = data.getString("filesuffix");
+                        String imgCertFront = OSSUtil.uploadImage(base64str, fileSuffix);
+                        user.setImgCertFront(imgCertFront);
+                    }
+
+                    if (finalResultJson2 != null) {
+                        JSONObject data2 = finalResultJson2.getJSONObject("data");
+                        String base64str2 = data2.getString("filestr");
+                        String fileSuffix2 = data2.getString("filesuffix");
+                        String imgCertBack = OSSUtil.uploadImage(base64str2, fileSuffix2);
+                        user.setImgCertBack(imgCertBack);
+                    }
+
+                    if (finalResultJson3 != null) {
+                        JSONObject data3 = finalResultJson3.getJSONObject("data");
+                        String base64str3 = data3.getString("filestr");
+                        String fileSuffix3 = data3.getString("filesuffix");
+                        String imgFace = OSSUtil.uploadImage(base64str3, fileSuffix3);
+                        user.setImgFace(imgFace);
+                    }
+                } catch (Exception e) {
+                    log.error("推送用户补充信息：OSS上传身份证文件信息出错", e);
+                }
+            });
             flag = true;
         } catch (Exception e) {
             log.error("推送用户补充信息：上传身份证文件信息出错", e);
