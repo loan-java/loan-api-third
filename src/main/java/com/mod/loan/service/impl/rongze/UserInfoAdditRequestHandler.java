@@ -169,7 +169,8 @@ public class UserInfoAdditRequestHandler {
                 }
                 MoxieMobile moxieMobile = moxieMobileMapper.selectLastOne(user.getId());
                 if (moxieMobile != null && !StringUtils.isEmpty(moxieMobile.getRemark())) {
-                    OSSUtil.deleteFile(user.getImgCertFront(), Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
+                    OSSUtil.deleteFile(moxieMobile.getRemark(), Constant.OSS_STATIC_BUCKET_NAME_MOBILE);
+                    moxieMobileMapper.delete(moxieMobile);
                 }
             } catch (Exception e) {
                 log.error("删除照片，运营商信息失败", e);
@@ -339,36 +340,41 @@ public class UserInfoAdditRequestHandler {
     public boolean checkPhone(String orderNo, User user) throws BizException {
         boolean flag = false;
         try {
-            JSONObject jsonObject1 = new JSONObject();
-            jsonObject1.put("order_no", orderNo);
-            jsonObject1.put("type", "1");
-            String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
-            //判断运营商数据
-            JSONObject jsonObject = JSONObject.parseObject(mxMobile);
-            if (!jsonObject.containsKey("code") || !jsonObject.containsKey("data") || jsonObject.getInteger("code") != 200) {
-                throw new BizException("推送用户补充信息:下载运营商数据解析失败");
-            }
-            String dataStr = jsonObject.getString("data");
-            JSONObject all = JSONObject.parseObject(dataStr);
-            JSONObject data = all.getJSONObject("data");
-            JSONObject report = data.getJSONObject("report");
-            JSONObject members = report.getJSONObject("members");
-            //上传
-            String mxMobilePath = OSSUtil.uploadStr(members.toJSONString(), user.getId());
-            if (StringUtils.isBlank(mxMobilePath)) {
-                throw new BizException("推送用户补充信息:运营商数据上传失败");
-            }
-            MoxieMobile moxieMobile = new MoxieMobile();
-            moxieMobile.setUid(RequestThread.getUid());
-            moxieMobile.setPhone(user.getUserPhone());
-            moxieMobile.setRemark(mxMobilePath);//oss上文件的地址存在remark这个字段
-            moxieMobileMapper.insertSelective(moxieMobile);
-
+            ThreadPoolUtils.executor.execute(() -> {
+                try {
+                    JSONObject jsonObject1 = new JSONObject();
+                    jsonObject1.put("order_no", orderNo);
+                    jsonObject1.put("type", "1");
+                    String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+                    //判断运营商数据
+                    JSONObject jsonObject = JSONObject.parseObject(mxMobile);
+                    if (!jsonObject.containsKey("code") || !jsonObject.containsKey("data") || jsonObject.getInteger("code") != 200) {
+                        throw new BizException("推送用户补充信息:下载运营商数据解析失败");
+                    }
+                    String dataStr = jsonObject.getString("data");
+                    JSONObject all = JSONObject.parseObject(dataStr);
+                    JSONObject data = all.getJSONObject("data");
+                    JSONObject report = data.getJSONObject("report");
+                    JSONObject members = report.getJSONObject("members");
+                    //上传
+                    String mxMobilePath = OSSUtil.uploadStr(members.toJSONString(), user.getId());
+                    if (StringUtils.isBlank(mxMobilePath)) {
+                        throw new BizException("推送用户补充信息:运营商数据上传失败");
+                    }
+                    MoxieMobile moxieMobile = new MoxieMobile();
+                    moxieMobile.setUid(RequestThread.getUid());
+                    moxieMobile.setPhone(user.getUserPhone());
+                    //oss上文件的地址存在remark这个字段
+                    moxieMobile.setRemark(mxMobilePath);
+                    moxieMobileMapper.insertSelective(moxieMobile);
+                } catch (Exception e) {
+                    log.error("推送用户补充信息:运营商数据出错", e);
+                }
+            });
             flag = true;
         } catch (Exception e) {
             log.error("推送用户补充信息:运营商数据出错", e);
         }
-
         return flag;
     }
 
