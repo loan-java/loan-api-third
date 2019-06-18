@@ -22,6 +22,7 @@ import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,13 +49,16 @@ public class BankRequestHandler extends BaseRequestHandler {
     @Autowired
     private BaofooService baofooService;
 
+    @Resource
+    private YeePayService yeePayService;
+
     @Autowired
     private OrderService orderService;
 
     @Autowired
     private RedisMapper redisMapper;
 
-    @Autowired
+    @Resource
     private BankMapper bankMapper;
 
     /**
@@ -109,6 +113,9 @@ public class BankRequestHandler extends BaseRequestHandler {
                 break;
             case 5:
                 message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), bankCard, userMobile);
+                break;
+            case 6:
+                message = yeePayService.requestBindCard(RequestThread.getUid(), orderNo, bankCard, userMobile);
                 break;
             default:
                 throw new BizException("支付渠道异常");
@@ -181,6 +188,9 @@ public class BankRequestHandler extends BaseRequestHandler {
                 break;
             case 5:
                 message = kuaiQianService.bindKuaiQianSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
+                break;
+            case 6:
+                message = yeePayService.confirmBindCard(orderNo, verifyCode);
                 break;
             default:
                 throw new BizException("支付渠道异常");
