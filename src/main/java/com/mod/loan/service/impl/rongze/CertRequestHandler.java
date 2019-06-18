@@ -49,7 +49,7 @@ public class CertRequestHandler {
         Map<String, Object> map = new HashMap<>();
         String message = "成功";
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============查询复贷和黑名单信息开始====================");
+        log.info("查询复贷和黑名单信息开始");
         String md5 = bizData.getString("md5");
         String orderNo = bizData.getString("order_no");
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户
@@ -57,7 +57,6 @@ public class CertRequestHandler {
         if (user != null) {
             if (StringUtils.isEmpty(user.getUserOrigin()) || !user.getUserOrigin().equals(UserOriginEnum.RZ.getCode())) {
                 log.info(user.getId() + "聚合用户，不走当前线路");
-                log.info("==================================================================");
                 userType = "1";
                 message = "聚合用户，不走当前线路";
             } else {
@@ -69,13 +68,11 @@ public class CertRequestHandler {
                         DateTime d2 = new DateTime(blacklist.getInvalidTime());
                         Integer remainDays = Days.daysBetween(d1, d2).getDays() + 1;
                         log.info(user.getId() + "暂时无法下单，请于" + remainDays + "天后再尝试");
-                        log.info("==================================================================");
                         userType = "1";
                         message = "C002";
                     } else if (2 == blacklist.getType()) {
                         // 黑名单
                         log.info(user.getId() + "您不符合下单条件");
-                        log.info("==================================================================");
                         userType = "1";
                         message = "C002";
                     }
@@ -86,7 +83,6 @@ public class CertRequestHandler {
                     if (null != orderIng) {
                         if (orderIng.getStatus() < 40 && orderIng.getStatus() != 23) {
                             log.info(user.getId() + "订单进行中，无法提单");
-                            log.info("==================================================================");
                             userType = "1";
                             message = "C001";
                         } else if (orderIng.getStatus() == 51 || orderIng.getStatus() == 52) {
@@ -96,14 +92,12 @@ public class CertRequestHandler {
                             Integer remainDays = Days.daysBetween(nowTime.withMillisOfDay(0), applyTime.withMillisOfDay(0)).getDays();
                             if (0 < remainDays && remainDays <= 30) {
                                 log.info(user.getId() + "请" + remainDays + "天后重试提单");
-                                log.info("==================================================================");
                                 userType = "1";
                                 message = "C003";
                             }
                         } else if (orderIng.getStatus() == 41 || orderIng.getStatus() == 42) {
                             // 订单已结清
                             log.info(user.getId() + "最后一笔订单已结清");
-                            log.info("==================================================================");
                             userType = "2";
 
                             OrderUser ou = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.RZ.getCode()), user.getId());
@@ -145,7 +139,7 @@ public class CertRequestHandler {
         } else {
             map.put("is_reloan", 0);
         }
-        log.info("===============查询复贷和黑名单信息结束====================");
+        log.info("查询复贷和黑名单信息结束");
         return new ResponseBean<>(code, message, map);
     }
 
