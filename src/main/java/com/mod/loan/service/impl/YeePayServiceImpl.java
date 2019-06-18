@@ -18,8 +18,10 @@ import com.mod.loan.service.UserService;
 import com.mod.loan.service.YeePayService;
 import com.mod.loan.util.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -77,6 +79,7 @@ public class YeePayServiceImpl implements YeePayService {
 
     //还款
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public ResultMessage repay(Order order) {
         try {
             String requestno = order.getOrderNo();
@@ -86,6 +89,7 @@ public class YeePayServiceImpl implements YeePayService {
             String identityid = "" + uid;
 
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
+            if (userBank == null || StringUtils.isBlank(userBank.getCardNo())) throw new BizException("用户未绑卡");
 
             String cardtop = userBank.getCardNo().substring(0, 6); //卡号前六位
             String cardlast = userBank.getCardNo().substring(userBank.getCardNo().length() - 4); //卡号后四位

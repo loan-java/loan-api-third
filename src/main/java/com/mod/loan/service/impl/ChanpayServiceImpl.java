@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -72,6 +73,7 @@ public class ChanpayServiceImpl implements ChanpayService {
     }
 
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public ResultMessage repay(Order order) {
         try {
             long uid = order.getUid();
