@@ -47,7 +47,7 @@ public class UserInfoBaseRequestHandler {
     public ResponseBean<Map<String, Object>> userInfoBase(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============推送用户基本信息开始====================");
+        log.info("推送用户基本信息开始");
         JSONObject orderInfo = bizData.getJSONObject("orderInfo");//订单基本信息
         String orderNo = orderInfo.getString("order_no");
 //        Integer isReloan = orderInfo.getInteger("is_reloan");
@@ -146,7 +146,7 @@ public class UserInfoBaseRequestHandler {
             redisMapper.set(key, user.getId());
         }
 
-        log.info("===============推送用户基本信息结束====================");
+        log.info("推送用户基本信息结束");
         return ResponseBean.success(map);
     }
 

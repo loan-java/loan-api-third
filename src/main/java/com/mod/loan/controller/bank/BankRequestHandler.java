@@ -62,7 +62,7 @@ public class BankRequestHandler extends BaseRequestHandler {
      */
     public ResponseBean<Map<String, Object>> bankCardCode(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
-        log.info("===============银行卡鉴权发送验证码开始====================");
+        log.info("银行卡鉴权发送验证码开始");
 
         //订单编号
         String orderNo = data.getString("order_no");
@@ -114,7 +114,7 @@ public class BankRequestHandler extends BaseRequestHandler {
                 throw new BizException("支付渠道异常");
         }
 
-        log.info("===============银行卡鉴权发送验证码结束====================" + JSONObject.toJSONString(message));
+        log.info("银行卡鉴权发送验证码结束" + JSONObject.toJSONString(message));
 
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             Map<String, Object> map = new HashMap<>();
@@ -132,7 +132,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         Map<String, Object> map = new HashMap<>();
         map.put("deal_result", "0");
         JSONObject data = parseAndCheckBizData(param);
-        log.info("======================绑定银行卡开始===========");
+        log.info("绑定银行卡开始");
         //订单编号
         String orderNo = data.getString("order_no");
         //绑卡卡号
@@ -193,7 +193,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         } else {
             throw new BizException(message.getStatus(), message.getMessage());
         }
-        log.info("======================绑定银行卡结束=================");
+        log.info("绑定银行卡结束");
         return ResponseBean.success(map);
     }
 }

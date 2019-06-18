@@ -58,7 +58,7 @@ public class UserInfoAdditRequestHandler {
         Map<String, Object> map = new HashMap<>();
         String message = "成功";
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============推送用户补充信息开始====================");
+        log.info("推送用户补充信息开始");
         //机构定制信息
         String orderNo = bizData.getString("order_no");
         String ID_Positive = bizData.getJSONArray("ID_Positive").getString(0);
@@ -146,7 +146,7 @@ public class UserInfoAdditRequestHandler {
         userIdent.setLivenessTime(new Date());
         int userIdentN = userIdentMapper.updateByPrimaryKey(userIdent);
         if (userIdentN == 0) throw new RuntimeException("推送用户补充信息:用户认证信息更新失败");
-        log.info("===============推送用户补充信息结束====================");
+        log.info("推送用户补充信息结束");
         return ResponseBean.success(map);
     }
 
