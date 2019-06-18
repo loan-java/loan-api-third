@@ -201,7 +201,7 @@ public class RongZeRequestController {
             log.info("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
             throw new BizException("商户不存在");
         }
-        log.info("融泽请求方法名" + method + ",redis的缓存key值:" + key + ",用户的id：" + uid);
+        log.info("融泽请求方法名:" + method + ",redis的缓存key值:" + key + ",用户的id：" + uid);
         return key;
     }
 
