@@ -1,4 +1,5 @@
 import com.mod.loan.config.Constant;
+import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import com.mod.loan.util.rongze.BizDataUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import com.mod.loan.util.rongze.SignUtil;
@@ -17,6 +18,13 @@ public class CommonTest extends BaseSpringBootJunitTest {
 
     @Resource
     private DataSource dataSource;
+    @Resource
+    private ChanpayApiRequest chanpayApiRequest;
+
+    @Test
+    public void chanpay() throws Exception {
+        chanpayApiRequest.bindCardRequest("121212", "212211", "6212261202004578077", "21212", "fa", "1300000000");
+    }
 
     @Test
     public void yeePay() throws Exception {

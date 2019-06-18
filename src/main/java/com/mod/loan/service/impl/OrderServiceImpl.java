@@ -60,8 +60,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     @Resource
     private BaofooService baofooService;
     @Resource
+    private ChanpayService chanpayService;
+    @Resource
     private TbDecisionResDetailMapper decisionResDetailMapper;
-    @Autowired
+    @Resource
     private DecisionPbDetailMapper decisionPbDetailMapper;
 
     @Transactional(rollbackFor = Throwable.class)
@@ -88,6 +90,12 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
         if (merchant != null) {
             switch (merchant.getBindType()) {
+                case 2:
+                    message = chanpayService.repay(order);
+                    break;
+                case 3:
+                    message = baofooService.repay(order);
+                    break;
                 case 4:
                     message = baofooService.repay(order);
                     break;
