@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public final class FormatUtil {
-	/** ==============IS Base=================== */
 	/** 判断是否为整数(包括负数) */
 	public static boolean isNumber(Object arg) {
 		return NumberBo(0, toString(arg));
