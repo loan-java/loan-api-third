@@ -4,6 +4,7 @@ import org.apache.commons.httpclient.NameValuePair;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ChanPayUtil {
@@ -216,5 +217,11 @@ public class ChanPayUtil {
         }
 
         return nameValuePair;
+    }
+
+    public static String generateOutTradeNo() {
+        return new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())
+                + String.valueOf(new Double(
+                Math.round(Math.random() * 10000000)).longValue());
     }
 }

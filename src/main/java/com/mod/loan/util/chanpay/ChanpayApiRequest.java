@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.config.Constant;
+import com.mod.loan.util.chanpay.dsf.BaseParameter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,12 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class ChanpayApiRequest {
+public class ChanpayApiRequest extends BaseParameter {
 
     private static ChanpayGateway chanpay = new ChanpayGateway();
 
     //鉴权绑卡请求
-    public ChanpayResponse bindCardRequest(String orderNo, String userId, String bankCardNo, String idCardNo, String username, String mobileNo) throws Exception {
+    public JSONObject bindCardRequest(String orderNo, String userId, String bankCardNo, String idCardNo, String username, String mobileNo) throws Exception {
         Map<String, String> origMap = new HashMap<String, String>();
         origMap = chanpay.setCommonMap(origMap);
         // 2.1 鉴权绑卡 api 业务参数
@@ -50,7 +51,7 @@ public class ChanpayApiRequest {
     }
 
     //鉴权绑卡确认
-    public ChanpayResponse bindCardConfirm(String orderNo, String smsCode) throws Exception {
+    public JSONObject bindCardConfirm(String orderNo, String smsCode) throws Exception {
 
         Map<String, String> origMap = new HashMap<String, String>();
         // 2.1 基本参数
@@ -64,9 +65,8 @@ public class ChanpayApiRequest {
         return doPost(origMap);
     }
 
-    //绑卡支付请求
-    public ChanpayResponse cardPayRequest(String orderNo, String userId, String cardPre, String cardSuf, String amount) throws Exception {
-
+    //协议支付请求
+    public CardPayResponse cardPayRequest(String orderNo, String userId, String cardPre, String cardSuf, String amount) throws Exception {
         Map<String, String> origMap = new HashMap<String, String>();
         // 2.1 基本参数
         origMap = chanpay.setCommonMap(origMap);
@@ -83,93 +83,34 @@ public class ChanpayApiRequest {
         origMap.put("TrxAmt", amount);// 交易金额，元
         origMap.put("TradeType", "11");// 交易类型，11-即时，12-担保
         origMap.put("SmsFlag", "0");
-        return doPost(origMap);
+        JSONObject json = doPost(origMap);
+        return new CardPayResponse(json.getString("OrderTrxid"));
     }
 
-    private ChanpayResponse doPost(Map<String, String> origMap) throws Exception {
+    private JSONObject doPost(Map<String, String> origMap) throws Exception {
         log.info("畅捷 api 请求开始, params: " + JSON.toJSONString(origMap));
         String result = chanpay.gatewayPost(origMap);
         log.info("畅捷 api 请求结束, result: " + result);
 
         JSONObject json = JSON.parseObject(result);
-        ChanpayResponse r = new ChanpayResponse(json.getString("AcceptStatus"), json.getString("AppRetMsg"),
-                json.getString("AppRetcode"), json.getString("Status"), json.getString("RetCode"), json.getString("RetMsg"));
-        if ("F".equals(r.getAcceptStatus()) || "F".equals(r.getStatus())) {
-            throw new BizException(StringUtils.isNotBlank(r.getRetCode()) ? r.getRetCode() : r.getAppRetcode(), StringUtils.isNotBlank(r.getRetMsg()) ? r.getRetMsg() : r.getAppRetMsg());
+        String acceptStatus = json.getString("AcceptStatus");
+        String appRetMsg = json.getString("AppRetMsg");
+        String appRetCode = json.getString("AppRetcode");
+        String status = json.getString("Status");
+        String retCode = json.getString("RetCode");
+        String retMsg = json.getString("RetMsg");
+
+        if ("F".equals(acceptStatus) || "F".equals(status)) {
+            throw new BizException(StringUtils.isNotBlank(retCode) ? retCode : appRetCode, StringUtils.isNotBlank(retMsg) ? retMsg : appRetMsg);
         }
-        r.setOrderTrxid(json.getString("OrderTrxid"));
-        return r;
+        return json;
     }
 
-    public static class ChanpayResponse {
-        private String acceptStatus;
-        private String appRetMsg;
-        private String appRetcode;
-
-        private String status;
-        private String retCode;
-        private String retMsg;
-
+    public static class CardPayResponse {
         private String orderTrxid; //支付时畅捷订单号
 
-        public ChanpayResponse() {
-        }
-
-        public ChanpayResponse(String acceptStatus, String appRetMsg, String appRetcode, String status, String retCode, String retMsg) {
-            this.acceptStatus = acceptStatus;
-            this.appRetMsg = appRetMsg;
-            this.appRetcode = appRetcode;
-            this.status = status;
-            this.retCode = retCode;
-            this.retMsg = retMsg;
-        }
-
-        public String getAcceptStatus() {
-            return acceptStatus;
-        }
-
-        public void setAcceptStatus(String acceptStatus) {
-            this.acceptStatus = acceptStatus;
-        }
-
-        public String getAppRetMsg() {
-            return appRetMsg;
-        }
-
-        public void setAppRetMsg(String appRetMsg) {
-            this.appRetMsg = appRetMsg;
-        }
-
-        public String getAppRetcode() {
-            return appRetcode;
-        }
-
-        public void setAppRetcode(String appRetcode) {
-            this.appRetcode = appRetcode;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public String getRetCode() {
-            return retCode;
-        }
-
-        public void setRetCode(String retCode) {
-            this.retCode = retCode;
-        }
-
-        public String getRetMsg() {
-            return retMsg;
-        }
-
-        public void setRetMsg(String retMsg) {
-            this.retMsg = retMsg;
+        public CardPayResponse(String orderTrxid) {
+            this.orderTrxid = orderTrxid;
         }
 
         public String getOrderTrxid() {
@@ -180,4 +121,5 @@ public class ChanpayApiRequest {
             this.orderTrxid = orderTrxid;
         }
     }
+
 }

@@ -86,7 +86,7 @@ public class ChanpayServiceImpl implements ChanpayService {
             String cardSuf = userBank.getCardNo().substring(userBank.getCardNo().length() - 4); //卡号后四位
 
             String amount = order.getShouldRepay().toPlainString();
-            ChanpayApiRequest.ChanpayResponse response = chanpayApiRequest.cardPayRequest(order.getOrderNo(), userId, cardPre, cardSuf, amount);
+            ChanpayApiRequest.CardPayResponse response = chanpayApiRequest.cardPayRequest(order.getOrderNo(), userId, cardPre, cardSuf, amount);
 
             String tid = response.getOrderTrxid();
 
@@ -106,7 +106,7 @@ public class ChanpayServiceImpl implements ChanpayService {
 
             OrderRepayQueryMessage message = new OrderRepayQueryMessage();
             message.setMerchantAlias(RequestThread.getClientAlias());
-            message.setRepayNo(tid);
+            message.setRepayNo(order.getOrderNo());
             message.setTimes(1);
             message.setRepayType(1);
             rabbitTemplate.convertAndSend(RabbitConst.chanpay_queue_repay_order_query, message);
