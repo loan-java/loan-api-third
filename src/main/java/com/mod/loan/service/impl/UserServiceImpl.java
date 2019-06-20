@@ -109,10 +109,10 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
             bank.setForeignId(userBank.getForeignId());
             userBankMapper.updateByPrimaryKey(bank);
         } else {
+            //2.把之前的老卡无效
+            userBankMapper.updateUserOldCardInvaild(uid);
             userBankMapper.insertSelective(userBank);
         }
-//        //2.把之前的老卡无效
-//        userBankMapper.updateUserOldCardInvaild(uid);
 
         return true;
     }
