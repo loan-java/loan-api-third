@@ -51,7 +51,7 @@ public class ChanpayApiRequest extends BaseParameter {
     }
 
     //鉴权绑卡确认
-    public JSONObject bindCardConfirm(String orderNo, String smsCode) throws Exception {
+    public BindCardResponse bindCardConfirm(String orderNo, String smsCode) throws Exception {
 
         Map<String, String> origMap = new HashMap<String, String>();
         // 2.1 基本参数
@@ -62,7 +62,8 @@ public class ChanpayApiRequest extends BaseParameter {
         origMap.put("OriAuthTrxId", orderNo);// 原鉴权绑卡订单号
         origMap.put("SmsCode", smsCode);// 鉴权短信验证码
 //        origMap.put("NotifyUrl", "http://dev.chanpay.com/receive.php");// 异步通知地址
-        return doPost(origMap);
+        JSONObject json = doPost(origMap);
+        return new BindCardResponse(json.getString("OrderTrxid"));
     }
 
     //协议支付请求
@@ -122,4 +123,19 @@ public class ChanpayApiRequest extends BaseParameter {
         }
     }
 
+    public static class BindCardResponse {
+        private String orderTrxid; //畅捷支付支付系统内部流水号
+
+        public BindCardResponse(String orderTrxid) {
+            this.orderTrxid = orderTrxid;
+        }
+
+        public String getOrderTrxid() {
+            return orderTrxid;
+        }
+
+        public void setOrderTrxid(String orderTrxid) {
+            this.orderTrxid = orderTrxid;
+        }
+    }
 }

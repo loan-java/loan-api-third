@@ -2,6 +2,7 @@ package com.mod.loan.service.impl;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.MerchantEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
@@ -65,12 +66,26 @@ public class YeePayServiceImpl implements YeePayService {
 
     //确认绑卡
     @Override
-    public ResultMessage confirmBindCard(String orderNo, String validateCode) {
+    @Transactional(rollbackFor = Throwable.class)
+    public ResultMessage confirmBindCard(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
         try {
-            JSONObject result = YeePayApiRequest.bindCardConfirm(orderNo, validateCode);
+            JSONObject result = YeePayApiRequest.bindCardConfirm(orderNo, smsCode);
             String status = result.getString("status");
             if (!"BIND_SUCCESS".equalsIgnoreCase(status))
                 throw new BizException(status);
+
+            String protocolNo = result.getString("yborderid");
+            UserBank userBank = new UserBank();
+            userBank.setCardCode(bankCode);
+            userBank.setCardName(bankName);
+            userBank.setCardNo(cardNo);
+            userBank.setCardPhone(cardPhone);
+            userBank.setCardStatus(1);
+            userBank.setCreateTime(new Date());
+            userBank.setForeignId(protocolNo);
+            userBank.setUid(uid);
+            userBank.setBindType(MerchantEnum.yeepay.getCode());
+            userService.insertUserBank(uid, userBank);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡确认失败: " + e.getMessage());
         }

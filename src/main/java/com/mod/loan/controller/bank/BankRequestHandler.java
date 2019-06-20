@@ -110,18 +110,17 @@ public class BankRequestHandler extends BaseRequestHandler {
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         log.info("merchant=" + JSONObject.toJSONString(merchant));
         switch (merchant.getBindType()) {
-
-            case 2:
-                message = chanpayService.bindCardRequest(orderNo, RequestThread.getUid(), bankCard, userMobile);
-                break;
-            case 3:
-                message = yeePayService.requestBindCard(RequestThread.getUid(), orderNo, bankCard, userMobile);
-                break;
             case 4:
                 message = baofooService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile);
                 break;
             case 5:
                 message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), bankCard, userMobile);
+                break;
+            case 6:
+                message = chanpayService.bindCardRequest(orderNo, RequestThread.getUid(), bankCard, userMobile);
+                break;
+            case 7:
+                message = yeePayService.requestBindCard(RequestThread.getUid(), orderNo, bankCard, userMobile);
                 break;
             default:
                 throw new BizException("支付渠道异常");
@@ -189,17 +188,17 @@ public class BankRequestHandler extends BaseRequestHandler {
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         switch (merchant.getBindType()) {
-            case 2:
-                message = chanpayService.bindCardConfirm(orderNo, verifyCode);
-                break;
-            case 3:
-                message = yeePayService.confirmBindCard(orderNo, verifyCode);
-                break;
             case 4:
                 message = baofooService.bindBaoFooSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
                 break;
             case 5:
                 message = kuaiQianService.bindKuaiQianSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
+                break;
+            case 6:
+                message = chanpayService.bindCardConfirm(orderNo, uid, verifyCode, openBank, bankName, bankCard, userMobile);
+                break;
+            case 7:
+                message = yeePayService.confirmBindCard(orderNo, uid, verifyCode, openBank, bankName, bankCard, userMobile);
                 break;
             default:
                 throw new BizException("支付渠道异常");

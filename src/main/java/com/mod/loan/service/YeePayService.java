@@ -12,7 +12,7 @@ public interface YeePayService {
     ResultMessage requestBindCard(long uid, String orderNo, String cardno, String phone);
 
     //绑卡确认
-    ResultMessage confirmBindCard(String orderNo, String validateCode);
+    ResultMessage confirmBindCard(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
 
     //还款
     ResultMessage repay(Order order) throws Exception;

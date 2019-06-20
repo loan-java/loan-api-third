@@ -23,7 +23,9 @@ public class CommonTest extends BaseSpringBootJunitTest {
 
     @Test
     public void chanpay() throws Exception {
-        chanpayApiRequest.bindCardRequest("121212", "212211", "6212261202004578077", "21212", "fa", "1300000000");
+//        chanpayApiRequest.queryPayBalance();
+//        chanpayApiRequest.queryTradeStatus("fdasfda");
+        chanpayApiRequest.bindCardRequest("21122", "212211", "62122212232", "21212", "fa", "1300000000");
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.MerchantEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
@@ -15,6 +16,7 @@ import com.mod.loan.service.ChanpayService;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.baofoo.util.SecurityUtil;
 import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -55,7 +57,6 @@ public class ChanpayServiceImpl implements ChanpayService {
             String idCardNo = user.getUserCertNo();
             String username = user.getUserName();
             chanpayApiRequest.bindCardRequest(orderNo, userId, bankCardNo, idCardNo, username, mobileNo);
-
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "畅捷绑卡请求失败: " + e.getMessage());
         }
@@ -63,9 +64,23 @@ public class ChanpayServiceImpl implements ChanpayService {
     }
 
     @Override
-    public ResultMessage bindCardConfirm(String orderNo, String smsCode) {
+    @Transactional(rollbackFor = Throwable.class)
+    public ResultMessage bindCardConfirm(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
         try {
-            chanpayApiRequest.bindCardConfirm(orderNo, smsCode);
+            ChanpayApiRequest.BindCardResponse response = chanpayApiRequest.bindCardConfirm(orderNo, smsCode);
+            //签约协议号
+            String protocolNo = response.getOrderTrxid();
+            UserBank userBank = new UserBank();
+            userBank.setCardCode(bankCode);
+            userBank.setCardName(bankName);
+            userBank.setCardNo(cardNo);
+            userBank.setCardPhone(cardPhone);
+            userBank.setCardStatus(1);
+            userBank.setCreateTime(new Date());
+            userBank.setForeignId(protocolNo);
+            userBank.setUid(uid);
+            userBank.setBindType(MerchantEnum.chanpay.getCode());
+            userService.insertUserBank(uid, userBank);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "畅捷绑卡确认失败: " + e.getMessage());
         }

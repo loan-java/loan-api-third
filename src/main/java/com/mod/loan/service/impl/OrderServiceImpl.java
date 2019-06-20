@@ -90,17 +90,17 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
         if (merchant != null) {
             switch (merchant.getBindType()) {
-                case 2:
-                    message = chanpayService.repay(order);
-                    break;
-                case 3:
-                    message = baofooService.repay(order);
-                    break;
                 case 4:
                     message = baofooService.repay(order);
                     break;
                 case 5:
                     message = kuaiQianService.repay(order);
+                    break;
+                case 6:
+                    message = chanpayService.repay(order);
+                    break;
+                case 7:
+                    message = baofooService.repay(order);
                     break;
                 default:
                     throw new BizException("支付渠道异常");

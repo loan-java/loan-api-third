@@ -6,6 +6,8 @@ public enum MerchantEnum {
     huiju(3, "", "汇聚"),
     baofoo(4, "", "宝付"),
     kuaiqian(5, "", "快钱"),
+    chanpay(6, "", "快捷"),
+    yeepay(7, "", "易宝"),
 
     jishidai(-1, "jishidai", "及时贷"),
     huashidai(-1, "huashidai", "华时贷"),
