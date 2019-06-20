@@ -92,11 +92,6 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
     @Override
     public boolean insertUserBank(Long uid, UserBank userBank) {
         // TODO Auto-generated method stub
-        UserBank bank = userBankMapper.selectUserCurrentBankCard(uid);
-        if (bank != null && bank.getCardNo().equals(userBank.getCardNo())) {
-            log.error("绑卡已绑定，用户={}", uid);
-            return false;
-        }
         //1.更新绑卡认证状态
         UserIdent ident = new UserIdent();
         ident.setUid(uid);
@@ -104,10 +99,21 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
         ident.setBindbankTime(new Date());
         userIdentMapper.updateByPrimaryKeySelective(ident);
 
-        //2.把之前的老卡无效
-        userBankMapper.updateUserOldCardInvaild(uid);
+        UserBank bank = userBankMapper.selectUserCurrentBankCard(uid);
+        if (bank != null && bank.getCardNo().equals(userBank.getCardNo())) {
+            bank.setCardCode(userBank.getCardCode());
+            bank.setCardName(userBank.getCardName());
+            bank.setCardNo(userBank.getCardNo());
+            bank.setCardPhone(userBank.getCardPhone());
+            bank.setCardStatus(userBank.getCardStatus());
+            bank.setForeignId(userBank.getForeignId());
+            userBankMapper.updateByPrimaryKey(bank);
+        } else {
+            userBankMapper.insertSelective(userBank);
+        }
+//        //2.把之前的老卡无效
+//        userBankMapper.updateUserOldCardInvaild(uid);
 
-        userBankMapper.insertSelective(userBank);
         return true;
     }
 }
