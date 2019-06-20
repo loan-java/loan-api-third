@@ -63,6 +63,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private TbDecisionResDetailMapper decisionResDetailMapper;
     @Autowired
     private DecisionPbDetailMapper decisionPbDetailMapper;
+    @Autowired
+    private DecisionZmDetailMapper decisionZmDetailMapper;
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
@@ -120,6 +122,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         if (merchant == null) {
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
+        Integer riskType = merchant.getRiskType();
+        if(riskType == null) riskType = 2;
 
         MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
         if (null == merchantRate) {
@@ -224,20 +228,34 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setStatus(Constant.unsettledOrderStatus);
         orderMapper.updateByPrimaryKey(order);
 
-        DecisionPbDetail decisionResDetail = decisionPbDetailMapper.selectByOrderNo(orderNo);
-        if (decisionResDetail != null) {
-            decisionResDetail.setOrderId(order.getId());
-            decisionResDetail.setUpdatetime(new Date());
-            decisionPbDetailMapper.updateByPrimaryKeySelective(decisionResDetail);
+        switch (riskType) {
+            case 1:
+                TbDecisionResDetail resDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
+                if (resDetail != null) {
+                    resDetail.setOrderId(order.getId());
+                    resDetail.setUpdatetime(new Date());
+                    decisionResDetailMapper.updateByTransId(resDetail);
+                }
+                break;
+            case 2:
+                DecisionPbDetail pbDetail = decisionPbDetailMapper.selectByOrderNo(orderNo);
+                if (pbDetail != null) {
+                    pbDetail.setOrderId(order.getId());
+                    pbDetail.setUpdatetime(new Date());
+                    decisionPbDetailMapper.updateByPrimaryKeySelective(pbDetail);
+                }
+                break;
+            case 3:
+                DecisionZmDetail zmDetail = decisionZmDetailMapper.selectByOrderNo(orderNo);
+                if (zmDetail != null) {
+                    zmDetail.setOrderId(order.getId());
+                    zmDetail.setUpdatetime(new Date());
+                    decisionZmDetailMapper.updateByPrimaryKeySelective(zmDetail);
+                }
+                break;
+            default:
+                throw new BizException("不存在当前的风控类型");
         }
-
-//        TbDecisionResDetail decisionResDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
-//        if (decisionResDetail != null) {
-//            decisionResDetail.setOrderId(order.getId());
-//            decisionResDetail.setUpdatetime(new Date());
-//            decisionResDetailMapper.updateByTransId(decisionResDetail);
-//        }
-
         return order;
     }
 

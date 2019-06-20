@@ -57,6 +57,28 @@ CREATE TABLE `tb_decision_pb_detail` (
 ) ENGINE=InnoDB AUTO_INCREMENT=282 DEFAULT CHARSET=utf8;
 
 
+#20190620新增sql
+ALTER TABLE tb_merchant DROP risk_type;
+alter table tb_merchant add risk_type tinyint(4) DEFAULT 2 COMMENT '1-新颜，2-十露盘，3-指谜（默认2）';
+
+drop table tb_decision_zm_detail;
+CREATE TABLE `tb_decision_zm_detail` (
+  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` bigint(11) DEFAULT NULL COMMENT '订单id',
+  `order_no` varchar(30) DEFAULT NULL COMMENT '(融泽)订单编号',
+  `request_id` varchar(64) DEFAULT NULL COMMENT '风控订单号',
+  `return_code` varchar(32) DEFAULT NULL COMMENT '风控状态标识',
+	`return_info` varchar(32) DEFAULT NULL COMMENT '审核结果',
+  `score` varchar(32) DEFAULT NULL COMMENT '分数',
+  `history_apply` varchar(255) DEFAULT NULL COMMENT '请求次数',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `requestId` (`request_id`),
+  UNIQUE KEY `orderNo` (`order_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=282 DEFAULT CHARSET=utf8;
+
+
 
 
 
