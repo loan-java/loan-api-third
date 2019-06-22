@@ -98,8 +98,8 @@ public class UserInfoAdditRequestHandler {
         this.checkPhone(orderNo, user);
         //更新用户信息
         user.setUserEmail(user_email);
-
-        int userN = userMapper.updateByPrimaryKey(user);
+        user.setUpdateTime(new Date());
+        int userN = userMapper.updateByPrimaryKeySelective(user);
         if (userN == 0) throw new RuntimeException("推送用户补充信息:用户更新失败");
 
         UserInfo userInfo = userInfoMapper.selectByPrimaryKey(RequestThread.getUid());
@@ -160,12 +160,18 @@ public class UserInfoAdditRequestHandler {
             try {
                 if (!StringUtils.isEmpty(user.getImgCertBack())) {
                     OSSUtil.deleteFile(user.getImgCertBack(), Constant.OSS_STATIC_BUCKET_NAME);
+                    //后续线程池更新  防止主线程更新
+                    user.setImgCertBack(null);
                 }
                 if (!StringUtils.isEmpty(user.getImgCertFront())) {
                     OSSUtil.deleteFile(user.getImgCertFront(), Constant.OSS_STATIC_BUCKET_NAME);
+                    //后续线程池更新  防止主线程更新
+                    user.setImgCertFront(null);
                 }
                 if (!StringUtils.isEmpty(user.getImgFace())) {
                     OSSUtil.deleteFile(user.getImgFace(), Constant.OSS_STATIC_BUCKET_NAME);
+                    //后续线程池更新  防止主线程更新
+                    user.setImgFace(null);
                 }
                 MoxieMobile moxieMobile = moxieMobileMapper.selectLastOne(user.getId());
                 if (moxieMobile != null && !StringUtils.isEmpty(moxieMobile.getRemark())) {
@@ -319,6 +325,8 @@ public class UserInfoAdditRequestHandler {
                         String imgFace = OSSUtil.uploadImage(base64str3, fileSuffix3);
                         user.setImgFace(imgFace);
                     }
+                    user.setUpdateTime(new Date());
+                    userMapper.updateByPrimaryKeySelective(user);
                 } catch (Exception e) {
                     log.error("推送用户补充信息：OSS上传身份证文件信息出错", e);
                 }
