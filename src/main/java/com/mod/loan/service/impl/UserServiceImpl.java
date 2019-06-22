@@ -108,6 +108,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
             bank.setCardPhone(userBank.getCardPhone());
             bank.setCardStatus(userBank.getCardStatus());
             bank.setForeignId(userBank.getForeignId());
+            bank.setUpdateTime(new Date());
             userBankMapper.updateByPrimaryKey(bank);
         } else {
             //2.把之前的老卡无效
