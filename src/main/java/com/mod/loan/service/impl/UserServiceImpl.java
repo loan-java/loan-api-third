@@ -101,6 +101,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
 
         UserBank bank = userBankMapper.selectUserCurrentBankCard(uid);
         if (bank != null && bank.getCardNo().equals(userBank.getCardNo())) {
+            log.info("重复绑卡用户:{},卡号:{}", userBank.getUid(), userBank.getCardNo());
             bank.setCardCode(userBank.getCardCode());
             bank.setCardName(userBank.getCardName());
             bank.setCardNo(userBank.getCardNo());
