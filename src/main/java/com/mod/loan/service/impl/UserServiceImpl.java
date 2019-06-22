@@ -112,6 +112,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
             userBankMapper.updateByPrimaryKey(bank);
         } else {
             //2.把之前的老卡无效
+            log.info("新绑卡用户:{},卡号:{}", userBank.getUid(), userBank.getCardNo());
             userBankMapper.updateUserOldCardInvaild(uid);
             userBankMapper.insertSelective(userBank);
         }
