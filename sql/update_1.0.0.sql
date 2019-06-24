@@ -70,7 +70,7 @@ CREATE TABLE `tb_decision_zm_detail` (
   `return_code` varchar(32) DEFAULT NULL COMMENT '风控状态标识',
 	`return_info` varchar(32) DEFAULT NULL COMMENT '审核结果',
   `score` varchar(32) DEFAULT NULL COMMENT '分数',
-  `history_apply` varchar(255) DEFAULT NULL COMMENT '请求次数',
+  `history_apply` text DEFAULT NULL COMMENT '请求次数文本',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`),
