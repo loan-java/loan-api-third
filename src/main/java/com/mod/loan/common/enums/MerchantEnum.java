@@ -8,10 +8,6 @@ public enum MerchantEnum {
     kuaiqian(5, "", "快钱"),
     chanpay(6, "", "畅捷"),
     yeepay(7, "", "易宝"),
-
-    jishidai(-1, "jishidai", "及时贷"),
-    huashidai(-1, "huashidai", "华时贷"),
-
     ;
 
     private Integer code;

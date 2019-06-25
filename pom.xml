@@ -230,10 +230,10 @@
 			</activation>
 		</profile>
 		<profile>
-			<!-- 及时贷环境 -->
-			<id>jishidai</id>
+			<!-- 小虎钱包环境 -->
+			<id>xiaohuqianbao</id>
 			<properties>
-				<profiles.active>jishidai</profiles.active>
+				<profiles.active>xiaohuqianbao</profiles.active>
 			</properties>
 		</profile>
 		<profile>
@@ -241,25 +241,6 @@
 			<id>huashidai</id>
 			<properties>
 				<profiles.active>huashidai</profiles.active>
-			</properties>
-		</profile>
-		<!-- 第三方生产环境 -->
-		<profile>
-			<id>suixinghua</id>
-			<properties>
-				<profiles.active>suixinghua</profiles.active>
-			</properties>
-		</profile>
-		<profile>
-			<id>jingyu</id>
-			<properties>
-				<profiles.active>jingyu</profiles.active>
-			</properties>
-		</profile>
-		<profile>
-			<id>mofu</id>
-			<properties>
-				<profiles.active>mofu</profiles.active>
 			</properties>
 		</profile>
 	</profiles>
