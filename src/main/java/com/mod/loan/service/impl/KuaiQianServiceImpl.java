@@ -77,7 +77,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
         //客户号
         String customerId = Constant.KUAI_QIAN_UID_PFX + uid;
         //外部跟踪编号
-        String externalRefNumber = StringUtil.getOrderNumber("ps");
+        String externalRefNumber = StringUtil.getOrderNumber("kq");
         //持卡人姓名
         String cardHolderName = user.getUserName();
         //证件类型
@@ -275,7 +275,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
         //商户端交易时间
         String entryTime = TimeUtils.parseTime(new Date(), TimeUtils.dateformat5);
         //外部跟踪号
-        String externalRefNumber = StringUtil.getOrderNumber("rp");
+        String externalRefNumber = StringUtil.getOrderNumber("kq");
         //客户号
         String customerId = Constant.KUAI_QIAN_UID_PFX + uid;
         //tr3回调地址
