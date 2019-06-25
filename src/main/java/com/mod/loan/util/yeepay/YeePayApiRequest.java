@@ -1,6 +1,5 @@
 package com.mod.loan.util.yeepay;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import java.util.Date;
@@ -14,29 +13,11 @@ import java.util.Map;
 public class YeePayApiRequest {
 
     //鉴权绑卡请求
-    public static JSONObject bindCardRequest(String requestno, String identityid,
+    public static StringResultDTO bindCardRequest(String requestno, String identityid,
                                               String cardno, String idcardno, String username, String phone) throws Exception {
         String merchantno = Config.getInstance().getValue("merchantno");
-//        String requestno 		=format(request.getParameter("requestno"));
-//        String identityid   		=format(request.getParameter("identityid"));
-//        String identitytype = format(request.getParameter("identitytype"));
-//        String cardno = format(request.getParameter("cardno"));
-//        String idcardno = format(request.getParameter("idcardno"));
-//        String idcardtype = format(request.getParameter("idcardtype"));
         String idcardtype = "ID";
-//        String username = format(request.getParameter("username"));
-//        String phone = format(request.getParameter("phone"));
-//        String issms = format(request.getParameter("issms"));
-//        String advicesmstype = format(request.getParameter("advicesmstype"));
-//        String smstemplateid = format(request.getParameter("smstemplateid"));
-//        String smstempldatemsg = format(request.getParameter("smstempldatemsg"));
-//        String avaliabletime = format(request.getParameter("avaliabletime"));
-//        String callbackurl = format(request.getParameter("callbackurl"));
-//        String requesttime = format(request.getParameter("requesttime"));
-//        String authtype = format(request.getParameter("authtype"));
         String authtype = "COMMON_FOUR";
-//        String remark = format(request.getParameter("remark"));
-//        String extinfos = format(request.getParameter("extinfos"));
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("merchantno", merchantno);
@@ -49,27 +30,20 @@ public class YeePayApiRequest {
         map.put("username", username);
         map.put("phone", phone);
         map.put("issms", "true");
-//        map.put("advicesmstype", advicesmstype);
-//        map.put("smstemplateid", smstemplateid);
-//        map.put("smstempldatemsg", smstempldatemsg);
-//        map.put("avaliabletime", avaliabletime);
-//        map.put("callbackurl", callbackurl);
         map.put("requesttime", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
         map.put("authtype", authtype);
-//        map.put("remark", remark);
-//        map.put("extinfos", extinfos);
 
         String authbindcardreqUri = Config.getInstance().getValue("authbindcardreqUri");
         return YeepayUtil.yeepayYOP(map, authbindcardreqUri);
     }
 
     //鉴权绑卡确认
-    public static JSONObject bindCardConfirm(String requestno, String validatecode) throws Exception {
+    public static StringResultDTO bindCardConfirm(String requestno, String validatecode) throws Exception {
         String merchantno = Config.getInstance().getValue("merchantno");
 //        String requestno = format(request.getParameter("requestno"));
 //        String validatecode = format(request.getParameter("validatecode"));
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("merchantno", merchantno);
         map.put("requestno", requestno);
         map.put("validatecode", validatecode);
@@ -80,7 +54,7 @@ public class YeePayApiRequest {
     }
 
     //绑卡支付请求
-    public static JSONObject cardPayRequest(String requestno, String identityid, String cardtop,
+    public static StringResultDTO cardPayRequest(String requestno, String identityid, String cardtop,
                                              String cardlast, String amount, String productname, String terminalno, boolean issms) throws Exception {
         String unibindcardpayUri = Config.getInstance().getValue("unibindcardpayUri");
 
@@ -127,7 +101,7 @@ public class YeePayApiRequest {
     }
 
     //支付查询
-    public JSONObject queryPayResult(String yborderid) throws Exception {
+    public StringResultDTO queryPayResult(String yborderid) throws Exception {
         String merchantno = Config.getInstance().getValue("merchantno");
 //        String requestno=format(request.getParameter("requestno"));
 //        String yborderid=format(request.getParameter("yborderid"));
