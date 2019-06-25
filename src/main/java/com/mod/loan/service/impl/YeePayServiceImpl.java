@@ -17,6 +17,7 @@ import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.service.YeePayService;
+import com.mod.loan.util.yeepay.StringResultDTO;
 import com.mod.loan.util.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -48,16 +49,19 @@ public class YeePayServiceImpl implements YeePayService {
     //绑卡
     @Override
     public ResultMessage requestBindCard(long uid, String orderNo, String cardno, String phone) {
-
         try {
             User user = userService.selectByPrimaryKey(uid);
             if (user == null) throw new BizException("用户(" + uid + ")不存在");
 
-            String identityid = "" + uid;
+            String identityid = "YB" + uid;
             String idcardno = user.getUserCertNo();
             String username = user.getUserName();
 
-            YeePayApiRequest.bindCardRequest(orderNo, identityid, cardno, idcardno, username, phone);
+            StringResultDTO resultDTO = YeePayApiRequest.bindCardRequest(orderNo, identityid, cardno, idcardno, username, phone);
+            if ("FAIL".equals(resultDTO.getStatus()) || "TIME_OUT".equals(resultDTO.getStatus())) {
+                log.info("易宝绑卡请求异常，uid={}, errorcode={}, error={}", uid, resultDTO.getErrorcode(), resultDTO.getErrormsg());
+                return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + resultDTO.getErrormsg());
+            }
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + e.getMessage());
         }
@@ -69,12 +73,12 @@ public class YeePayServiceImpl implements YeePayService {
     @Transactional(rollbackFor = Throwable.class)
     public ResultMessage confirmBindCard(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
         try {
-            JSONObject result = YeePayApiRequest.bindCardConfirm(orderNo, smsCode);
-            String status = result.getString("status");
+            StringResultDTO result = YeePayApiRequest.bindCardConfirm(orderNo, smsCode);
+            String status = result.getStatus();
             if (!"BIND_SUCCESS".equalsIgnoreCase(status))
                 throw new BizException(status);
 
-            String protocolNo = result.getString("yborderid");
+            String protocolNo = result.getYborderid();
             UserBank userBank = new UserBank();
             userBank.setCardCode(bankCode);
             userBank.setCardName(bankName);
@@ -114,15 +118,15 @@ public class YeePayServiceImpl implements YeePayService {
 
             String terminalno = "SQKKSCENEKJ010";  //协议支付： SQKKSCENEKJ010 代扣： SQKKSCENE10 商户需开通对应协议支付/代扣权限
 
-            JSONObject result = YeePayApiRequest.cardPayRequest(requestno, identityid, cardtop, cardlast, amount, productname, terminalno, false);
+            StringResultDTO result = YeePayApiRequest.cardPayRequest(requestno, identityid, cardtop, cardlast, amount, productname, terminalno, false);
 
-            String status = result.getString("status");
+            String status = result.getStatus();
 
             if ("PAY_FAIL".equalsIgnoreCase(status) || "FAIL".equalsIgnoreCase(status)) {
                 return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝还款失败: " + status);
             }
 
-            String yborderid = result.getString("yborderid");
+            String yborderid = result.getYborderid();
 
             OrderRepay orderRepay = new OrderRepay();
             orderRepay.setRepayNo(yborderid);
