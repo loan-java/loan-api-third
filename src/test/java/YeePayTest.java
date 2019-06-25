@@ -18,7 +18,7 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     @Test
     public void requestBindCard() {
         long uid = 2L;
-        String orderNo = "1661269536227111224";
+        String orderNo = "1661269536227111225";
         String cardno = "6222021202041701419";
         String phone = "15868417851";
         ResultMessage message = yeePayService.requestBindCard(uid, orderNo, cardno, phone);
@@ -28,14 +28,13 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     //绑卡确认
     @Test
     public void confirmBindCard() {
-        String orderNo = "1661269536227111111";
         long uid = 2L;
         String smsCode = "";
         String bankCode = "CMB";
         String bankName = "招商银行";
         String cardNo = "6222021202041701419";
         String cardPhone = "15868417851";
-        ResultMessage message = yeePayService.confirmBindCard(orderNo, uid, smsCode, bankCode, bankName, cardNo, cardPhone);
+        ResultMessage message = yeePayService.confirmBindCard(uid, smsCode, bankCode, bankName, cardNo, cardPhone);
         System.out.println(JSON.toJSONString(message));
     }
 

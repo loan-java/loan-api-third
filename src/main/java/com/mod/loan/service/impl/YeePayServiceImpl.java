@@ -9,6 +9,8 @@ import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.rabbitmq.RabbitConst;
+import com.mod.loan.config.redis.RedisConst;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
@@ -30,8 +32,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @ author liujianjian
- * @ date 2019/6/15 20:55
+ * @author liujianjian
+ * @date 2019/6/15 20:55
  */
 @Slf4j
 @Service
@@ -45,14 +47,21 @@ public class YeePayServiceImpl implements YeePayService {
     private OrderRepayService orderRepayService;
     @Resource
     private RabbitTemplate rabbitTemplate;
+    @Resource
+    private RedisMapper redisMapper;
 
-    //绑卡
+    /**
+     * 绑卡
+     */
     @Override
     public ResultMessage requestBindCard(long uid, String orderNo, String cardno, String phone) {
         try {
             User user = userService.selectByPrimaryKey(uid);
-            if (user == null) throw new BizException("用户(" + uid + ")不存在");
-
+            if (user == null) {
+                throw new BizException("用户(" + uid + ")不存在");
+            }
+            String timeStr = System.currentTimeMillis() + "";
+            orderNo += timeStr.substring(timeStr.length() - 6);
             String identityid = "YB" + uid;
             String idcardno = user.getUserCertNo();
             String username = user.getUserName();
@@ -62,21 +71,27 @@ public class YeePayServiceImpl implements YeePayService {
                 log.info("易宝绑卡请求异常，uid={}, errorcode={}, error={}", uid, resultDTO.getErrorcode(), resultDTO.getErrormsg());
                 return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + resultDTO.getErrormsg());
             }
+            redisMapper.set(RedisConst.user_bank_bind + uid, resultDTO.getRequestno(), 600);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + e.getMessage());
         }
         return new ResultMessage(ResponseEnum.M2000);
     }
 
-    //确认绑卡
+    /**
+     * 确认绑卡
+     */
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public ResultMessage confirmBindCard(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
+    public ResultMessage confirmBindCard(long uid, String smsCode,
+                                         String bankCode, String bankName,
+                                         String cardNo, String cardPhone) {
         try {
+            String orderNo = redisMapper.get(RedisConst.user_bank_bind + uid);
             StringResultDTO result = YeePayApiRequest.bindCardConfirm(orderNo, smsCode);
-            String status = result.getStatus();
-            if (!"BIND_SUCCESS".equalsIgnoreCase(status))
-                throw new BizException(status);
+            if (!"BIND_SUCCESS".equalsIgnoreCase(result.getStatus())) {
+                throw new BizException(result.getErrorcode());
+            }
 
             String protocolNo = result.getYborderid();
             UserBank userBank = new UserBank();
@@ -96,7 +111,9 @@ public class YeePayServiceImpl implements YeePayService {
         return new ResultMessage(ResponseEnum.M2000);
     }
 
-    //还款
+    /**
+     * 还款
+     */
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public ResultMessage repay(Order order) {
@@ -108,15 +125,20 @@ public class YeePayServiceImpl implements YeePayService {
             String identityid = "" + uid;
 
             UserBank userBank = userBankService.selectUserCurrentBankCard(order.getUid());
-            if (userBank == null || StringUtils.isBlank(userBank.getCardNo())) throw new BizException("用户未绑卡");
+            if (userBank == null || StringUtils.isBlank(userBank.getCardNo())) {
+                throw new BizException("用户未绑卡");
+            }
 
-            String cardtop = userBank.getCardNo().substring(0, 6); //卡号前六位
-            String cardlast = userBank.getCardNo().substring(userBank.getCardNo().length() - 4); //卡号后四位
+            //卡号前六位
+            String cardtop = userBank.getCardNo().substring(0, 6);
+            //卡号后四位
+            String cardlast = userBank.getCardNo().substring(userBank.getCardNo().length() - 4);
 
             String amount = order.getShouldRepay().toPlainString();
             String productname = "还款";
 
-            String terminalno = "SQKKSCENEKJ010";  //协议支付： SQKKSCENEKJ010 代扣： SQKKSCENE10 商户需开通对应协议支付/代扣权限
+            //协议支付： SQKKSCENEKJ010 代扣： SQKKSCENE10 商户需开通对应协议支付/代扣权限
+            String terminalno = "SQKKSCENEKJ010";
 
             StringResultDTO result = YeePayApiRequest.cardPayRequest(requestno, identityid, cardtop, cardlast, amount, productname, terminalno, false);
 

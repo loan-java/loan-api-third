@@ -8,12 +8,18 @@ import com.mod.loan.model.Order;
  * @ date 2019/6/15 20:41
  */
 public interface YeePayService {
-    //绑卡请求
+    /**
+     * 绑卡请求
+     */
     ResultMessage requestBindCard(long uid, String orderNo, String cardno, String phone);
 
-    //绑卡确认
-    ResultMessage confirmBindCard(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
+    /**
+     * 绑卡确认
+     */
+    ResultMessage confirmBindCard(long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
 
-    //还款
+    /**
+     * 还款
+     */
     ResultMessage repay(Order order) throws Exception;
 }
