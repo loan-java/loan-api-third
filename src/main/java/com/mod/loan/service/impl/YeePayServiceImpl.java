@@ -1,6 +1,7 @@
 package com.mod.loan.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.MerchantEnum;
 import com.mod.loan.common.enums.ResponseEnum;
@@ -90,6 +91,7 @@ public class YeePayServiceImpl implements YeePayService {
             String orderNo = redisMapper.get(RedisConst.user_bank_bind + uid);
             StringResultDTO result = YeePayApiRequest.bindCardConfirm(orderNo, smsCode);
             if (!"BIND_SUCCESS".equalsIgnoreCase(result.getStatus())) {
+                log.error("易宝确认绑卡失败, uid={}, result={}", uid, JSON.toJSONString(result));
                 throw new BizException(result.getErrorcode());
             }
 

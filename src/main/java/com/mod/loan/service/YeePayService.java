@@ -21,5 +21,5 @@ public interface YeePayService {
     /**
      * 还款
      */
-    ResultMessage repay(Order order) throws Exception;
+    ResultMessage repay(Order order);
 }
