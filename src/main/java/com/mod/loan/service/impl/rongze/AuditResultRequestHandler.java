@@ -94,9 +94,9 @@ public class AuditResultRequestHandler {
         int conclusion=40;
         String remark="审批拒绝";
 
-        //不丢失复贷用户 复贷用户前五次不需要走风控
+        //不丢失复贷用户 复贷用户前四次不需要走风控
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
-        if (orderList != null && orderList.size() > 0 && orderList.size() < 6) {
+        if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
             conclusion = 10;
             remark = "审批成功";
             //单期产品
