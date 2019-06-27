@@ -195,7 +195,7 @@ public class BankRequestHandler extends BaseRequestHandler {
                 message = kuaiQianService.bindKuaiQianSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
                 break;
             case 6:
-                message = chanpayService.bindCardConfirm(orderNo, uid, verifyCode, openBank, bankName, bankCard, userMobile);
+                message = chanpayService.bindCardConfirm(uid, verifyCode, openBank, bankName, bankCard, userMobile);
                 break;
             case 7:
                 message = yeePayService.confirmBindCard(uid, verifyCode, openBank, bankName, bankCard, userMobile);
