@@ -1,5 +1,6 @@
 package com.mod.loan.util.yeepay;
 
+import com.yeepay.shade.com.google.common.collect.Maps;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import java.util.Date;
@@ -7,12 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @ author liujianjian
- * @ date 2019/6/15 21:00
+ * @author liujianjian
+ * @date 2019/6/15 21:00
  */
 public class YeePayApiRequest {
 
-    //鉴权绑卡请求
+    /**
+     * 鉴权绑卡请求
+     */
     public static StringResultDTO bindCardRequest(String requestno, String identityid,
                                               String cardno, String idcardno, String username, String phone) throws Exception {
         String merchantno = Config.getInstance().getValue("merchantno");
@@ -37,13 +40,13 @@ public class YeePayApiRequest {
         return YeepayUtil.yeepayYOP(map, authbindcardreqUri);
     }
 
-    //鉴权绑卡确认
+    /**
+     * 鉴权绑卡确认
+     */
     public static StringResultDTO bindCardConfirm(String requestno, String validatecode) throws Exception {
         String merchantno = Config.getInstance().getValue("merchantno");
-//        String requestno = format(request.getParameter("requestno"));
-//        String validatecode = format(request.getParameter("validatecode"));
 
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = Maps.newHashMap();
         map.put("merchantno", merchantno);
         map.put("requestno", requestno);
         map.put("validatecode", validatecode);
@@ -53,7 +56,9 @@ public class YeePayApiRequest {
         return YeepayUtil.yeepayYOP(map, authbindcardconfirmUri);
     }
 
-    //绑卡支付请求
+    /**
+     * 绑卡支付请求
+     */
     public static StringResultDTO cardPayRequest(String requestno, String identityid, String cardtop,
                                              String cardlast, String amount, String productname, String terminalno, boolean issms) throws Exception {
         String unibindcardpayUri = Config.getInstance().getValue("unibindcardpayUri");

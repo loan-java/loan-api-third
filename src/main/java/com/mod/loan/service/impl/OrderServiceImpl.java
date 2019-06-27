@@ -65,6 +65,8 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private TbDecisionResDetailMapper decisionResDetailMapper;
     @Resource
     private DecisionPbDetailMapper decisionPbDetailMapper;
+    @Resource
+    private YeePayService yeePayService;
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
@@ -100,7 +102,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                     message = chanpayService.repay(order);
                     break;
                 case 7:
-                    message = baofooService.repay(order);
+                    message = yeePayService.repay(order);
                     break;
                 default:
                     throw new BizException("支付渠道异常");

@@ -198,7 +198,7 @@ public class BankRequestHandler extends BaseRequestHandler {
                 message = chanpayService.bindCardConfirm(orderNo, uid, verifyCode, openBank, bankName, bankCard, userMobile);
                 break;
             case 7:
-                message = yeePayService.confirmBindCard(orderNo, uid, verifyCode, openBank, bankName, bankCard, userMobile);
+                message = yeePayService.confirmBindCard(uid, verifyCode, openBank, bankName, bankCard, userMobile);
                 break;
             default:
                 throw new BizException("支付渠道异常");
