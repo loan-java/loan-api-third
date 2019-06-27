@@ -88,6 +88,50 @@ public class ChanpayApiRequest extends BaseParameter {
         return new CardPayResponse(json.getString("OrderTrxid"));
     }
 
+    //协议支付订单查询
+//    public JSONObject queryTrade(String orderNo) throws Exception {
+//        Map<String, String> origMap = new HashMap<String, String>();
+//        // 2.1 基本参数
+//        origMap = chanpay.setCommonMap(origMap);
+//        origMap.put("Service", "nmg_api_query_trade");// 请求的接口名
+//        // 2.2 业务参数
+//        origMap.put("TrxId", orderNo);// 订单号
+//        origMap.put("OrderTrxId", "2017072002950502");// 原业务请求订单号，固定值
+//        origMap.put("TradeType", "pay_order");// 原业务订单类型
+//        return doPost(origMap);
+//    }
+
+    //商户余额查询
+//    public double queryPayBalance() throws Exception {
+//        Map<String, String> map = this.requestBaseParameter();
+//        map.put("TransCode", "C00005");
+//        map.put("OutTradeNo", ChanPayUtil.generateOutTradeNo());
+////        map.put("AcctNo", ChanPayUtil.encrypt("200000920146777",
+////                BaseConstant.MERCHANT_PUBLIC_KEY, BaseConstant.CHARSET));
+////        map.put("AcctName", ChanPayUtil.encrypt("测试",
+////                BaseConstant.MERCHANT_PUBLIC_KEY, BaseConstant.CHARSET));
+//
+//        JSONObject json = doPost(map);
+//        return Double.valueOf(json.getString("PayBalance")); //出款户余额
+//    }
+
+    //放款
+//    public void transfer(String orderNo, String bankName, String bankCardNo, String username, String amount) throws Exception {
+//        Map<String, String> map = this.requestBaseParameter();
+//        map.put("TransCode", "T10000"); // 交易码
+//        map.put("OutTradeNo", orderNo); // 商户网站唯一订单号
+////        map.put("CorpAcctNo", "1223332343");  //可空
+//        map.put("BusinessType", "0"); // 业务类型：0对私 1对公
+//        map.put("BankCommonName", bankName); // 通用银行名称
+////        map.put("BankCode", "CCB");//对公必填
+//        map.put("AccountType", "00"); // 账户类型
+//        map.put("AcctNo", chanpay.encrypt(bankCardNo)); // 对手人账号(此处需要用真实的账号信息)
+//        map.put("AcctName", chanpay.encrypt(username)); // 对手人账户名称
+//        map.put("TransAmt", amount);
+//        map.put("ChargeRole", "payee");
+//        doPost(map);
+//    }
+
     private JSONObject doPost(Map<String, String> origMap) throws Exception {
         log.info("畅捷 api 请求开始, params: " + JSON.toJSONString(origMap));
         String result = chanpay.gatewayPost(origMap);

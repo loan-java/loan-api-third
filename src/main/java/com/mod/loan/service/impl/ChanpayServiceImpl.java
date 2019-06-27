@@ -8,6 +8,8 @@ import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.rabbitmq.RabbitConst;
+import com.mod.loan.config.redis.RedisConst;
+import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.model.User;
@@ -16,7 +18,6 @@ import com.mod.loan.service.ChanpayService;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
-import com.mod.loan.util.baofoo.util.SecurityUtil;
 import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +47,8 @@ public class ChanpayServiceImpl implements ChanpayService {
     private OrderRepayService orderRepayService;
     @Resource
     private RabbitTemplate rabbitTemplate;
+    @Resource
+    private RedisMapper redisMapper;
 
     @Override
     public ResultMessage bindCardRequest(String orderNo, long uid, String bankCardNo, String mobileNo) {
@@ -56,7 +59,14 @@ public class ChanpayServiceImpl implements ChanpayService {
             String userId = "" + uid;
             String idCardNo = user.getUserCertNo();
             String username = user.getUserName();
+
+            String timeStr = System.currentTimeMillis() + "";
+            orderNo += timeStr.substring(timeStr.length() - 6);
+
             chanpayApiRequest.bindCardRequest(orderNo, userId, bankCardNo, idCardNo, username, mobileNo);
+
+            redisMapper.set(RedisConst.user_bank_bind + uid, orderNo, 600);
+
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "畅捷绑卡请求失败: " + e.getMessage());
         }
@@ -65,8 +75,13 @@ public class ChanpayServiceImpl implements ChanpayService {
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public ResultMessage bindCardConfirm(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
+    public ResultMessage bindCardConfirm(long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
         try {
+            String orderNo = redisMapper.get(RedisConst.user_bank_bind + uid);
+            if (StringUtils.isBlank(orderNo)) {
+                return new ResultMessage(ResponseEnum.M4000.getCode(), "请重新绑卡");
+            }
+
             ChanpayApiRequest.BindCardResponse response = chanpayApiRequest.bindCardConfirm(orderNo, smsCode);
             //签约协议号
             String protocolNo = response.getOrderTrxid();

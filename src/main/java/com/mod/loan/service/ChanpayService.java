@@ -7,7 +7,7 @@ public interface ChanpayService {
 
     ResultMessage bindCardRequest(String orderNo, long uid, String bankCardNo, String mobileNo);
 
-    ResultMessage bindCardConfirm(String orderNo, long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
+    ResultMessage bindCardConfirm(long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
 
     /**
      * 还款
