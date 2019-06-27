@@ -55,7 +55,7 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     //还款
     @Test
     public void repay() throws Exception {
-        Order order = orderService.findOrderByOrderNoAndSource("1661269536227111111", 1);
+        Order order = orderService.findOrderByOrderNoAndSource("1661269536227111225", 1);
         ResultMessage message = yeePayService.repay(order);
         System.out.println(JSON.toJSONString(message));
     }

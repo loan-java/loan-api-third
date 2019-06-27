@@ -62,27 +62,9 @@ public class YeePayApiRequest {
     public static StringResultDTO cardPayRequest(String requestno, String identityid, String cardtop,
                                              String cardlast, String amount, String productname, String terminalno, boolean issms) throws Exception {
         String unibindcardpayUri = Config.getInstance().getValue("unibindcardpayUri");
-
         String merchantno = Config.getInstance().getValue("merchantno");
-//        String requestno = format(request.getParameter("requestno"));
-//        String issms = format(request.getParameter("issms"));
-//        String identityid = format(request.getParameter("identityid"));
-//        String identitytype = format(request.getParameter("identitytype"));
-//        String cardtop = format(request.getParameter("cardtop"));
-//        String cardlast = format(request.getParameter("cardlast"));
-//        String amount = format(request.getParameter("amount"));
-//        String advicesmstype = format(request.getParameter("advicesmstype"));
-//        String avaliabletime = format(request.getParameter("avaliabletime"));
-//        String productname = format(request.getParameter("productname"));
-//        String callbackurl = format(request.getParameter("callbackurl"));
-//        String requesttime = format(request.getParameter("requesttime"));
-//        String terminalno = format(request.getParameter("terminalno"));
-//        String remark = format(request.getParameter("remark"));
-//        String extinfos = format(request.getParameter("extinfos"));
-//        String dividecallbackurl = format(request.getParameter("dividecallbackurl"));
-//        String dividejstr = format(request.getParameter("dividejstr"));
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("merchantno", merchantno);
         map.put("requestno", requestno);
         map.put("issms", String.valueOf(issms));
