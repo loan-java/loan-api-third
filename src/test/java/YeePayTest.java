@@ -31,10 +31,10 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     //绑卡请求
     @Test
     public void requestBindCard() {
-        long uid = 2L;
-        String orderNo = "1661269536227111225";
-        String cardno = "6222021202041701419";
-        String phone = "15868417851";
+        long uid = 1L;
+        String orderNo = "1661269536227111226";
+        String cardno = "6214835899276321";
+        String phone = "15867122886";
         ResultMessage message = yeePayService.requestBindCard(uid, orderNo, cardno, phone);
         System.out.println(JSON.toJSONString(message));
     }
@@ -42,12 +42,12 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     //绑卡确认
     @Test
     public void confirmBindCard() {
-        long uid = 2L;
-        String smsCode = "877280";
+        long uid = 1L;
+        String smsCode = "867827";
         String bankCode = "CMB";
         String bankName = "招商银行";
-        String cardNo = "6222021202041701419";
-        String cardPhone = "15868417851";
+        String cardNo = "6214835899276321";
+        String cardPhone = "15867122886";
         ResultMessage message = yeePayService.confirmBindCard(uid, smsCode, bankCode, bankName, cardNo, cardPhone);
         System.out.println(JSON.toJSONString(message));
     }
@@ -63,8 +63,8 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     @Test
     public void addOrder() {
         Order order = new Order();
-        order.setOrderNo("1661269536227111225");
-        order.setUid(2L);
+        order.setOrderNo("1661269536227111226");
+        order.setUid(1L);
         order.setBorrowDay(6);
         order.setBorrowMoney(new BigDecimal("1500.00"));
         order.setActualMoney(new BigDecimal("1050.00"));
