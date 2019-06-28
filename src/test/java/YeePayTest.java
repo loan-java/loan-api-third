@@ -43,7 +43,7 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     @Test
     public void confirmBindCard() {
         long uid = 2L;
-        String smsCode = "837238";
+        String smsCode = "877280";
         String bankCode = "CMB";
         String bankName = "招商银行";
         String cardNo = "6222021202041701419";
