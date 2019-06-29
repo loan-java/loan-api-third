@@ -83,6 +83,8 @@ public class RongZeRequestController {
         String key = null;
         try {//校验 sig
 
+            if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
+
             String sign = param.getString("sign");
             boolean check = SignUtil.checkSign(param.toJSONString(), sign);
             if (!check) throw new BizException(ResponseEnum.M4006);
@@ -95,7 +97,6 @@ public class RongZeRequestController {
                 log.warn(logPre + "请求方法:" + method + "解密后的数据：" + param.toJSONString());
             }
 
-            if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
             //锁住每个请求
             //redis的key
             key = this.binRequestThread(request, param, method);

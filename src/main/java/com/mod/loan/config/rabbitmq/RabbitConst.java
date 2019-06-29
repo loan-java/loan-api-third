@@ -21,4 +21,8 @@ public class RabbitConst {
     public final static String baofoo_queue_repay_order_query = "baofoo_queue_repay_order_query";
 
     public final static String kuaiqian_queue_repay_order_query = "kuaiqian_queue_repay_order_query";
+
+    public final static String chanpay_queue_repay_order_query = "chanpay_queue_repay_order_query";
+
+    public final static String yeepay_queue_repay_order_query = "yeepay_queue_repay_order_query";
 }

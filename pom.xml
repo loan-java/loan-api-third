@@ -176,13 +176,15 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/src/main/resources/lib/xmap.jar</systemPath>
 		</dependency>
-		<!--<dependency>
-			<groupId>jasypt</groupId>
-			<artifactId>jasypt</artifactId>
-			<version>1.9.2</version>
+
+		<dependency>
+			<groupId>yeepay</groupId>
+			<artifactId>yeepay-sdk</artifactId>
+			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/jasypt-1.9.2.jar</systemPath>
-		</dependency>-->
+			<systemPath>${project.basedir}/src/main/resources/lib/yop-java-sdk-3.1.9-jdk18.jar</systemPath>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/net.sf.json-lib/json-lib -->
 		<dependency>
 			<groupId>net.sf.json-lib</groupId>
