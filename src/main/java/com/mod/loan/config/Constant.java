@@ -64,143 +64,143 @@ public class Constant {
     public static String companyName;//公司名称
 
 
-    @Value("${company.name}")
+    @Value("${company.name:}")
     public void setCompanyName(String companyName) {
         Constant.companyName = companyName;
     }
 
-    @Value("${oss.endpoint.in}")
+    @Value("${oss.endpoint.in:}")
     public void setOssEndpointIn(String ossEndpointIn) {
         Constant.OSS_ENDPOINT_IN = ossEndpointIn;
     }
 
-    @Value("${sys.domain.host}")
+    @Value("${sys.domain.host:}")
     public void setSysDomainHost(String sysDomainHost) {
         Constant.sysDomainHost = sysDomainHost;
     }
 
-    @Value("${rongze.request.app.id}")
+    @Value("${rongze.request.app.id:}")
     public void setRongZeRequestAppId(String rongZeRequestAppId) {
         Constant.rongZeRequestAppId = rongZeRequestAppId;
     }
 
-    @Value("${rongze.callback.url}")
+    @Value("${rongze.callback.url:}")
     public void setRongZeCallbackUrl(String rongZeCallbackUrl) {
         Constant.rongZeCallbackUrl = rongZeCallbackUrl;
     }
 
-    @Value("${rongze.query.url}")
+    @Value("${rongze.query.url:}")
     public void setRongZeQueryUrl(String rongZeQueryUrl) {
         Constant.rongZeQueryUrl = rongZeQueryUrl;
     }
 
-    @Value("${org.rsa.private.key}")
+    @Value("${org.rsa.private.key:}")
     public void setOrgPrivateKey(String orgPrivateKey) {
         Constant.orgPrivateKey = orgPrivateKey;
     }
 
-    @Value("${rongze.rsa.public.key}")
+    @Value("${rongze.rsa.public.key:}")
     public void setRongZePublicKey(String rongZePublicKey) {
         Constant.rongZePublicKey = rongZePublicKey;
     }
 
-    @Value("${merchant}")
+    @Value("${merchant:}")
     public void setMerchant(String merchant) {
         Constant.merchant = merchant;
     }
 
-    @Value("${kuaiqian.jks.path}")
+    @Value("${kuaiqian.jks.path:}")
     public void setKuaiQianJksPath(String kuaiQianJksPath) {
         Constant.kuaiQianJksPath = kuaiQianJksPath;
     }
 
-    @Value("${kuaiqian.pri.key.path}")
+    @Value("${kuaiqian.pri.key.path:}")
     public void setKuaiQianPriKeyPath(String kuaiQianPriKeyPath) {
         Constant.kuaiQianPriKeyPath = kuaiQianPriKeyPath;
     }
 
-    @Value("${kuaiqian.key.password}")
+    @Value("${kuaiqian.key.password:}")
     public void setKuaiQianKeyPassword(String kuaiQianKeyPassword) {
         Constant.kuaiQianKeyPassword = kuaiQianKeyPassword;
     }
 
-    @Value("${kuaiqian.repay.url}")
+    @Value("${kuaiqian.repay.url:}")
     public void setKuaiQianRepayUrl(String kuaiQianRepayUrl) {
         Constant.kuaiQianRepayUrl = kuaiQianRepayUrl;
     }
 
-    @Value("${kuaiqian.send.sms.url}")
+    @Value("${kuaiqian.send.sms.url:}")
     public void setKuaiQianSendSmsUrl(String kuaiQianSendSmsUrl) {
         Constant.kuaiQianSendSmsUrl = kuaiQianSendSmsUrl;
     }
 
-    @Value("${kuaiqian.bind.sms.url}")
+    @Value("${kuaiqian.bind.sms.url:}")
     public void setKuaiQianBindSmsUrl(String kuaiQianBindSmsUrl) {
         Constant.kuaiQianBindSmsUrl = kuaiQianBindSmsUrl;
     }
 
-    @Value("${kuaiqian.member.id}")
+    @Value("${kuaiqian.member.id:}")
     public void setKuaiQianMemberId(String kuaiQianMemberId) {
         Constant.kuaiQianMemberId = kuaiQianMemberId;
     }
 
-    @Value("${kuaiqian.terminal.id}")
+    @Value("${kuaiqian.terminal.id:}")
     public void setKuaiQianTerminalId(String kuaiQianTerminalId) {
         Constant.kuaiQianTerminalId = kuaiQianTerminalId;
     }
 
-    @Value("${kuaiqian.version}")
+    @Value("${kuaiqian.version:}")
     public void setKuaiQianVersion(String kuaiQianVersion) {
         Constant.kuaiQianVersion = kuaiQianVersion;
     }
 
 
-    @Value("${juhe.call.back.url}")
+    @Value("${juhe.call.back.url:}")
     public void setJuHeCallBackUrl(String juHeCallBackUrl) {
         JuHeCallBackUrl = juHeCallBackUrl;
     }
 
-    @Value("${baofoo.key.store.path}")
+    @Value("${baofoo.key.store.path:}")
     public void setBaoFooKeyStorePath(String baoFooKeyStorePath) {
         Constant.baoFooKeyStorePath = baoFooKeyStorePath;
     }
 
-    @Value("${baofoo.key.store.password}")
+    @Value("${baofoo.key.store.password:}")
     public void setBaoFooKeyStorePassword(String baoFooKeyStorePassword) {
         Constant.baoFooKeyStorePassword = baoFooKeyStorePassword;
     }
 
-    @Value("${baofoo.pub.key.path}")
+    @Value("${baofoo.pub.key.path:}")
     public void setBaoFooPubKeyPath(String baoFooPubKeyPath) {
         Constant.baoFooPubKeyPath = baoFooPubKeyPath;
     }
 
-    @Value("${baofoo.repay.url}")
+    @Value("${baofoo.repay.url:}")
     public void setBaoFooRepayUrl(String baoFooRepayUrl) {
         Constant.baoFooRepayUrl = baoFooRepayUrl;
     }
 
-    @Value("${baofoo.send.sms.url}")
+    @Value("${baofoo.send.sms.url:}")
     public void setBaoFooSendSmsUrl(String baoFooSendSmsUrl) {
         Constant.baoFooSendSmsUrl = baoFooSendSmsUrl;
     }
 
-    @Value("${baofoo.bind.sms.url}")
+    @Value("${baofoo.bind.sms.url:}")
     public void setBaoFooBindSmsUrl(String baoFooBindSmsUrl) {
         Constant.baoFooBindSmsUrl = baoFooBindSmsUrl;
     }
 
-    @Value("${baofoo.member.id}")
+    @Value("${baofoo.member.id:}")
     public void setBaoFooMemberId(String baoFooMemberId) {
         Constant.baoFooMemberId = baoFooMemberId;
     }
 
-    @Value("${baofoo.terminal.id}")
+    @Value("${baofoo.terminal.id:}")
     public void setBaoFooTerminalId(String baoFooTerminalId) {
         Constant.baoFooTerminalId = baoFooTerminalId;
     }
 
-    @Value("${baofoo.version}")
+    @Value("${baofoo.version:}")
     public void setBaoFooVersion(String baoFooVersion) {
         Constant.baoFooVersion = baoFooVersion;
     }
