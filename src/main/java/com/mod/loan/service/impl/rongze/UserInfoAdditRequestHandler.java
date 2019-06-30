@@ -370,7 +370,7 @@ public class UserInfoAdditRequestHandler {
                         throw new BizException("推送用户补充信息:运营商数据上传失败");
                     }
                     MoxieMobile moxieMobile = new MoxieMobile();
-                    moxieMobile.setUid(RequestThread.getUid());
+                    moxieMobile.setUid(user.getId());
                     moxieMobile.setPhone(user.getUserPhone());
                     //oss上文件的地址存在remark这个字段
                     moxieMobile.setRemark(mxMobilePath);
