@@ -75,7 +75,9 @@ public class AuditResultRequestHandler {
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
         Integer riskType = merchant.getRiskType();
-        if(riskType == null) riskType = 2;
+        if (riskType == null) {
+            riskType = 2;
+        }
 
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null || user.getUserOrigin().equals(UserOriginEnum.JH.getCode())) {
@@ -91,8 +93,8 @@ public class AuditResultRequestHandler {
         }
 
         //10=审批通过 40=审批拒绝30=审批处理中
-        int conclusion=40;
-        String remark="审批拒绝";
+        int conclusion = 40;
+        String remark = "审批拒绝";
 
         //不丢失复贷用户 复贷用户前四次不需要走风控
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
@@ -202,7 +204,7 @@ public class AuditResultRequestHandler {
                 if (zmDetail != null && "0".equals(zmDetail.getReturnCode())) {
                     conclusion = 10;
                     remark = "审批成功";
-                } else if (zmDetail != null && !"0".equals(zmDetail.getReturnCode())){
+                } else if (zmDetail != null && !"0".equals(zmDetail.getReturnCode())) {
                     conclusion = 40;
                     remark = "审批拒绝";
                 } else {
@@ -229,10 +231,6 @@ public class AuditResultRequestHandler {
             default:
                 throw new BizException("不存在当前的风控类型");
         }
-
-
-
-
 
 
         //单期产品
