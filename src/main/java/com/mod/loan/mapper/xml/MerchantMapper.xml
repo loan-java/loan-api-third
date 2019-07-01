@@ -25,6 +25,7 @@
     <result column="huiju_id" jdbcType="VARCHAR" property="huiju_id" />
     <result column="huiju_md5_key" jdbcType="VARCHAR" property="huiju_md5_key" />
     <result column="bind_type" jdbcType="TINYINT" property="bindType" />
+    <result column="risk_type" jdbcType="TINYINT" property="riskType" />
   </resultMap>
 
   <select id="findByHuijuId" resultMap="BaseResultMap">
