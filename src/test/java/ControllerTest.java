@@ -8,7 +8,6 @@ import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.util.aliyun.OSSUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -22,8 +21,8 @@ import java.util.concurrent.Executors;
 
 public class ControllerTest extends BaseSpringBootJunitTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Autowired(required=true)
+    private TestRestTemplate testRestTemplate;
 
     @Autowired
     private UserMapper userMapper;
@@ -82,12 +81,19 @@ public class ControllerTest extends BaseSpringBootJunitTest {
         post(param);
     }
 
+    @Test
+    public void fundauditresult() throws Exception {
+        redisMapper.remove("merchant:huashidai");
+        String param="{\"method\":\"fund.audit.result\",\"sign\":\"si1Eqk8OPS4eCK0N9BcxtF0kdf/+gDeUDRrq29K/byiT+z7AbT76J5799sCHIKZzZT2WMm4EhIHESXUZ8oz/+767QuKK23GmqOcwNsBf3AaxRa0xCHhNW9NlJyBdeEDOMeDQLYj/PhIlyDWT/bhtEE/C24H+XFRQ5+w0qQ7yAhA=\",\"merchant_id\":\"Hsd0515\",\"des_key\":\"XhI3HtP62hs0xtrb0jhWa/vFWZ3NGK7byvjVqN6aNTa8tJb/890JnKVoeIf22GZVD84cBF/1R9NgiOWA/XOyStDhd5WVVz53A6LQi/DLEVlaD7hnVVtIlMSF/UemUcZxskmt7jhevSWjXfq+CLiEtf3fKiF3rhYnDJR8OIP1ayc=\",\"biz_data\":\"BVVmge2KrShNrMDcpcf2qoJ7snj8rFEjdeBResbuzpuKMjt1tbTW2Q==\",\"biz_enc\":\"1\"}";
+        post(param);
+    }
+
     private String post(String param) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf("application/json;UTF-8"));
         HttpEntity<String> strEntity = new HttpEntity<>(param, headers);
 
-        String body = restTemplate.postForObject("/rongze/dispatcherRequest", strEntity, String.class);
+        String body = testRestTemplate.postForObject("/rongze/dispatcherRequest", strEntity, String.class);
         System.out.println(body);
         return body;
     }
