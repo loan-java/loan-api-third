@@ -11,10 +11,7 @@ import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.rabbitmq.RabbitConst;
-import com.mod.loan.mapper.DecisionPbDetailMapper;
-import com.mod.loan.mapper.DecisionZmDetailMapper;
-import com.mod.loan.mapper.OrderMapper;
-import com.mod.loan.mapper.TbDecisionResDetailMapper;
+import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.MerchantRateService;
 import com.mod.loan.service.MerchantService;
@@ -45,30 +42,25 @@ public class AuditResultRequestHandler {
 
     @Resource
     private UserIdentService userIdentService;
-
     @Resource
     private UserService userService;
-
     @Resource
     private RabbitTemplate rabbitTemplate;
-
     @Autowired
     private TbDecisionResDetailMapper decisionResDetailMapper;
-
     @Autowired
     private DecisionPbDetailMapper decisionPbDetailMapper;
-
     @Autowired
     private DecisionZmDetailMapper decisionZmDetailMapper;
-
     @Resource
     private MerchantService merchantService;
-
     @Resource
     private MerchantRateService merchantRateService;
-
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderUserMapper orderUserMapper;
+
 
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
@@ -102,13 +94,19 @@ public class AuditResultRequestHandler {
         int conclusion = 40;
         String remark = "审批拒绝";
 
+        //是否存在关联的借贷信息
+        Long  merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if(merchantRateId == null){
+            throw new BizException("查询审批结论:商户不存在默认借贷信息");
+        }
+        MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(merchantRateId);
+        if(merchantRate == null){
+            throw new BizException("查询审批结论:商户不存在默认借贷信息");
+        }
+
         //不丢失复贷用户 复贷用户前四次不需要走风控
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
         if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
-            MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
-            if(merchantRate == null){
-                throw new BizException("查询审批结论:商户不存在默认借贷信息");
-            }
             conclusion = 10;
             remark = "审批成功";
             //单期产品

@@ -21,4 +21,7 @@ public interface OrderUserMapper extends MyBaseMapper<OrderUser> {
             "from tb_user_order a inner join (select max(id) as id,uid from tb_user_order GROUP BY uid ) b on a.id=b.id ")
     List<OrderUser> getList();
 
+    @Select("select merchant_rate_id as merchantRateId from tb_user_order where order_no=#{orderNo} and source=#{source} limit 1")
+    Long getMerchantRateByOrderNoAndSource(@Param("orderNo")String orderNo,@Param("source")Integer source);
+
 }
