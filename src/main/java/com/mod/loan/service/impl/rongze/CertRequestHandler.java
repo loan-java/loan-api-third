@@ -55,6 +55,10 @@ public class CertRequestHandler {
         String md5 = bizData.getString("md5");
         String orderNo = bizData.getString("order_no");
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户
+        MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
+        if(merchantRate == null){
+            throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷信息");
+        }
         User user = userMapper.getMd5PhoneAndIdcard(md5);
         if (user != null) {
             if (StringUtils.isEmpty(user.getUserOrigin()) || !user.getUserOrigin().equals(UserOriginEnum.RZ.getCode())) {
@@ -109,6 +113,7 @@ public class CertRequestHandler {
                                 ou.setOrderNo(orderNo);
                                 ou.setSource(Integer.valueOf(UserOriginEnum.RZ.getCode()));
                                 ou.setUid(user.getId());
+                                ou.setMerchantRateId(merchantRate.getId());
                                 orderUserMapper.insertSelective(ou);
                                 //设置缓存
                                 String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
@@ -120,10 +125,6 @@ public class CertRequestHandler {
             }
         }
         //userType： 1-不可申请用户，2-复贷用户，3-正常申请用户
-        MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
-        if(merchantRate == null){
-            throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷信息");
-        }
         int proType = 1; //单期产品
         int amountType = 0; //审批金额是否固定，0 - 固定
         int termType = 0; //审批期限是否固定，0 - 固定
