@@ -67,9 +67,10 @@ public class AuditResultRequestHandler {
 
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("===============查询审批结论开始====================");
 
         String orderNo = bizData.getString("order_no");
+        log.info("===============查询审批结论开始===================="+ orderNo);
+
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         if (merchant == null) {
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
@@ -135,7 +136,7 @@ public class AuditResultRequestHandler {
             map.put("reapply", reapply);
             map.put("order_no", orderNo);
             map.put("conclusion", conclusion);
-            log.info("===============查询审批结论结束====================");
+            log.info("===============查询审批结论结束===================="+ orderNo);
             return ResponseBean.success(map);
         }
 
@@ -159,6 +160,7 @@ public class AuditResultRequestHandler {
                         message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
                         message.setTimes(0);
                         try {
+                            log.info("===============开始进入风控队列qjld====================" + orderNo);
                             rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
                         } catch (Exception e) {
                             log.error("消息发送异常：", e);
@@ -190,6 +192,7 @@ public class AuditResultRequestHandler {
                         message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
                         message.setTimes(0);
                         try {
+                            log.info("===============开始进入风控队列pb====================" + orderNo);
                             rabbitTemplate.convertAndSend(RabbitConst.pb_queue_risk_order_notify, message);
                         } catch (Exception e) {
                             log.error("消息发送异常：", e);
@@ -218,8 +221,8 @@ public class AuditResultRequestHandler {
                         message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
                         message.setTimes(0);
                         try {
+                            log.info("===============开始进入风控队列zm====================" + orderNo);
                             rabbitTemplate.convertAndSend(RabbitConst.zm_queue_risk_order_notify, message);
-
                             conclusion = 30;
                             remark = "审批处理中";
                         } catch (Exception e) {
