@@ -3,6 +3,7 @@ package com.mod.loan.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.mapper.BaseServiceImpl;
 import com.mod.loan.common.model.RequestThread;
@@ -18,7 +19,6 @@ import com.mod.loan.util.rongze.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     @Resource
     private OrderRepayService orderRepayService;
     @Resource
-    private UserService userService;
+    private OrderUserMapper orderUserMapper;
     @Resource
     private MerchantService merchantService;
     @Resource
@@ -51,10 +51,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private UserIdentService userIdentService;
     @Resource
     private BlacklistService blacklistService;
-    @Resource
-    private MerchantRateService merchantRateService;
-    @Resource
-    private RabbitTemplate rabbitTemplate;
     @Resource
     private KuaiQianService kuaiQianService;
     @Resource
@@ -65,9 +61,10 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
     private TbDecisionResDetailMapper decisionResDetailMapper;
     @Resource
     private DecisionPbDetailMapper decisionPbDetailMapper;
-
     @Autowired
     private DecisionZmDetailMapper decisionZmDetailMapper;
+    @Autowired
+    private MerchantRateMapper merchantRateMapper;
 
     @Resource
     private YeePayService yeePayService;
@@ -138,11 +135,32 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         Integer riskType = merchant.getRiskType();
         if(riskType == null) riskType = 2;
 
-        MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
-        if (null == merchantRate) {
-            throw new BizException("未查到规则");
+        //是否存在关联的借贷信息===============================================================
+        Long  productId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if(productId == null){
+            throw new BizException("推送用户确认收款信息:商户不存在默认借贷信息");
         }
-        Long productId = merchantRate.getId();
+        MerchantRate merchantRate = merchantRateMapper.selectByPrimaryKey(productId);
+        if(merchantRate == null){
+            throw new BizException("推送用户确认收款信息:商户不存在默认借贷信息");
+        }
+        BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
+        if(approvalAmount == null) {
+            throw new BizException("推送用户确认收款信息:商户不存在默认借贷金额");
+        }
+        Integer approvalTerm = merchantRate.getProductDay(); //审批期限
+        if(approvalAmount == null) {
+            throw new BizException("推送用户确认收款信息:商户不存在默认借贷期限");
+        }
+        if(loanTerm != approvalTerm.intValue()) {
+            throw new BizException("推送用户确认收款信息:商户实际借贷期限：" + approvalTerm.intValue() + ",现在借款期限：" + loanTerm);
+        }
+        //借款金额
+        BigDecimal borrowMoney = new BigDecimal(loanAmount);
+        if(borrowMoney.intValue() != approvalAmount.intValue()) {
+            throw new BizException("推送用户确认收款信息:商户实际借贷金额：" + approvalAmount.intValue() + ",现在借款金额：" + borrowMoney.intValue());
+        }
+        //===================================================================================
 
         Order order = orderMapper.findByOrderNoAndSource(orderNo, source);
         boolean orderExist = order != null;
