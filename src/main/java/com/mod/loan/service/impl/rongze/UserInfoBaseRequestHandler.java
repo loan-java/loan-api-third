@@ -8,6 +8,7 @@ import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
+import com.mod.loan.service.MerchantRateService;
 import com.mod.loan.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class UserInfoBaseRequestHandler {
     private UserInfoMapper userInfoMapper;
     @Resource
     private RedisMapper redisMapper;
+    @Resource
+    private MerchantRateService merchantRateService;
 
     //推送用户基本信息
     @Transactional
@@ -75,6 +78,7 @@ public class UserInfoBaseRequestHandler {
 //        String monthlyAverageIncome = applyDetail.getString("monthly_average_income");
 //        String userSocialSecurity = applyDetail.getString("user_social_security");
 //        JSONObject addInfo = bizData.getJSONObject("addInfo");//抓取信审信息
+
         //开始新增用户
         User user = userService.selectUserByPhone(userMobile, RequestThread.getClientAlias());
         if (user == null) {
@@ -134,11 +138,24 @@ public class UserInfoBaseRequestHandler {
         //新增融泽用户订单关联信息
         OrderUser orderUser = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.RZ.getCode()), user.getId());
         if (orderUser == null) {
+            //将当前订单的借款信息id存缓存，永久
+            String merchatRateKey = redisMapper.getMerchantRateId(orderNo, UserOriginEnum.RZ.getCode());
+            String merchantRateId =redisMapper.get(merchatRateKey);
+            if("null".equals(merchantRateId) || merchantRateId == null || "".equals(merchantRateId)){
+                MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
+                if(merchantRate == null){
+                    throw new BizException("推送用户基本信息:商户不存在默认借贷信息");
+                }
+                merchantRateId = String.valueOf(merchantRateId);
+                redisMapper.set(merchatRateKey, merchantRateId);
+            }
+
             orderUser = new OrderUser();
             orderUser.setCreateTime(new Date());
             orderUser.setOrderNo(orderNo);
             orderUser.setSource(Integer.valueOf(UserOriginEnum.RZ.getCode()));
             orderUser.setUid(user.getId());
+            orderUser.setMerchantRateId(Long.parseLong(merchantRateId));
             int m = orderUserMapper.insert(orderUser);
             if (m == 0) throw new RuntimeException("推送用户基本信息:新增用户订单关联信息");
             //设置缓存
