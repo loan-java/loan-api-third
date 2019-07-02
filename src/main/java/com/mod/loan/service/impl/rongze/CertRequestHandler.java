@@ -122,13 +122,19 @@ public class CertRequestHandler {
         //userType： 1-不可申请用户，2-复贷用户，3-正常申请用户
         MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
         if(merchantRate == null){
-            throw new BizException("查询复贷和黑名单信息开始:不存在借贷金额信息");
+            throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷信息");
         }
         int proType = 1; //单期产品
         int amountType = 0; //审批金额是否固定，0 - 固定
         int termType = 0; //审批期限是否固定，0 - 固定
         BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
-        int approvalTerm = merchantRate.getProductDay(); //审批期限
+        if(approvalAmount == null) {
+            throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷金额");
+        }
+        Integer approvalTerm = merchantRate.getProductDay(); //审批期限
+        if(approvalAmount == null) {
+            throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷期限");
+        }
         int termUnit = 1; //期限单位，1 - 天
 
         int code = 200; //200-通过，400-不通过
@@ -139,8 +145,8 @@ public class CertRequestHandler {
             map.put("amount_type", amountType);
             map.put("pro_type", proType);
             map.put("term_type", termType);
-            map.put("approval_term", approvalTerm);
-            map.put("approval_amount", approvalAmount);
+            map.put("approval_term", approvalTerm.intValue());
+            map.put("approval_amount", approvalAmount.intValue());
             map.put("term_unit", termUnit);
             map.put("credit_deadline", DateUtil.getNextDay(DateUtil.getStringDateShort(), "1"));
         } else {
