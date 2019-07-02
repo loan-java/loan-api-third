@@ -16,6 +16,7 @@ import com.mod.loan.mapper.DecisionZmDetailMapper;
 import com.mod.loan.mapper.OrderMapper;
 import com.mod.loan.mapper.TbDecisionResDetailMapper;
 import com.mod.loan.model.*;
+import com.mod.loan.service.MerchantRateService;
 import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.UserIdentService;
 import com.mod.loan.service.UserService;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +63,9 @@ public class AuditResultRequestHandler {
 
     @Resource
     private MerchantService merchantService;
+
+    @Resource
+    private MerchantRateService merchantRateService;
 
     @Autowired
     private OrderMapper orderMapper;
@@ -100,6 +105,10 @@ public class AuditResultRequestHandler {
         //不丢失复贷用户 复贷用户前四次不需要走风控
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
         if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
+            MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
+            if(merchantRate == null){
+                throw new BizException("查询审批结论:商户不存在默认借贷信息");
+            }
             conclusion = 10;
             remark = "审批成功";
             //单期产品
@@ -108,10 +117,14 @@ public class AuditResultRequestHandler {
             int amountType = 0;
             //审批期限是否固定，0 - 固定
             int termType = 0;
-            //审批金额
-            int approvalAmount = 1500;
-            //审批期限
-            int approvalTerm = 6;
+            BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
+            if(approvalAmount == null) {
+                throw new BizException("查询审批结论:商户不存在默认借贷金额");
+            }
+            Integer approvalTerm = merchantRate.getProductDay(); //审批期限
+            if(approvalAmount == null) {
+                throw new BizException("查询审批结论:商户不存在默认借贷期限");
+            }
             //期限单位，1 - 天
             int termUnit = 1;
             //是否可再申请 1-是，0-不可以
@@ -128,8 +141,8 @@ public class AuditResultRequestHandler {
             map.put("term_unit", termUnit);
             map.put("amount_type", amountType);
             map.put("term_type", termType);
-            map.put("approval_amount", approvalAmount);
-            map.put("approval_term", approvalTerm);
+            map.put("approval_amount", approvalAmount.intValue());
+            map.put("approval_term", approvalTerm.intValue());
             map.put("credit_deadline", creditDeadline);
             map.put("refuse_time", approvalTime);
             map.put("remark", remark);
