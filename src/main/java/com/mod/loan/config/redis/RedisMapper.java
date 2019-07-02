@@ -113,4 +113,9 @@ public class RedisMapper {
        return "ORDER_USER:" +orderNo + source;
     }
 
+
+    public String getMerchantRateId(String orderNo, String source) {
+        return "ORDER_MERCHANT_RATE_ID:" +orderNo + source;
+    }
+
 }

@@ -153,6 +153,11 @@ public class CertRequestHandler {
         } else {
             map.put("is_reloan", 0);
         }
+
+        //将当前订单的借款信息id存缓存，永久
+        String merchatRateKey = redisMapper.getMerchantRateId(orderNo, UserOriginEnum.RZ.getCode());
+        redisMapper.set(merchatRateKey, merchantRate.getId());
+
         log.info("查询复贷和黑名单信息结束");
         return new ResponseBean<>(code, message, map);
     }
