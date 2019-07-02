@@ -96,6 +96,13 @@ public class ControllerTest extends BaseSpringBootJunitTest {
     }
 
 
+    @Test
+    public void fundwithdrawtrial() throws Exception {
+        String param="{\"method\":\"fund.withdraw.trial\",\"sign\":\"tv0bkUXVfhEQOTsZ6aP+SXrsXxvnCF1DhegVwALuJSlq+FaR8yqSt5MNMeLtezsj+bUIkpxTl0qCgruC/YTKTp2C3mwKIgJLCKxvNpS8sGpuPAavgce0N8v4NgU9xJ+F8GKDtRq4lHpctc0Vp1LBwM35LqsGIAqbanq7wNnMBUY=\",\"merchant_id\":\"Hsd0515\",\"des_key\":\"jEp0RB29NUfb7ax5QxBBbaTkWT9JXxzyyo9xPziQ5sdOpUR6/eBV3P4zVOMdpCC0w+PIn6Tv8BytQLBFgmu8py+8RjGV67KnDeibgBPLh4JXyCdh2ULn8ly0GD6Qj+SmiAn691xqCXOH/rTW6r4j6BIyjOKBuvFoIfMvtsWS3k8=\",\"biz_data\":\"awuNGHtGbUZUita58aUBa1S/4y5+z2Mu+X8jTT/4er3KvmEmoaX3mvbECeGR7lLdIfElNtZPV8IRRtXbqgJrOARVro6zbbK3\",\"biz_enc\":\"1\"}";
+        post(param);
+    }
+
+
     private String post(String param) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.valueOf("application/json;UTF-8"));

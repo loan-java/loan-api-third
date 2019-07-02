@@ -2,24 +2,18 @@ package com.mod.loan.service.impl.rongze;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
-import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.common.model.ResultMap;
 import com.mod.loan.mapper.MerchantRateMapper;
-import com.mod.loan.mapper.OrderMapper;
+import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.MerchantRate;
-import com.mod.loan.model.Order;
-import com.mod.loan.service.MerchantRateService;
 import com.mod.loan.util.MoneyUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -35,30 +29,53 @@ public class WithDrawRequestHandler {
 
     @Autowired
     private MerchantRateMapper merchantRateMapper;
-
     @Autowired
-    private MerchantRateService merchantRateService;
+    private OrderUserMapper orderUserMapper;
 
     //试算接口
     public ResponseBean<Map<String, Object>> withdrawTria(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
         JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
+        String orderNo = bizData.getString("order_no");
+
         log.info("===============试算接口开始====================");
         String loanAmount = bizData.getString("loan_amount");
+        if(loanAmount == null || "".equals(loanAmount)){
+            throw new BizException("试算接口:申请借贷金额不能为空");
+        }
         Integer loanTerm = bizData.getInteger("loan_term");
+        if(loanTerm == null){
+            throw new BizException("试算接口:申请借贷期限不能为空");
+        }
         //====================================================
-        MerchantRate record = merchantRateMapper.findByMerchant(RequestThread.getClientAlias());
-        if (record == null) throw new BizException("试算接口:借款周期基本信息失败");
-        Long productId = record.getId();
-        MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(productId);
-        if (null == merchantRate) {
-            throw new BizException("试算接口:未查到规则");
+        //是否存在关联的借贷信息
+        Long  merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if(merchantRateId == null){
+            throw new BizException("试算接口:商户不存在默认借贷信息");
+        }
+        MerchantRate merchantRate = merchantRateMapper.selectByPrimaryKey(merchantRateId);
+        if(merchantRate == null){
+            throw new BizException("试算接口:商户不存在默认借贷信息");
+        }
+        BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
+        if(approvalAmount == null) {
+            throw new BizException("试算接口:商户不存在默认借贷金额");
+        }
+        Integer approvalTerm = merchantRate.getProductDay(); //审批期限
+        if(approvalAmount == null) {
+            throw new BizException("试算接口:商户不存在默认借贷期限");
         }
         //====================================================
         //按6天算
         Integer borrowDay = loanTerm;
+        if(borrowDay.intValue() != approvalTerm.intValue()) {
+            throw new BizException("试算接口:商户实际借贷期限：" + approvalTerm.intValue() + ",现在借款期限：" + borrowDay.intValue());
+        }
         //借款金额
         BigDecimal borrowMoney = new BigDecimal(loanAmount);
+        if(borrowMoney.intValue() != approvalAmount.intValue()) {
+            throw new BizException("试算接口:商户实际借贷金额：" + approvalAmount.intValue() + ",现在借款金额：" + borrowMoney.intValue());
+        }
         //综合费率
         BigDecimal totalRate = merchantRate.getTotalRate();
         //日利率，整数
