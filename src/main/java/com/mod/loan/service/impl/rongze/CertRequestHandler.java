@@ -3,15 +3,14 @@ package com.mod.loan.service.impl.rongze;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
+import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.mapper.UserMapper;
-import com.mod.loan.model.Blacklist;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderUser;
-import com.mod.loan.model.User;
+import com.mod.loan.model.*;
 import com.mod.loan.service.BlacklistService;
+import com.mod.loan.service.MerchantRateService;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +43,8 @@ public class CertRequestHandler {
     private OrderUserMapper orderUserMapper;
     @Resource
     private RedisMapper redisMapper;
+    @Resource
+    private MerchantRateService merchantRateService;
 
     //复贷黑名单信息
     public ResponseBean<Map<String, Object>> certAuth(JSONObject param) throws BizException {
@@ -118,12 +120,17 @@ public class CertRequestHandler {
             }
         }
         //userType： 1-不可申请用户，2-复贷用户，3-正常申请用户
+        MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
+        if(merchantRate == null){
+            throw new BizException("查询复贷和黑名单信息开始:不存在借贷金额信息");
+        }
         int proType = 1; //单期产品
         int amountType = 0; //审批金额是否固定，0 - 固定
         int termType = 0; //审批期限是否固定，0 - 固定
-        int approvalAmount = 1500; //审批金额
-        int approvalTerm = 6; //审批期限
+        BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
+        int approvalTerm = merchantRate.getProductDay(); //审批期限
         int termUnit = 1; //期限单位，1 - 天
+
         int code = 200; //200-通过，400-不通过
         if (userType.equals("1")) {
             code = 400;
