@@ -246,7 +246,14 @@ public class AuditResultRequestHandler {
                 throw new BizException("不存在当前的风控类型");
         }
 
-
+        BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
+        if(approvalAmount1 == null) {
+            throw new BizException("查询审批结论:商户不存在默认借贷金额");
+        }
+        Integer approvalTerm1 = merchantRate.getProductDay(); //审批期限
+        if(approvalAmount1 == null) {
+            throw new BizException("查询审批结论:商户不存在默认借贷期限");
+        }
         //单期产品
         int proType = 1;
         //审批金额是否固定，0 - 固定
@@ -254,9 +261,9 @@ public class AuditResultRequestHandler {
         //审批期限是否固定，0 - 固定
         int termType = 0;
         //审批金额
-        int approvalAmount = 1500;
+        int approvalAmount = approvalAmount1.intValue();
         //审批期限
-        int approvalTerm = 6;
+        int approvalTerm = approvalTerm1.intValue();
         //期限单位，1 - 天
         int termUnit = 1;
         //是否可再申请 1-是，0-不可以
