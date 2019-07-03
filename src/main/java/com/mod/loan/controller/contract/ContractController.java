@@ -1,17 +1,24 @@
 package com.mod.loan.controller.contract;
 
+import com.mod.loan.common.enums.UserOriginEnum;
+import com.mod.loan.common.exception.BizException;
 import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.OrderMapper;
+import com.mod.loan.mapper.OrderUserMapper;
+import com.mod.loan.model.MerchantRate;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.User;
 import com.mod.loan.model.UserBank;
+import com.mod.loan.service.MerchantRateService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +38,10 @@ public class ContractController {
     private UserBankService userBankService;
     @Resource
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderUserMapper orderUserMapper;
+    @Resource
+    private MerchantRateService merchantRateService;
 
     /**
      * 查询借款合同需要的信息
@@ -40,14 +51,28 @@ public class ContractController {
      * @return
      */
     @RequestMapping("/queryLoanInfo")
-    public Object queryLoanInfo(long uid, String orderNo, int source) {
+    public Object queryLoanInfo(long uid, String orderNo, int source) throws BizException {
         String JF = Constant.companyName; //甲方
         String YF = ""; //乙方
         String idCardNo = ""; //乙方身份证号
         String bankCardNo = ""; //乙方收款/扣款银行卡号
         String bankName = ""; //乙方银行名称
 //        String bankAddress = ""; //开户地址
-        String loanAmount = "1500.00"; //贷款金额，元
+
+        Long  merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if(merchantRateId == null){
+            throw new BizException("查询审批结论:商户不存在默认借贷信息");
+        }
+        MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(merchantRateId);
+        if(merchantRate == null){
+            throw new BizException("查询审批结论:商户不存在默认借贷信息");
+        }
+        BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
+        if(approvalAmount1 == null) {
+            throw new BizException("查询审批结论:商户不存在默认借贷金额");
+        }
+
+        String loanAmount = approvalAmount1.toString(); //贷款金额，元
         String signTime = ""; //协议签署时间
         String tel = ""; //乙方手机号
         String loanNo = ""; //贷款协议号

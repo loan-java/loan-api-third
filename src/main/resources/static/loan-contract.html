@@ -209,7 +209,7 @@
         var bankCardNo = ''; //乙方收款/扣款银行卡号
         var bankName = ''; //乙方银行名称
         // var bankAddress = '浙江'; //开户地址
-        var loanAmount = '1500.00'; //贷款金额，元
+        var loanAmount = ''; //贷款金额，元
         var signTime = ''; //协议签署时间
         var tel = ''; //乙方手机号
         var loanNo = ''; //贷款协议号
@@ -217,6 +217,7 @@
         var uid = getQueryString('uid');
         var orderNo = getQueryString('orderNo');
         var source = getQueryString('source');
+        var approvalAmount = getQueryString('approvalAmount');
 
         $.ajax({
             type: "GET",
