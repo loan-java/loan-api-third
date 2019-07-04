@@ -140,7 +140,10 @@ public class UserInfoBaseRequestHandler {
         if (orderUser == null) {
             //将当前订单的借款信息id存缓存，永久
             String merchatRateKey = redisMapper.getMerchantRateId(orderNo, UserOriginEnum.RZ.getCode());
-            String merchantRateId =redisMapper.get(merchatRateKey);
+            String  merchantRateId = null;
+            if(redisMapper.hasKey(merchatRateKey)) {
+                merchantRateId =redisMapper.get(merchatRateKey);
+            }
             if("null".equals(merchantRateId) || merchantRateId == null || "".equals(merchantRateId)){
                 MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
                 if(merchantRate == null){
