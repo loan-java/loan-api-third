@@ -44,8 +44,7 @@ public class AuditResultRequestHandler {
     private UserIdentService userIdentService;
     @Resource
     private UserService userService;
-    @Resource
-    private RabbitTemplate rabbitTemplate;
+
     @Autowired
     private TbDecisionResDetailMapper decisionResDetailMapper;
     @Autowired
@@ -72,10 +71,7 @@ public class AuditResultRequestHandler {
         if (merchant == null) {
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
-        Integer riskType = merchant.getRiskType();
-        if (riskType == null) {
-            riskType = 2;
-        }
+
 
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null || user.getUserOrigin().equals(UserOriginEnum.JH.getCode())) {
@@ -104,6 +100,7 @@ public class AuditResultRequestHandler {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
 
+        //todo 自己的规则集逻辑
         //不丢失复贷用户 复贷用户前四次不需要走风控
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
         if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
@@ -151,100 +148,9 @@ public class AuditResultRequestHandler {
             return ResponseBean.success(map);
         }
 
-        switch (riskType) {
-            case 1:
-                TbDecisionResDetail resDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
-                if (resDetail != null && PolicyResultEnum.AGREE.getCode().equals(resDetail.getCode())) {
-                    conclusion = 10;
-                    remark = "审批成功";
-                } else if (resDetail != null && PolicyResultEnum.REJECT.getCode().equals(resDetail.getCode())) {
-                    conclusion = 40;
-                    remark = "审批失败";
-                } else {
-                    if (resDetail == null) {
-                        // 通知风控
-                        RiskAuditMessage message = new RiskAuditMessage();
-                        message.setOrderNo(orderNo);
-                        message.setStatus(1);
-                        message.setMerchant(RequestThread.getClientAlias());
-                        message.setUid(user.getId());
-                        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
-                        message.setTimes(0);
-                        try {
-                            log.info("===============开始进入风控队列qjld====================" + orderNo);
-                            rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
-                        } catch (Exception e) {
-                            log.error("消息发送异常：", e);
-                        }
-                    }
-                    conclusion = 30;
-                    remark = "审批处理中";
-                }
-                break;
-            case 2:
-                DecisionPbDetail pbDetail = decisionPbDetailMapper.selectByOrderNo(orderNo);
-                if (pbDetail != null && PbResultEnum.APPROVE.getCode().equals(pbDetail.getResult())) {
-                    conclusion = 10;
-                    remark = "审批成功";
-                } else if (pbDetail != null && PbResultEnum.MANUAL.getCode().equals(pbDetail.getResult())) {
-                    conclusion = 40;
-                    remark = "审批失败";
-                } else if (pbDetail != null && PbResultEnum.DENY.getCode().equals(pbDetail.getResult())) {
-                    conclusion = 40;
-                    remark = "审批拒绝";
-                } else {
-                    if (pbDetail == null) {
-                        // 通知风控
-                        RiskAuditMessage message = new RiskAuditMessage();
-                        message.setOrderNo(orderNo);
-                        message.setStatus(1);
-                        message.setMerchant(RequestThread.getClientAlias());
-                        message.setUid(user.getId());
-                        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
-                        message.setTimes(0);
-                        try {
-                            log.info("===============开始进入风控队列pb====================" + orderNo);
-                            rabbitTemplate.convertAndSend(RabbitConst.pb_queue_risk_order_notify, message);
-                        } catch (Exception e) {
-                            log.error("消息发送异常：", e);
-                        }
-                    }
-                    conclusion = 30;
-                    remark = "审批处理中";
-                }
-                break;
-            case 3:
-                DecisionZmDetail zmDetail = decisionZmDetailMapper.selectByOrderNo(orderNo);
-                if (zmDetail != null && "0".equals(zmDetail.getReturnCode())) {
-                    conclusion = 10;
-                    remark = "审批成功";
-                } else if (zmDetail != null && !"0".equals(zmDetail.getReturnCode())) {
-                    conclusion = 40;
-                    remark = "审批拒绝";
-                } else {
-                    if (zmDetail == null) {
-                        // 通知风控
-                        RiskAuditMessage message = new RiskAuditMessage();
-                        message.setOrderNo(orderNo);
-                        message.setStatus(1);
-                        message.setMerchant(RequestThread.getClientAlias());
-                        message.setUid(user.getId());
-                        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
-                        message.setTimes(0);
-                        try {
-                            log.info("===============开始进入风控队列zm====================" + orderNo);
-                            rabbitTemplate.convertAndSend(RabbitConst.zm_queue_risk_order_notify, message);
-                            conclusion = 30;
-                            remark = "审批处理中";
-                        } catch (Exception e) {
-                            log.error("消息发送异常：", e);
-                        }
-                    }
-                }
-                break;
-            default:
-                throw new BizException("不存在当前的风控类型");
-        }
+        //todo 探针A逻辑
+
+
 
         BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
         if(approvalAmount1 == null) {

@@ -2,23 +2,26 @@ package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.ResponseEnum;
-import com.mod.loan.common.enums.UserOriginEnum;
+import com.mod.loan.common.enums.*;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.mapper.BaseServiceImpl;
+import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
+import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
+import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.MoneyUtil;
 import com.mod.loan.util.rongze.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +71,9 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
     @Resource
     private YeePayService yeePayService;
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
 
     @Transactional(rollbackFor = Throwable.class)
@@ -133,31 +139,33 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
         Integer riskType = merchant.getRiskType();
-        if(riskType == null) riskType = 2;
+        if (riskType == null) {
+            riskType = 2;
+        }
 
         //是否存在关联的借贷信息===============================================================
-        Long  productId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
-        if(productId == null){
+        Long productId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if (productId == null) {
             throw new BizException("推送用户确认收款信息:商户不存在默认借贷信息");
         }
         MerchantRate merchantRate = merchantRateMapper.selectByPrimaryKey(productId);
-        if(merchantRate == null){
+        if (merchantRate == null) {
             throw new BizException("推送用户确认收款信息:商户不存在默认借贷信息");
         }
         BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
-        if(approvalAmount == null) {
+        if (approvalAmount == null) {
             throw new BizException("推送用户确认收款信息:商户不存在默认借贷金额");
         }
         Integer approvalTerm = merchantRate.getProductDay(); //审批期限
-        if(approvalAmount == null) {
+        if (approvalAmount == null) {
             throw new BizException("推送用户确认收款信息:商户不存在默认借贷期限");
         }
-        if(loanTerm != approvalTerm.intValue()) {
+        if (loanTerm != approvalTerm.intValue()) {
             throw new BizException("推送用户确认收款信息:商户实际借贷期限：" + approvalTerm.intValue() + ",现在借款期限：" + loanTerm);
         }
         //借款金额
         BigDecimal borrowMoney = new BigDecimal(loanAmount);
-        if(borrowMoney.intValue() != approvalAmount.intValue()) {
+        if (borrowMoney.intValue() != approvalAmount.intValue()) {
             throw new BizException("推送用户确认收款信息:商户实际借贷金额：" + approvalAmount.intValue() + ",现在借款金额：" + borrowMoney.intValue());
         }
         //===================================================================================
@@ -255,33 +263,90 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setSource(source);
         addOrUpdateOrder(order, orderPhone);
 
-        //直接改为人工审核
-        order.setStatus(Constant.unsettledOrderStatus);
-        orderMapper.updateByPrimaryKey(order);
-
+        //进入风控模块
         switch (riskType) {
             case 1:
                 TbDecisionResDetail resDetail = decisionResDetailMapper.selectByOrderNo(orderNo);
-                if (resDetail != null) {
-                    resDetail.setOrderId(order.getId());
-                    resDetail.setUpdatetime(new Date());
-                    decisionResDetailMapper.updateByTransId(resDetail);
+                if (resDetail != null && PolicyResultEnum.AGREE.getCode().equals(resDetail.getCode())) {
+                    order.setStatus(ConstantUtils.unsettledOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else if (resDetail != null && PolicyResultEnum.REJECT.getCode().equals(resDetail.getCode())) {
+                    order.setStatus(ConstantUtils.rejectOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else {
+                    if (resDetail == null) {
+                        // 通知风控
+                        RiskAuditMessage message = new RiskAuditMessage();
+                        message.setOrderNo(orderNo);
+                        message.setStatus(1);
+                        message.setMerchant(RequestThread.getClientAlias());
+                        message.setUid(uid);
+                        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
+                        message.setTimes(0);
+                        try {
+                            log.info("===============开始进入风控队列qjld====================" + orderNo);
+                            rabbitTemplate.convertAndSend(RabbitConst.qjld_queue_risk_order_notify, message);
+                        } catch (Exception e) {
+                            log.error("消息发送异常：", e);
+                        }
+                    }
                 }
                 break;
             case 2:
                 DecisionPbDetail pbDetail = decisionPbDetailMapper.selectByOrderNo(orderNo);
-                if (pbDetail != null) {
-                    pbDetail.setOrderId(order.getId());
-                    pbDetail.setUpdatetime(new Date());
-                    decisionPbDetailMapper.updateByPrimaryKeySelective(pbDetail);
+                if (pbDetail != null && PbResultEnum.APPROVE.getCode().equals(pbDetail.getResult())) {
+                    order.setStatus(ConstantUtils.unsettledOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else if (pbDetail != null && PbResultEnum.MANUAL.getCode().equals(pbDetail.getResult())) {
+                    order.setStatus(ConstantUtils.rejectOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else if (pbDetail != null && PbResultEnum.DENY.getCode().equals(pbDetail.getResult())) {
+                    order.setStatus(ConstantUtils.rejectOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else {
+                    if (pbDetail == null) {
+                        // 通知风控
+                        RiskAuditMessage message = new RiskAuditMessage();
+                        message.setOrderNo(orderNo);
+                        message.setStatus(1);
+                        message.setMerchant(RequestThread.getClientAlias());
+                        message.setUid(uid);
+                        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
+                        message.setTimes(0);
+                        try {
+                            log.info("===============开始进入风控队列pb====================" + orderNo);
+                            rabbitTemplate.convertAndSend(RabbitConst.pb_queue_risk_order_notify, message);
+                        } catch (Exception e) {
+                            log.error("消息发送异常：", e);
+                        }
+                    }
                 }
                 break;
             case 3:
                 DecisionZmDetail zmDetail = decisionZmDetailMapper.selectByOrderNo(orderNo);
-                if (zmDetail != null) {
-                    zmDetail.setOrderId(order.getId());
-                    zmDetail.setUpdatetime(new Date());
-                    decisionZmDetailMapper.updateByPrimaryKeySelective(zmDetail);
+                if (zmDetail != null && "0".equals(zmDetail.getReturnCode())) {
+                    order.setStatus(ConstantUtils.unsettledOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else if (zmDetail != null && !"0".equals(zmDetail.getReturnCode())) {
+                    order.setStatus(ConstantUtils.rejectOrderStatus);
+                    orderMapper.updateByPrimaryKey(order);
+                } else {
+                    if (zmDetail == null) {
+                        // 通知风控
+                        RiskAuditMessage message = new RiskAuditMessage();
+                        message.setOrderNo(orderNo);
+                        message.setStatus(1);
+                        message.setMerchant(RequestThread.getClientAlias());
+                        message.setUid(uid);
+                        message.setSource(RiskAuditSourceEnum.RONG_ZE.getCode());
+                        message.setTimes(0);
+                        try {
+                            log.info("===============开始进入风控队列zm====================" + orderNo);
+                            rabbitTemplate.convertAndSend(RabbitConst.zm_queue_risk_order_notify, message);
+                        } catch (Exception e) {
+                            log.error("消息发送异常：", e);
+                        }
+                    }
                 }
                 break;
             default:

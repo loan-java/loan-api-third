@@ -8,14 +8,7 @@ public class Constant {
 
     public final static String KUAI_QIAN_UID_PFX = "JSD";
 
-    /**
-     * 人工审核订单
-     */
-    public final static Integer unsettledOrderStatus = 12;
-    /**
-     * 订单状态：待放款
-     */
-    public final static Integer ORDER_FOR_LENDING = 21;
+
 
     public static String ENVIROMENT;
 
