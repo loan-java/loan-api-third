@@ -81,7 +81,7 @@ CREATE TABLE `tb_decision_zm_detail` (
 
 
 #20190702新增字段
-alter table tb_user_order add merchant_rate_id tinyint(6) DEFAULT 34 COMMENT '借款信息id';
+alter table tb_user_order add merchant_rate_id tinyint(6) DEFAULT 1 COMMENT '借款信息id';
 
 
 
