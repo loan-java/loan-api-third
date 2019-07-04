@@ -277,6 +277,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                     if (resDetail == null) {
                         // 通知风控
                         RiskAuditMessage message = new RiskAuditMessage();
+                        message.setOrderId(order.getId());
                         message.setOrderNo(orderNo);
                         message.setStatus(1);
                         message.setMerchant(RequestThread.getClientAlias());
@@ -307,6 +308,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                     if (pbDetail == null) {
                         // 通知风控
                         RiskAuditMessage message = new RiskAuditMessage();
+                        message.setOrderId(order.getId());
                         message.setOrderNo(orderNo);
                         message.setStatus(1);
                         message.setMerchant(RequestThread.getClientAlias());
@@ -334,6 +336,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                     if (zmDetail == null) {
                         // 通知风控
                         RiskAuditMessage message = new RiskAuditMessage();
+                        message.setOrderId(order.getId());
                         message.setOrderNo(orderNo);
                         message.setStatus(1);
                         message.setMerchant(RequestThread.getClientAlias());
