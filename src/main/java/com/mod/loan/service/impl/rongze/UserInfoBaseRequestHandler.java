@@ -146,7 +146,7 @@ public class UserInfoBaseRequestHandler {
                 if(merchantRate == null){
                     throw new BizException("推送用户基本信息:商户不存在默认借贷信息");
                 }
-                merchantRateId = String.valueOf(merchantRateId);
+                merchantRateId = String.valueOf(merchantRate.getId());
                 redisMapper.set(merchatRateKey, merchantRateId);
             }
 
