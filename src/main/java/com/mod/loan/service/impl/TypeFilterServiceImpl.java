@@ -126,7 +126,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
 
             postString = HttpUtils.doPostByForm(url, headers, params);
             log.info("指针A请求返回：" + postString);
-            flag = resultTypeA(postString); //判断黑名单：true，不是，false，是
+            flag = resultTypeA(postString); //false-黑名单，true-不是黑名单
 
             typeFilter.setResult(flag.toString());
             typeFilter.setResultlStr(postString);
