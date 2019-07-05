@@ -263,6 +263,13 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setSource(source);
         addOrUpdateOrder(order, orderPhone);
 
+        //不丢失复贷用户 复贷用户前四次不需要走风控
+        List<Order> orderList = orderMapper.getDoubleLoanByUid(uid);
+        if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
+            order.setStatus(ConstantUtils.unsettledOrderStatus);
+            orderMapper.updateByPrimaryKey(order);
+            return order;
+        }
         //进入风控模块
         switch (riskType) {
             case 1:

@@ -101,7 +101,7 @@ public class AuditResultRequestHandler {
         }
 
         //todo 自己的规则集逻辑
-        //不丢失复贷用户 复贷用户前四次不需要走风控
+        //不丢失复贷用户 复贷用户前四次不需要走探针
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
         if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
             conclusion = 10;
