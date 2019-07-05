@@ -6,11 +6,15 @@ import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.DateUtil;
+import com.mod.loan.util.ThreadPoolUtils;
+import com.mod.loan.util.aliyun.OSSUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,6 +51,8 @@ public class AuditResultRequestHandler {
     @Autowired
     private TypeFilterService typeFilterService;
 
+    @Resource
+    private TypeFilterMapper typeFilterMapper;
 
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
@@ -135,17 +141,26 @@ public class AuditResultRequestHandler {
             return ResponseBean.success(map);
         }
 
-        //todo 探针A逻辑
-        Boolean flag = typeFilterService.getInfoByTypeA(user, orderNo);
-        if(flag != null && flag.booleanValue()){
-            conclusion = 10;
-            remark = "审批成功";
+        TypeFilter typeFilter = new TypeFilter();
+        typeFilter.setOrderNo(orderNo);
+        typeFilter.setType(1);
+        typeFilter = typeFilterMapper.selectOne(typeFilter);
+        if(typeFilter == null){
+            ThreadPoolUtils.executor.execute(() -> {
+                //todo 探针A逻辑
+                typeFilterService.getInfoByTypeA(user, orderNo);
+            });
+            conclusion = 30;
+            remark = "审批处理中";
         }else{
-            conclusion = 40;
-            remark = "审批拒绝";
+            if("true".equals(typeFilter.getResult())){
+                conclusion = 10;
+                remark = "审批成功";
+            }else{
+                conclusion = 40;
+                remark = "审批拒绝";
+            }
         }
-
-
 
         BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
         if(approvalAmount1 == null) {

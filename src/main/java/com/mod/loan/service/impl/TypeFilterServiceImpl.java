@@ -40,7 +40,6 @@ public class TypeFilterServiceImpl implements TypeFilterService {
         Boolean flag = true;
         TypeFilter typeFilter = new TypeFilter();
         try {
-;
             typeFilter.setOrderNo(orderNo);
             typeFilter.setType(1);
             typeFilter = typeFilterMapper.selectOne(typeFilter);
