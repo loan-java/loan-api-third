@@ -8,7 +8,7 @@ import java.io.UnsupportedEncodingException;
 /**
  *  指针A
  */
-public interface TypeAService {
+public interface TypeFilterService {
 
 
     Boolean getInfoByTypeA(User user, String orderNo);

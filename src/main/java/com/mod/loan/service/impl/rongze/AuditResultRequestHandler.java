@@ -45,7 +45,7 @@ public class AuditResultRequestHandler {
     private OrderUserMapper orderUserMapper;
 
     @Autowired
-    private TypeAService typeAService;
+    private TypeFilterService typeFilterService;
 
 
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
@@ -136,7 +136,7 @@ public class AuditResultRequestHandler {
         }
 
         //todo 探针A逻辑
-        Boolean flag = typeAService.getInfoByTypeA(user, orderNo);
+        Boolean flag = typeFilterService.getInfoByTypeA(user, orderNo);
         if(flag != null && flag.booleanValue()){
             conclusion = 10;
             remark = "审批成功";
@@ -144,6 +144,8 @@ public class AuditResultRequestHandler {
             conclusion = 40;
             remark = "审批拒绝";
         }
+
+
 
         BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
         if(approvalAmount1 == null) {

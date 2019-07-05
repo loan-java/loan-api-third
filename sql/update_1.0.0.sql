@@ -85,6 +85,27 @@ alter table tb_user_order add merchant_rate_id tinyint(6) DEFAULT 1 COMMENT '借
 
 
 
+#探针A
+-- ----------------------------
+-- Table structure for tb_type_filter
+-- ----------------------------
+DROP TABLE IF EXISTS `tb_type_filter`;
+CREATE TABLE `tb_type_filter`  (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `uid` bigint(11) NULL DEFAULT NULL COMMENT '用户id',
+  `order_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '订单编号-融泽',
+  `type` int(255) NULL DEFAULT NULL COMMENT '1-新颜',
+  `result` varchar(255) DEFAULT NULL COMMENT '系统处理结果',
+  `resultl_str` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '返回结果参数',
+  `create_time` datetime(0) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `order_no_type`(`order_no`, `type`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
 
 
 
