@@ -34,7 +34,8 @@ public class TypeAServiceImpl implements TypeAService {
      * 获取是否是黑名单
      */
     @Override
-    public boolean getInfoByTypeA(User user, String orderNo) {
+    public Boolean getInfoByTypeA(User user, String orderNo) {
+
         try {
             /** 1、 商户号 **/
             String member_id = Constant.typeaMemberId;
@@ -108,38 +109,58 @@ public class TypeAServiceImpl implements TypeAService {
 
             /** ================处理返回结果============= **/
             if (postString.isEmpty()) {// 判断参数是否为空
-                log.error("指针A=====返回数据为空" + postString);
+                log.error("指针A=====1返回数据为空" + postString);
                 return false;
             }
             JSONObject jsonObject = JSONObject.parseObject(postString);
             if(!jsonObject.containsKey("success")) {
-                log.error("指针A=====1返回数据异常。" + postString);
+                log.error("指针A=====2返回数据异常。" + postString);
                 return false;
             }
             boolean success = jsonObject.getBooleanValue("success");
             if(!success){
-                log.error("指针A=====2返回数据异常。" + postString);
+                log.error("指针A=====3返回数据异常。" + postString);
                 return false;
             }
             if(!jsonObject.containsKey("data")) {
-                log.error("指针A=====3返回数据异常。" + postString);
+                log.error("指针A=====4返回数据异常。" + postString);
                 return false;
             }
             JSONObject data = jsonObject.getJSONObject("data");
             if(!data.containsKey("code")) {
-                log.error("指针A=====4返回数据异常。" + postString);
+                log.error("指针A=====5返回数据异常。" + postString);
                 return false;
             }
             String code = data.getString("code");
-            if(StringUtil.isEmpty(code) || "1".equals(code)) {
-                log.error("指针A=====未命中。" + postString);
+            if(StringUtil.isEmpty(code)) {
+                log.error("指针A=====6返回数据异常。" + postString);
                 return false;
+            }
+            if("1".equals(code)) {
+                return true;
+            }
+            if(!data.containsKey("result_detail")) {
+                log.error("指针A=====7返回数据异常。" + postString);
+                return false;
+            }
+            JSONObject resultDetail = jsonObject.getJSONObject("result_detail");
+            if(!resultDetail.containsKey("result_code")) {
+                log.error("指针A=====8返回数据异常。" + postString);
+                return false;
+            }
+            String resultCode = data.getString("resultCode");
+            if(StringUtil.isEmpty(resultCode)) {
+                log.error("指针A=====9返回数据异常。" + postString);
+                return false;
+            }
+            if("U".equals(resultCode)) {
+                return null;
             }
         } catch (Exception e) {
             log.error("指针A查询出错", e);
             return false;
         }
-        return true;
+        return false;
     }
 
 

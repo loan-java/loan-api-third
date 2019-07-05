@@ -2,25 +2,16 @@ package com.mod.loan.service.impl.rongze;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.PbResultEnum;
-import com.mod.loan.common.enums.PolicyResultEnum;
-import com.mod.loan.common.enums.RiskAuditSourceEnum;
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
-import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
-import com.mod.loan.service.MerchantRateService;
-import com.mod.loan.service.MerchantService;
-import com.mod.loan.service.UserIdentService;
-import com.mod.loan.service.UserService;
+import com.mod.loan.service.*;
 import com.mod.loan.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,13 +35,6 @@ public class AuditResultRequestHandler {
     private UserIdentService userIdentService;
     @Resource
     private UserService userService;
-
-    @Autowired
-    private TbDecisionResDetailMapper decisionResDetailMapper;
-    @Autowired
-    private DecisionPbDetailMapper decisionPbDetailMapper;
-    @Autowired
-    private DecisionZmDetailMapper decisionZmDetailMapper;
     @Resource
     private MerchantService merchantService;
     @Resource
@@ -59,6 +43,9 @@ public class AuditResultRequestHandler {
     private OrderMapper orderMapper;
     @Autowired
     private OrderUserMapper orderUserMapper;
+
+    @Autowired
+    private TypeAService typeAService;
 
 
     public ResponseBean<Map<String, Object>> auditResult(JSONObject param) throws Exception {
@@ -149,8 +136,14 @@ public class AuditResultRequestHandler {
         }
 
         //todo 探针A逻辑
-
-
+        Boolean flag = typeAService.getInfoByTypeA(user, orderNo);
+        if(flag != null && flag.booleanValue()){
+            conclusion = 10;
+            remark = "审批成功";
+        }else{
+            conclusion = 40;
+            remark = "审批拒绝";
+        }
 
         BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
         if(approvalAmount1 == null) {
