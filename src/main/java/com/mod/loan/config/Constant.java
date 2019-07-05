@@ -63,7 +63,45 @@ public class Constant {
     public static String chanpayPublicKey;
     public static String chanpayOrgPrivateKey;
 
-//    @Value("${chanpay.partner.id}")
+    //指针A
+    public static String typeaMemberId;
+    public static String typeaTerminalId;
+    public static String typeaVersions;
+    public static String typeaUrl;
+    public static String typeaPfxName;
+    public static String typeaPfxPwd;
+    public static String typeaCerName;
+
+    @Value("${typea.member.id:}")
+    public  void setTypaMemberId(String typeaMemberId) {
+        Constant.typeaMemberId = typeaMemberId;
+    }
+    @Value("${typea.terminal.id:}")
+    public  void setTypaTerminalId(String typeaTerminalId) {
+        Constant.typeaTerminalId = typeaTerminalId;
+    }
+    @Value("${typea.versions:}")
+    public  void setTypaVersions(String typeaVersions) {
+        Constant.typeaVersions = typeaVersions;
+    }
+    @Value("${typea.url:}")
+    public  void setTypaUrl(String typeaUrl) {
+        Constant.typeaUrl = typeaUrl;
+    }
+    @Value("${typea.pfx.name:}")
+    public  void setTypaPfxName(String typeaPfxName) {
+        Constant.typeaPfxName = typeaPfxName;
+    }
+    @Value("${typea.pfx.pwd:}")
+    public void setTypaPfxPwd(String typeaPfxPwd) {
+        Constant.typeaPfxPwd = typeaPfxPwd;
+    }
+    @Value("${typea.cer.name:}")
+    public  void setTypaCerName(String typeaCerName) {
+        Constant.typeaCerName = typeaCerName;
+    }
+
+    //    @Value("${chanpay.partner.id}")
 //    public void setChanpayPartnerId(String chanpayPartnerId) {
 //        Constant.chanpayPartnerId = chanpayPartnerId;
 //    }

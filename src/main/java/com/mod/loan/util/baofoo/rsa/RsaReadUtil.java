@@ -93,7 +93,7 @@ public final class RsaReadUtil {
             priKeyStream.read(reads);
             return getPrivateKeyByStream(reads, priKeyPass);
         } catch (Exception e) {
-            // log.error("解析文件，读取私钥失败:", e);
+             log.error("解析文件，读取私钥失败:", e);
         } finally {
             if (priKeyStream != null) {
                 try {
