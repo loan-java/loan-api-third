@@ -11,5 +11,5 @@ import java.io.UnsupportedEncodingException;
 public interface TypeFilterService {
 
 
-    Boolean getInfoByTypeA(User user, String orderNo);
+    void getInfoByTypeA(User user, String orderNo);
 }

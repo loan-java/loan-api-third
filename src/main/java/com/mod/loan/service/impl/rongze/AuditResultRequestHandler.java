@@ -153,11 +153,11 @@ public class AuditResultRequestHandler {
             remark = "审批处理中";
         } else {
             if ("true".equalsIgnoreCase(typeFilter.getResult())) {
-                conclusion = 10;
-                remark = "审批成功";
-            } else {
                 conclusion = 40;
                 remark = "审批拒绝";
+            } else {
+                conclusion = 10;
+                remark = "审批成功";
             }
         }
 

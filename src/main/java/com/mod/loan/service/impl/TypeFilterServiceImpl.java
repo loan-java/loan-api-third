@@ -32,11 +32,10 @@ public class TypeFilterServiceImpl implements TypeFilterService {
     private TypeFilterMapper typeFilterMapper;
 
     /**
-     * 获取是否是黑名单 true--不是黑名单  false--黑名单
+     * 获取是否是黑名单 true--黑名单  false--不是黑名单
      */
     @Override
-    public Boolean getInfoByTypeA(User user, String orderNo) {
-        Boolean flag = true;
+    public void getInfoByTypeA(User user, String orderNo) {
         TypeFilter typeFilter = new TypeFilter();
         try {
             typeFilter.setOrderNo(orderNo);
@@ -44,11 +43,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             typeFilter = typeFilterMapper.selectOne(typeFilter);
             if (typeFilter != null) {
                 log.info("指针A=====当前订单已经探针过" + orderNo);
-                if ("true".equalsIgnoreCase(typeFilter.getResult())) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return;
             }
             typeFilter = new TypeFilter();
             typeFilter.setOrderNo(orderNo);
@@ -124,77 +119,77 @@ public class TypeFilterServiceImpl implements TypeFilterService {
 
             postString = HttpUtils.doPostByForm(url, headers, params);
             log.info("指针A请求返回：" + postString);
-            flag = resultTypeA(postString); //false-黑名单，true-不是黑名单
+            Boolean flag = resultTypeA(postString); //false-不是黑名单，true-是黑名单
 
             typeFilter.setResult(flag.toString());
             typeFilter.setResultlStr(postString);
             typeFilterMapper.insert(typeFilter);
         } catch (Exception e) {
             log.error("指针A查询出错", e);
-            return false;
+            return;
         }
-        return flag;
+        return;
     }
 
     /**
      * 获取返回结果
      *
      * @param postString
-     * @return false-黑名单，true-不是黑名单
+     * @return false-不是黑名单，true-是黑名单
      */
     public Boolean resultTypeA(String postString) {
         try {
             /** ================处理返回结果============= **/
             if (postString.isEmpty()) {// 判断参数是否为空
                 log.error("指针A=====1返回数据为空" + postString);
-                return true;
+                return false;
             } else {
                 JSONObject jsonObject = JSONObject.parseObject(postString);
                 if (!jsonObject.containsKey("success")) {
                     log.error("指针A=====2返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 boolean success = jsonObject.getBooleanValue("success");
                 if (!success) {
                     log.error("指针A=====3返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 //判断 data 是否有值
                 if (!jsonObject.containsKey("data")) {
                     log.error("指针A=====4返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 JSONObject data = jsonObject.getJSONObject("data");
                 if (!data.containsKey("code")) {
                     log.error("指针A=====5返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 //判断 code 得值
                 String code = data.getString("code");
                 if (StringUtil.isEmpty(code)) {
                     log.error("指针A=====6返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 if ("1".equals(code)) {
-                    return true;
+                    return false;
                 }
                 //判断result_detail得值
                 if (!data.containsKey("result_detail")) {
                     log.error("指针A=====7返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 JSONObject resultDetail = jsonObject.getJSONObject("result_detail");
                 if (!resultDetail.containsKey("result_code")) {
                     log.error("指针A=====8返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 String resultCode = data.getString("resultCode");
                 if (StringUtil.isEmpty(resultCode)) {
                     log.error("指针A=====9返回数据异常。" + postString);
-                    return true;
+                    return false;
                 }
                 if ("U".equalsIgnoreCase(resultCode) || "A".equalsIgnoreCase(resultCode)) {
-                    return false;
+                    return true;
                 }
             }
         } catch (Exception e) {
