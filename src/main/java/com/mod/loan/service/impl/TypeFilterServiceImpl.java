@@ -191,6 +191,9 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                 if ("1".equals(resultCode)) {
                     return true;
                 }
+                if ("4".equals(resultCode)) {
+                    return false;
+                }
             }
         } catch (Exception e) {
             log.error("指针A查询出错", e);
