@@ -96,7 +96,7 @@ CREATE TABLE `tb_type_filter`  (
   `order_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '订单编号-融泽',
   `type` int(255) NULL DEFAULT NULL COMMENT '1-新颜',
   `result` varchar(255) DEFAULT NULL COMMENT '系统处理结果',
-  `resultl_str` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '返回结果参数',
+  `resultl_str` varchar(2048) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '返回结果参数',
   `create_time` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `order_no_type`(`order_no`, `type`) USING BTREE
