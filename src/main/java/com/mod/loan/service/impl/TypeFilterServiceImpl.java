@@ -188,7 +188,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                     log.error("指针A=====9返回数据异常。" + postString);
                     return false;
                 }
-                if ("4".equals(resultCode) || "1".equals(resultCode)) {
+                if ("1".equals(resultCode)) {
                     return true;
                 }
             }
