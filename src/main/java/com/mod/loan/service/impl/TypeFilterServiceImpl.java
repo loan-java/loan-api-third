@@ -140,7 +140,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
     public Boolean resultTypeA(String postString) {
         try {
             /** ================处理返回结果============= **/
-            if (postString.isEmpty()) {// 判断参数是否为空
+            if (postString == null || postString.isEmpty()) {// 判断参数是否为空
                 log.error("指针A=====1返回数据为空" + postString);
                 return false;
             } else {
