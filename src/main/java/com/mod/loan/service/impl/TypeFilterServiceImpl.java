@@ -5,13 +5,12 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.TypeFilterMapper;
 import com.mod.loan.model.TypeFilter;
 import com.mod.loan.model.User;
-import com.mod.loan.service.*;
+import com.mod.loan.service.TypeFilterService;
 import com.mod.loan.util.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.util.baofoo.util.SecurityUtil;
 import com.mod.loan.util.typeA.HttpUtils;
 import com.mod.loan.util.typeA.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.util.StringUtil;
 
@@ -43,11 +42,11 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             typeFilter.setOrderNo(orderNo);
             typeFilter.setType(1);
             typeFilter = typeFilterMapper.selectOne(typeFilter);
-            if(typeFilter != null){
+            if (typeFilter != null) {
                 log.info("指针A=====当前订单已经探针过" + orderNo);
-                if("true".equals(typeFilter.getResult())){
+                if ("true".equals(typeFilter.getResult())) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
@@ -108,8 +107,8 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             base64str = base64str.replaceAll("\r\n", "");//重要 避免出现换行空格符
             log.info("指针Abase64str:" + base64str);
             /** rsa加密 **/
-//            String pfxpath = Constant.typeaPfxName;// 商户私钥 todo 正式/测试
-            String pfxpath = "E://other_project/key-typea/8000013189_pri.pfx";// 商户私钥 todo 本地
+            String pfxpath = Constant.typeaPfxName;// 商户私钥 正式
+            //           String pfxpath = "E://other_project/key-typea/8000013189_pri.pfx";// 商户私钥
 
             String pfxpwd = Constant.typeaPfxPwd;// 私钥密码
 
@@ -139,10 +138,11 @@ public class TypeFilterServiceImpl implements TypeFilterService {
 
     /**
      * 获取返回结果
+     *
      * @param postString
      * @return false-黑名单，true-不是黑名单
      */
-    public Boolean resultTypeA(String postString){
+    public Boolean resultTypeA(String postString) {
         try {
             /** ================处理返回结果============= **/
             if (postString.isEmpty()) {// 判断参数是否为空
@@ -197,7 +197,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                     return false;
                 }
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("指针A查询出错", e);
             return false;
         }

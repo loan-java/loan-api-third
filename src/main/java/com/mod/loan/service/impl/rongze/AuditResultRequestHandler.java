@@ -147,7 +147,7 @@ public class AuditResultRequestHandler {
         typeFilter = typeFilterMapper.selectOne(typeFilter);
         if(typeFilter == null){
             ThreadPoolUtils.executor.execute(() -> {
-                //todo 探针A逻辑
+                //探针A逻辑
                 typeFilterService.getInfoByTypeA(user, orderNo);
             });
             conclusion = 30;
