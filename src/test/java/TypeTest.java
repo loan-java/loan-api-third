@@ -16,7 +16,7 @@ public class TypeTest extends BaseSpringBootJunitTest {
     @Test
     public void requestBindCard() {
         User user = userMapper.selectByPrimaryKey((long)3);
-        String orderNo="154753518181346882";
+        String orderNo="1547535181813468800";
         typeFilterService.getInfoByTypeA(user, orderNo);
     }
 

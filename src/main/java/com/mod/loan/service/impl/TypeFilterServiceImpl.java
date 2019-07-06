@@ -103,7 +103,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             log.info("指针Abase64str:" + base64str);
             /** rsa加密 **/
             String pfxpath = Constant.typeaPfxName;// 商户私钥 正式
-            //           String pfxpath = "E://other_project/key-typea/8000013189_pri.pfx";// 商户私钥
+//                       String pfxpath = "E://other_project/key-typea/8000013189_pri.pfx";// 商户私钥
 
             String pfxpwd = Constant.typeaPfxPwd;// 私钥密码
 
@@ -183,7 +183,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                     log.error("指针A=====8返回数据异常。" + postString);
                     return false;
                 }
-                String resultCode = resultDetail.getString("resultCode");
+                String resultCode = resultDetail.getString("result_code");
                 if (StringUtil.isEmpty(resultCode)) {
                     log.error("指针A=====9返回数据异常。" + postString);
                     return false;
