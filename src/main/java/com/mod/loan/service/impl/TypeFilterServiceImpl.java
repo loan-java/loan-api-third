@@ -140,7 +140,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
     public Boolean resultTypeA(String postString) {
         try {
             /** ================处理返回结果============= **/
-            if (postString.isEmpty()) {// 判断参数是否为空
+            if (postString == null || postString.isEmpty()) {// 判断参数是否为空
                 log.error("指针A=====1返回数据为空" + postString);
                 return false;
             } else {
@@ -178,12 +178,12 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                     log.error("指针A=====7返回数据异常。" + postString);
                     return false;
                 }
-                JSONObject resultDetail = jsonObject.getJSONObject("result_detail");
+                JSONObject resultDetail = data.getJSONObject("result_detail");
                 if (!resultDetail.containsKey("result_code")) {
                     log.error("指针A=====8返回数据异常。" + postString);
                     return false;
                 }
-                String resultCode = data.getString("resultCode");
+                String resultCode = resultDetail.getString("resultCode");
                 if (StringUtil.isEmpty(resultCode)) {
                     log.error("指针A=====9返回数据异常。" + postString);
                     return false;
