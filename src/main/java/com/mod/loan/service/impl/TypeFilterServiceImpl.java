@@ -178,12 +178,12 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                     log.error("指针A=====7返回数据异常。" + postString);
                     return false;
                 }
-                JSONObject resultDetail = jsonObject.getJSONObject("result_detail");
+                JSONObject resultDetail = data.getJSONObject("result_detail");
                 if (!resultDetail.containsKey("result_code")) {
                     log.error("指针A=====8返回数据异常。" + postString);
                     return false;
                 }
-                String resultCode = data.getString("resultCode");
+                String resultCode = resultDetail.getString("resultCode");
                 if (StringUtil.isEmpty(resultCode)) {
                     log.error("指针A=====9返回数据异常。" + postString);
                     return false;
