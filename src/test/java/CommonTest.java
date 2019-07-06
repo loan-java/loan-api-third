@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.config.Constant;
 import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import com.mod.loan.util.rongze.BizDataUtil;
@@ -43,8 +44,12 @@ public class CommonTest extends BaseSpringBootJunitTest {
 
     @Test
     public void req() throws Exception {
-        String result = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", "{'order_no':'111'}");
-        System.out.println(result);
+        JSONObject jsonObject1 = new JSONObject();
+        jsonObject1.put("order_no", "1674262731316867072");
+        jsonObject1.put("type", "2");
+        String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+        //判断运营商数据
+        System.out.println(mxMobile);
     }
 
 
