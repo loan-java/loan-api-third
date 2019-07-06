@@ -32,7 +32,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
     private TypeFilterMapper typeFilterMapper;
 
     /**
-     * 获取是否是黑名单
+     * 获取是否是黑名单 true--不是黑名单  false--黑名单
      */
     @Override
     public Boolean getInfoByTypeA(User user, String orderNo) {
@@ -44,7 +44,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             typeFilter = typeFilterMapper.selectOne(typeFilter);
             if (typeFilter != null) {
                 log.info("指针A=====当前订单已经探针过" + orderNo);
-                if ("true".equals(typeFilter.getResult())) {
+                if ("true".equalsIgnoreCase(typeFilter.getResult())) {
                     return true;
                 } else {
                     return false;
@@ -147,33 +147,33 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             /** ================处理返回结果============= **/
             if (postString.isEmpty()) {// 判断参数是否为空
                 log.error("指针A=====1返回数据为空" + postString);
-                return false;
+                return true;
             } else {
                 JSONObject jsonObject = JSONObject.parseObject(postString);
                 if (!jsonObject.containsKey("success")) {
                     log.error("指针A=====2返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 boolean success = jsonObject.getBooleanValue("success");
                 if (!success) {
                     log.error("指针A=====3返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 //判断 data 是否有值
                 if (!jsonObject.containsKey("data")) {
                     log.error("指针A=====4返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 JSONObject data = jsonObject.getJSONObject("data");
                 if (!data.containsKey("code")) {
                     log.error("指针A=====5返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 //判断 code 得值
                 String code = data.getString("code");
                 if (StringUtil.isEmpty(code)) {
                     log.error("指针A=====6返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 if ("1".equals(code)) {
                     return true;
@@ -181,19 +181,19 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                 //判断result_detail得值
                 if (!data.containsKey("result_detail")) {
                     log.error("指针A=====7返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 JSONObject resultDetail = jsonObject.getJSONObject("result_detail");
                 if (!resultDetail.containsKey("result_code")) {
                     log.error("指针A=====8返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
                 String resultCode = data.getString("resultCode");
                 if (StringUtil.isEmpty(resultCode)) {
                     log.error("指针A=====9返回数据异常。" + postString);
-                    return false;
+                    return true;
                 }
-                if ("U".equals(resultCode)) {
+                if ("U".equalsIgnoreCase(resultCode) || "A".equalsIgnoreCase(resultCode)) {
                     return false;
                 }
             }

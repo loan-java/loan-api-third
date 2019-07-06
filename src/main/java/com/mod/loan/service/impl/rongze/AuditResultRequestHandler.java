@@ -6,15 +6,14 @@ import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
-import com.mod.loan.config.Constant;
-import com.mod.loan.mapper.*;
+import com.mod.loan.mapper.OrderMapper;
+import com.mod.loan.mapper.OrderUserMapper;
+import com.mod.loan.mapper.TypeFilterMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.ThreadPoolUtils;
-import com.mod.loan.util.aliyun.OSSUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,7 +57,7 @@ public class AuditResultRequestHandler {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
 
         String orderNo = bizData.getString("order_no");
-        log.info("===============查询审批结论开始===================="+ orderNo);
+        log.info("===============查询审批结论开始====================" + orderNo);
 
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         if (merchant == null) {
@@ -84,12 +83,12 @@ public class AuditResultRequestHandler {
         String remark = "审批拒绝";
 
         //是否存在关联的借贷信息
-        Long  merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
-        if(merchantRateId == null){
+        Long merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if (merchantRateId == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
         MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(merchantRateId);
-        if(merchantRate == null){
+        if (merchantRate == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
 
@@ -106,11 +105,11 @@ public class AuditResultRequestHandler {
             //审批期限是否固定，0 - 固定
             int termType = 0;
             BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
-            if(approvalAmount == null) {
+            if (approvalAmount == null) {
                 throw new BizException("查询审批结论:商户不存在默认借贷金额");
             }
             Integer approvalTerm = merchantRate.getProductDay(); //审批期限
-            if(approvalAmount == null) {
+            if (approvalAmount == null) {
                 throw new BizException("查询审批结论:商户不存在默认借贷期限");
             }
             //期限单位，1 - 天
@@ -137,7 +136,7 @@ public class AuditResultRequestHandler {
             map.put("reapply", reapply);
             map.put("order_no", orderNo);
             map.put("conclusion", conclusion);
-            log.info("===============查询审批结论结束===================="+ orderNo);
+            log.info("===============查询审批结论结束====================" + orderNo);
             return ResponseBean.success(map);
         }
 
@@ -145,29 +144,29 @@ public class AuditResultRequestHandler {
         typeFilter.setOrderNo(orderNo);
         typeFilter.setType(1);
         typeFilter = typeFilterMapper.selectOne(typeFilter);
-        if(typeFilter == null){
+        if (typeFilter == null) {
             ThreadPoolUtils.executor.execute(() -> {
                 //探针A逻辑
                 typeFilterService.getInfoByTypeA(user, orderNo);
             });
             conclusion = 30;
             remark = "审批处理中";
-        }else{
-            if("true".equals(typeFilter.getResult())){
+        } else {
+            if ("true".equalsIgnoreCase(typeFilter.getResult())) {
                 conclusion = 10;
                 remark = "审批成功";
-            }else{
+            } else {
                 conclusion = 40;
                 remark = "审批拒绝";
             }
         }
 
         BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
-        if(approvalAmount1 == null) {
+        if (approvalAmount1 == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷金额");
         }
         Integer approvalTerm1 = merchantRate.getProductDay(); //审批期限
-        if(approvalAmount1 == null) {
+        if (approvalAmount1 == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷期限");
         }
         //单期产品
