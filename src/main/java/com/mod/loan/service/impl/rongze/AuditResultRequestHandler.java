@@ -157,6 +157,7 @@ public class AuditResultRequestHandler {
                 conclusion = 40;
                 remark = "审批拒绝";
             }else{
+                //开始探针逻辑
                 typeFilter = new TypeFilter();
                 typeFilter.setOrderNo(orderNo);
                 typeFilter.setType(1);

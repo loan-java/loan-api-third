@@ -23,7 +23,7 @@ public class TypeTest extends BaseSpringBootJunitTest {
 
     @Test
     public void guize() {
-        User user = userMapper.selectByPrimaryKey((long)10088);
+        User user = userMapper.selectByPrimaryKey((long)3);
         String orderNo="1669965333712744448";
         typeFilterService.guize(user, orderNo);
     }

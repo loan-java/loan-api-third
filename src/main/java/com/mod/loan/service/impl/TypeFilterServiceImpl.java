@@ -229,10 +229,11 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             typeFilter.setUid(user.getId());
             typeFilter.setCreateTime(new Date());
             String guizeResult = this.guizeInfo(orderNo, user);
+            log.error(orderNo + "规则集结果：" + guizeResult);
             if(guizeResult == null){
                 typeFilter.setResult("true");
             }else{
-                typeFilter.setResult("true");
+                typeFilter.setResult("false");
             }
             typeFilter.setResultlStr(guizeResult);
             typeFilterMapper.insert(typeFilter);
@@ -268,11 +269,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             JSONObject all = JSONObject.parseObject(dataStr);
             JSONObject data = all.getJSONObject("data");
             JSONObject report = data.getJSONObject("report");
-            JSONObject members = report.getJSONObject("members");
-            JSONObject dataTwo = members.getJSONObject("data");
-            JSONObject dataThree = dataTwo.getJSONObject("data");
-            JSONObject reportTwo = dataThree.getJSONObject("report");
-            JSONArray applicationCheck = reportTwo.getJSONArray("application_check");
+            JSONArray applicationCheck = report.getJSONArray("application_check");
             //是否模拟器 todo 暂时没法决定
 
             //手机注册小于6个月
@@ -284,19 +281,19 @@ public class TypeFilterServiceImpl implements TypeFilterService {
                 return "手机注册小于6个月，实际：" + lessDayLong;
             }
             //静默次数大于1天
-            JSONArray behaviorCheck = reportTwo.getJSONArray("behavior_check");
+            JSONArray behaviorCheck = report.getJSONArray("behavior_check");
             JSONObject jingmo = behaviorCheck.getJSONObject(2);
-            int jimoscore = jingmo.getInteger("socre");
-            if(1 > jimoscore){
+            int jimoscore = jingmo.getInteger("score");
+            if(1 >= jimoscore){
                 return "静默次数大于1天，实际：" + jimoscore;
             }
             //通讯录人数少于120
-            JSONArray collectionContact = reportTwo.getJSONArray("collection_contact");
+            JSONArray collectionContact = report.getJSONArray("collection_contact");
             if(120 > collectionContact.size()){
                 return "通讯录人数少于120，实际：" + collectionContact.size();
             }
             //用户通话数记录数少于15
-            JSONArray contactList = reportTwo.getJSONArray("contact_list");
+            JSONArray contactList = report.getJSONArray("contact_list");
             if(15 > contactList.size()){
                 return "用户通话数记录数少于15，实际：" + contactList.size();
             }
