@@ -12,12 +12,20 @@ public class TypeTest extends BaseSpringBootJunitTest {
     @Autowired
     private  UserMapper userMapper;
 
-    //绑卡请求
     @Test
     public void requestBindCard() {
         User user = userMapper.selectByPrimaryKey((long)3);
         String orderNo="1547535181813468800";
         typeFilterService.getInfoByTypeA(user, orderNo);
+    }
+
+
+
+    @Test
+    public void guize() {
+        User user = userMapper.selectByPrimaryKey((long)10088);
+        String orderNo="1669965333712744448";
+        typeFilterService.guize(user, orderNo);
     }
 
 }

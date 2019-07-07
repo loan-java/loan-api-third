@@ -21,7 +21,7 @@ public class TypeFilter {
     private String orderNo;
 
     /**
-     * 1-新颜
+     * 1-新颜 ,2-规则
      */
     @Column(name = "type")
     private Integer type;

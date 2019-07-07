@@ -12,4 +12,6 @@ public interface TypeFilterService {
 
 
     void getInfoByTypeA(User user, String orderNo);
+
+    void guize(User user, String orderNo);
 }

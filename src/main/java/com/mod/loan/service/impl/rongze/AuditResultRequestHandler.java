@@ -141,27 +141,42 @@ public class AuditResultRequestHandler {
         }
 
         //todo 自己的规则集逻辑
-
-
-
         TypeFilter typeFilter = new TypeFilter();
         typeFilter.setOrderNo(orderNo);
-        typeFilter.setType(1);
+        typeFilter.setType(2);
         typeFilter = typeFilterMapper.selectOne(typeFilter);
         if (typeFilter == null) {
             ThreadPoolUtils.executor.execute(() -> {
                 //探针A逻辑
-                typeFilterService.getInfoByTypeA(user, orderNo);
+                typeFilterService.guize(user, orderNo);
             });
             conclusion = 30;
             remark = "审批处理中";
         } else {
-            if ("true".equalsIgnoreCase(typeFilter.getResult())) {
+            if("false".equals(typeFilter.getResult())){
                 conclusion = 40;
                 remark = "审批拒绝";
-            } else {
-                conclusion = 10;
-                remark = "审批成功";
+            }else{
+                typeFilter = new TypeFilter();
+                typeFilter.setOrderNo(orderNo);
+                typeFilter.setType(1);
+                typeFilter = typeFilterMapper.selectOne(typeFilter);
+                if (typeFilter == null) {
+                    ThreadPoolUtils.executor.execute(() -> {
+                        //探针A逻辑
+                        typeFilterService.getInfoByTypeA(user, orderNo);
+                    });
+                    conclusion = 30;
+                    remark = "审批处理中";
+                } else {
+                    if ("true".equalsIgnoreCase(typeFilter.getResult())) {
+                        conclusion = 40;
+                        remark = "审批拒绝";
+                    } else {
+                        conclusion = 10;
+                        remark = "审批成功";
+                    }
+                }
             }
         }
 

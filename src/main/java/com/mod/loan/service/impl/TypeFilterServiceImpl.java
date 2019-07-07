@@ -1,13 +1,16 @@
 package com.mod.loan.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.TypeFilterMapper;
 import com.mod.loan.model.TypeFilter;
 import com.mod.loan.model.User;
 import com.mod.loan.service.TypeFilterService;
+import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.util.baofoo.util.SecurityUtil;
+import com.mod.loan.util.rongze.RongZeRequestUtil;
 import com.mod.loan.util.typeA.HttpUtils;
 import com.mod.loan.util.typeA.MD5Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -200,6 +203,114 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             return false;
         }
         return false;
+    }
+
+
+
+
+    /**
+     * t
+     * @return
+     */
+    @Override
+    public void guize(User user, String orderNo) {
+        TypeFilter typeFilter = new TypeFilter();
+        try{
+            typeFilter.setOrderNo(orderNo);
+            typeFilter.setType(2);
+            typeFilter = typeFilterMapper.selectOne(typeFilter);
+            if (typeFilter != null) {
+                log.info("规则集=====当前订单已经规则集过" + orderNo);
+                return;
+            }
+            typeFilter = new TypeFilter();
+            typeFilter.setOrderNo(orderNo);
+            typeFilter.setType(2);
+            typeFilter.setUid(user.getId());
+            typeFilter.setCreateTime(new Date());
+            String guizeResult = this.guizeInfo(orderNo, user);
+            if(guizeResult == null){
+                typeFilter.setResult("true");
+            }else{
+                typeFilter.setResult("true");
+            }
+            typeFilter.setResultlStr(guizeResult);
+            typeFilterMapper.insert(typeFilter);
+        }catch (Exception e) {
+            log.error("规则集出错",e);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println("330124199212274817".substring(6,14));
+    }
+
+    /**
+     * null-通过（解析出错），非null-拒绝
+     * @return
+     */
+    public String guizeInfo(String orderNo, User user){
+        try {
+            //1	身份证有效期小于3个月
+            long indate = Long.parseLong(user.getIndate());
+            long birthDay = Long.parseLong(user.getUserCertNo().substring(6,14));
+            long less = indate - birthDay - 3*30;
+            if(less < 0  ){
+                return "身份证有效期小于3个月，实际：" + less;
+            }
+            JSONObject jsonObject1 = new JSONObject();
+            jsonObject1.put("order_no", orderNo);
+            jsonObject1.put("type", "2");
+            String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+            JSONObject jsonObject = JSONObject.parseObject(mxMobile);
+            String dataStr = jsonObject.getString("data");
+            JSONObject all = JSONObject.parseObject(dataStr);
+            JSONObject data = all.getJSONObject("data");
+            JSONObject report = data.getJSONObject("report");
+            JSONObject members = report.getJSONObject("members");
+            JSONObject dataTwo = members.getJSONObject("data");
+            JSONObject dataThree = dataTwo.getJSONObject("data");
+            JSONObject reportTwo = dataThree.getJSONObject("report");
+            JSONArray applicationCheck = reportTwo.getJSONArray("application_check");
+            //是否模拟器 todo 暂时没法决定
+
+            //手机注册小于6个月
+            JSONObject cellPhone = applicationCheck.getJSONObject(2);
+            JSONObject cellPhoneCheckPoints = cellPhone.getJSONObject("check_points");
+            String regTime = cellPhoneCheckPoints.getString("reg_time");
+            long lessDayLong = Long.parseLong(DateUtil.getTwoDay(DateUtil.dateToStrLong(new Date()),regTime));
+            if(120 > lessDayLong){
+                return "手机注册小于6个月，实际：" + lessDayLong;
+            }
+            //静默次数大于1天
+            JSONArray behaviorCheck = reportTwo.getJSONArray("behavior_check");
+            JSONObject jingmo = behaviorCheck.getJSONObject(2);
+            int jimoscore = jingmo.getInteger("socre");
+            if(1 > jimoscore){
+                return "静默次数大于1天，实际：" + jimoscore;
+            }
+            //通讯录人数少于120
+            JSONArray collectionContact = reportTwo.getJSONArray("collection_contact");
+            if(120 > collectionContact.size()){
+                return "通讯录人数少于120，实际：" + collectionContact.size();
+            }
+            //用户通话数记录数少于15
+            JSONArray contactList = reportTwo.getJSONArray("contact_list");
+            if(15 > contactList.size()){
+                return "用户通话数记录数少于15，实际：" + contactList.size();
+            }
+            //年龄小于20或大于45		拒绝
+            JSONObject idCard = applicationCheck.getJSONObject(1);
+            JSONObject idCardCheckPoints = idCard.getJSONObject("check_points");
+            int idCardAge = idCardCheckPoints.getInteger("age");
+            if(idCardAge < 20 || idCardAge > 45){
+                return "年龄小于20或大于45，实际：" + idCardAge;
+            }
+        }catch (Exception e) {
+            log.error("规则集出错",e);
+        }
+        return null;
     }
 
 
