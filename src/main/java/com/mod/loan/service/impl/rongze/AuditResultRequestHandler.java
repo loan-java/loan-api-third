@@ -92,8 +92,8 @@ public class AuditResultRequestHandler {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
 
-        //todo 自己的规则集逻辑
-        //不丢失复贷用户 复贷用户前四次不需要走探针
+
+        //不丢失复贷用户 复贷用户前四次不需要走规则集以及探针
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
         if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
             conclusion = 10;
@@ -139,6 +139,10 @@ public class AuditResultRequestHandler {
             log.info("===============查询审批结论结束====================" + orderNo);
             return ResponseBean.success(map);
         }
+
+        //todo 自己的规则集逻辑
+
+
 
         TypeFilter typeFilter = new TypeFilter();
         typeFilter.setOrderNo(orderNo);
