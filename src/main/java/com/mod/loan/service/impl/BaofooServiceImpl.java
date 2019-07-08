@@ -20,6 +20,7 @@ import com.mod.loan.service.BaofooService;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.StringUtil;
 import com.mod.loan.util.TimeUtils;
 import com.mod.loan.util.baofoo.model.ReadySignVO;
@@ -90,7 +91,7 @@ public class BaofooServiceImpl implements BaofooService {
             Map<String, String> dateArray = new TreeMap<>();
             dateArray.put("send_time", sendTime);
             //报文流水号
-            dateArray.put("msg_id", "TISN" + System.currentTimeMillis());
+            dateArray.put("msg_id", "TISN" + System.currentTimeMillis() + RandomUtils.generateRandomNum(6));
             dateArray.put("version", Constant.baoFooVersion);
             dateArray.put("terminal_id", Constant.baoFooTerminalId);
             //交易类型
@@ -199,7 +200,7 @@ public class BaofooServiceImpl implements BaofooService {
             Map<String, String> dateArray = new TreeMap<>();
             dateArray.put("send_time", sendTime);
             //报文流水号
-            dateArray.put("msg_id", "TISN" + System.currentTimeMillis());
+            dateArray.put("msg_id", "TISN" + System.currentTimeMillis() + RandomUtils.generateRandomNum(6));
             dateArray.put("version", Constant.baoFooVersion);
             dateArray.put("terminal_id", Constant.baoFooTerminalId);
             //交易类型
@@ -318,7 +319,7 @@ public class BaofooServiceImpl implements BaofooService {
             Map<String, String> dateArray = new TreeMap<>();
             dateArray.put("send_time", sendTime);
             //报文流水号
-            dateArray.put("msg_id", "TISN" + System.currentTimeMillis());
+            dateArray.put("msg_id", "TISN" + System.currentTimeMillis() + RandomUtils.generateRandomNum(6));
             dateArray.put("version", Constant.baoFooVersion);
             dateArray.put("terminal_id", Constant.baoFooTerminalId);
             //交易类型(参看：文档中《交易类型枚举》)
