@@ -47,7 +47,9 @@ public class YeepayUtil {
     }
 
     private static StringResultDTO parseResult(String result) {
-        if (StringUtils.isBlank(result)) return null;
+        if (StringUtils.isBlank(result)) {
+            return null;
+        }
         return JSONObject.parseObject(result, StringResultDTO.class);
     }
 }
