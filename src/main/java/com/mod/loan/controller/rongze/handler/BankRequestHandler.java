@@ -14,6 +14,7 @@ import com.mod.loan.model.Merchant;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.User;
 import com.mod.loan.service.*;
+import com.mod.loan.util.GetBankUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
