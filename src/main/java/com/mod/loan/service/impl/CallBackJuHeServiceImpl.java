@@ -6,7 +6,7 @@ import com.mod.loan.common.enums.JuHeCallBackEnum;
 import com.mod.loan.config.Constant;
 import com.mod.loan.model.User;
 import com.mod.loan.service.CallBackJuHeService;
-import com.mod.loan.util.CallBackJuHeUtil;
+import com.mod.loan.util.juhe.CallBackJuHeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.mod.loan.controller.contract;
+package com.mod.loan.controller.rongze.contract;
 
 import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
@@ -59,16 +59,16 @@ public class ContractController {
         String bankName = ""; //乙方银行名称
 //        String bankAddress = ""; //开户地址
 
-        Long  merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
-        if(merchantRateId == null){
+        Long merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        if (merchantRateId == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
         MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(merchantRateId);
-        if(merchantRate == null){
+        if (merchantRate == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
         BigDecimal approvalAmount1 = merchantRate.getProductMoney(); //审批金额
-        if(approvalAmount1 == null) {
+        if (approvalAmount1 == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷金额");
         }
 
@@ -91,7 +91,7 @@ public class ContractController {
                 bankName = userBank.getCardName();
             }
 
-            Order order = orderMapper.findByOrderNoAndUid(orderNo, uid,source);
+            Order order = orderMapper.findByOrderNoAndUid(orderNo, uid, source);
             if (order != null) {
                 if (order.getCreateTime() != null) {
                     signTime = DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss");

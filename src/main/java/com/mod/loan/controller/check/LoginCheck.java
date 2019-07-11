@@ -8,7 +8,7 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.util.HttpUtils;
-import com.mod.loan.util.SignUtil;
+import com.mod.loan.util.juhe.SignUtil;
 import com.mod.loan.util.jwtUtil;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang.StringUtils;

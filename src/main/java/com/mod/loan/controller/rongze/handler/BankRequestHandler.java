@@ -1,4 +1,4 @@
-package com.mod.loan.controller.bank;
+package com.mod.loan.controller.rongze.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
@@ -8,14 +8,12 @@ import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.controller.BaseRequestHandler;
 import com.mod.loan.mapper.BankMapper;
 import com.mod.loan.model.Bank;
 import com.mod.loan.model.Merchant;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.User;
 import com.mod.loan.service.*;
-import com.mod.loan.util.GetBankUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;

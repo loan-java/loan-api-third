@@ -1,4 +1,4 @@
-package com.mod.loan.util.rsajuhe;
+package com.mod.loan.util.juhe;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 

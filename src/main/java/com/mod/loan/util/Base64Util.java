@@ -1,6 +1,6 @@
 package com.mod.loan.util;
 
-import com.mod.loan.util.rsajuhe.RsaUtils;
+import com.mod.loan.util.juhe.RsaUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.nio.charset.StandardCharsets;
