@@ -65,7 +65,7 @@ public class AuditResultRequestHandler {
             throw new BizException("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
         }
 
-        
+
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null || user.getUserOrigin().equals(UserOriginEnum.JH.getCode())) {
             throw new BizException("查询审批结论:用户不存在/用户非融泽用户,订单号=" + orderNo);
@@ -94,8 +94,6 @@ public class AuditResultRequestHandler {
         }
 
         //收款撤退 准备回款 全部不走风控
-        conclusion = 10;
-        remark = "审批成功";
         //单期产品
         int proType = 1;
         //审批金额是否固定，0 - 固定
