@@ -1,4 +1,4 @@
-package com.mod.loan.controller;
+package com.mod.loan.controller.rongze.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;

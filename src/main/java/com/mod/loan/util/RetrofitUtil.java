@@ -1,4 +1,4 @@
-package com.mod.loan;
+package com.mod.loan.util;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;

@@ -1,4 +1,4 @@
-package com.mod.loan.util.rsajuhe;
+package com.mod.loan.util.juhe;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.ArrayUtils;

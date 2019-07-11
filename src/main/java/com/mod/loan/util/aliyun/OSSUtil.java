@@ -2,14 +2,10 @@ package com.mod.loan.util.aliyun;
 
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectResult;
 import com.mod.loan.config.Constant;
-import com.mod.loan.controller.UploadController;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
 

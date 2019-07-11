@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze;
+package com.mod.loan.controller.rongze.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.OrderSourceEnum;
@@ -38,16 +38,16 @@ public class RongZeRequestHandler {
     private OrderUserMapper orderUserMapper;
 
     //推送用户确认收款信息
-    ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) throws BizException {
+    public ResponseBean<Map<String, Object>> handleOrderSubmit(JSONObject param) throws BizException {
         JSONObject data = parseAndCheckBizData(param);
         String orderNo = data.getString("order_no");
 
         String loanAmount = data.getString("loan_amount");
-        if(loanAmount == null || "".equals(loanAmount)){
+        if (loanAmount == null || "".equals(loanAmount)) {
             throw new BizException("推送用户确认收款信息:申请借贷金额不能为空");
         }
         Integer loanTerm = data.getInteger("loan_term");
-        if(loanTerm == null){
+        if (loanTerm == null) {
             throw new BizException("推送用户确认收款信息:申请借贷期限不能为空");
         }
         checkAndGetUserId(orderNo);
@@ -60,7 +60,7 @@ public class RongZeRequestHandler {
     }
 
     //查询借款合同
-    ResponseBean<Map<String, Object>> handleQueryContract(JSONObject param) throws BizException {
+    public ResponseBean<Map<String, Object>> handleQueryContract(JSONObject param) throws BizException {
 
         String orderNo = getOrderNo(param);
 
@@ -70,7 +70,7 @@ public class RongZeRequestHandler {
     }
 
     //查询订单状态
-    ResponseBean<Map<String, Object>> handleQueryOrderStatus(JSONObject param) throws BizException {
+    public ResponseBean<Map<String, Object>> handleQueryOrderStatus(JSONObject param) throws BizException {
 
         String orderNo = getOrderNo(param);
         checkAndGetUserId(orderNo);
@@ -123,7 +123,7 @@ public class RongZeRequestHandler {
     }
 
     //用户还款
-    ResponseBean<Map<String, Object>> handleRepayment(JSONObject param) throws BizException {
+    public ResponseBean<Map<String, Object>> handleRepayment(JSONObject param) throws BizException {
         String orderNo = getOrderNo(param);
         checkAndGetUserId(orderNo);
 

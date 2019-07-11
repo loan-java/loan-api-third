@@ -1,5 +1,6 @@
-package com.mod.loan.util;
+package com.mod.loan.util.juhe;
 
+import com.mod.loan.util.MD5;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Comparator;

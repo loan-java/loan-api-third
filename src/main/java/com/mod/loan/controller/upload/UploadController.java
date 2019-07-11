@@ -1,4 +1,4 @@
-package com.mod.loan.controller;
+package com.mod.loan.controller.upload;
 
 import com.mod.loan.common.annotation.LoginRequired;
 import com.mod.loan.common.enums.ResponseEnum;
