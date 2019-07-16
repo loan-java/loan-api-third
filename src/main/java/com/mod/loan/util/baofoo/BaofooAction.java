@@ -1,7 +1,7 @@
 package com.mod.loan.util.baofoo;
 
 
-import com.mod.loan.controller.order.OrderApplyController;
+import com.mod.loan.controller.juhe.order.OrderApplyController;
 import com.mod.loan.util.baofoo.util.FormatUtil;
 import com.mod.loan.util.baofoo.util.PathUtil;
 
