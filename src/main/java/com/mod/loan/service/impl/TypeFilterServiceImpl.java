@@ -228,14 +228,13 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             typeFilter.setUid(user.getId());
             typeFilter.setCreateTime(new Date());
             String guizeResult = this.guizeInfo(orderNo, user);
-            log.error(orderNo + "规则集结果：" + guizeResult);
+            log.info("订单号:{},规则集结果:{}", orderNo, guizeResult);
             if (guizeResult == null) {
                 typeFilter.setResult("false");
             } else {
                 typeFilter.setResult("true");
             }
             typeFilter.setResultlStr(guizeResult);
-            System.out.println("规则集结果:" + JSONObject.toJSONString(typeFilter));
             typeFilterMapper.insert(typeFilter);
         } catch (Exception e) {
             log.error("规则集出错", e);
@@ -250,10 +249,10 @@ public class TypeFilterServiceImpl implements TypeFilterService {
      */
     public String guizeInfo(String orderNo, User user) {
         try {
-            //身份证有效期小于3个月
-            long less = DateUtil.betweenDaysInDate(DateUtil.getTodayShort(), user.getIndate(), "yyyyMMdd") - 3 * 30;
-            if (less < 0) {
-                return "身份证有效期小于3个月，实际：" + less;
+            //身份证有效期小于90天
+            long less = DateUtil.betweenDaysInDate(DateUtil.getTodayShort(), user.getIndate(), "yyyyMMdd");
+            if (90 > less) {
+                return "身份证有效期小于90天，实际：" + less;
             }
             JSONObject jsonObject1 = new JSONObject();
             jsonObject1.put("order_no", orderNo);
@@ -267,40 +266,43 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             JSONArray applicationCheck = report.getJSONArray("application_check");
             //todo 暂时没法决定 是否模拟器
 
-            //手机注册小于6个月
+            //手机注册小于180天
             JSONObject cellPhone = applicationCheck.getJSONObject(2);
             JSONObject cellPhoneCheckPoints = cellPhone.getJSONObject("check_points");
             String regTime = cellPhoneCheckPoints.getString("reg_time");
             long lessDayLong = DateUtil.betweenDaysInDate(regTime, DateUtil.dateToStrLong(new Date()), "yyyy-MM-dd HH:mm:ss");
             if (180 > lessDayLong) {
-                return "手机注册小于6个月，实际：" + lessDayLong;
+                return "手机注册小于180天，实际：" + lessDayLong;
             }
-            //静默次数大于1天
+            //静默次数
             JSONArray behaviorCheck = report.getJSONArray("behavior_check");
             JSONObject jingmo = behaviorCheck.getJSONObject(2);
             int jimoscore = jingmo.getInteger("score");
-            if (1 < jimoscore) {
-                return "静默次数大于1天，实际：" + jimoscore;
+            if (2 == jimoscore) {
+                return "手机静默情况较多，实际：" + jingmo;
             }
             //通讯录人数少于120
-            JSONArray collectionContact = report.getJSONArray("collection_contact");
-            if (120 > collectionContact.size()) {
-                return "通讯录人数少于120，实际：" + collectionContact.size();
+            JSONObject userInfoCheck = report.getJSONObject("user_info_check");
+            JSONObject checkblackInfo = userInfoCheck.getJSONObject("check_black_info");
+            Integer collectionContactConut = checkblackInfo.getInteger("contacts_class1_cnt");
+            if (120 > collectionContactConut) {
+                return "通讯录人数少于120人，实际：" + collectionContactConut;
             }
             //用户通话数记录数少于15
             JSONArray contactList = report.getJSONArray("contact_list");
             if (15 > contactList.size()) {
-                return "用户通话数记录数少于15，实际：" + contactList.size();
+                return "用户通话数记录数少于15次，实际：" + contactList.size();
             }
             //年龄小于20或大于45		拒绝
             JSONObject idCard = applicationCheck.getJSONObject(1);
             JSONObject idCardCheckPoints = idCard.getJSONObject("check_points");
             int idCardAge = idCardCheckPoints.getInteger("age");
             if (idCardAge < 20 || idCardAge > 45) {
-                return "年龄小于20或大于45，实际：" + idCardAge;
+                return "年龄小于20岁或大于45岁，实际：" + idCardAge;
             }
         } catch (Exception e) {
             log.error("规则集出错", e);
+            return e.toString();
         }
         return null;
     }
