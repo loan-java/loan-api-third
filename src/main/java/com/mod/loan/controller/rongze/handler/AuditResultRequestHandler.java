@@ -92,6 +92,7 @@ public class AuditResultRequestHandler {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
 
+
         //不丢失复贷用户 复贷用户前四次不需要走规则集以及探针
         List<Order> orderList = orderMapper.getDoubleLoanByUid(user.getId());
         if (orderList != null && orderList.size() > 0 && orderList.size() < 5) {
@@ -140,25 +141,43 @@ public class AuditResultRequestHandler {
         }
 
         //todo 自己的规则集逻辑
-
         TypeFilter typeFilter = new TypeFilter();
         typeFilter.setOrderNo(orderNo);
-        typeFilter.setType(1);
+        typeFilter.setType(2);
         typeFilter = typeFilterMapper.selectOne(typeFilter);
         if (typeFilter == null) {
             ThreadPoolUtils.executor.execute(() -> {
                 //探针A逻辑
-                typeFilterService.getInfoByTypeA(user, orderNo);
+                typeFilterService.guize(user, orderNo);
             });
             conclusion = 30;
             remark = "审批处理中";
         } else {
-            if ("true".equalsIgnoreCase(typeFilter.getResult())) {
+            if("true".equals(typeFilter.getResult())){
                 conclusion = 40;
                 remark = "审批拒绝";
-            } else {
-                conclusion = 10;
-                remark = "审批成功";
+            }else{
+                //开始探针逻辑
+                typeFilter = new TypeFilter();
+                typeFilter.setOrderNo(orderNo);
+                typeFilter.setType(1);
+                typeFilter = typeFilterMapper.selectOne(typeFilter);
+                if (typeFilter == null) {
+                    ThreadPoolUtils.executor.execute(() -> {
+                        //探针A逻辑
+                        typeFilterService.getInfoByTypeA(user, orderNo);
+                    });
+                    conclusion = 30;
+                    remark = "审批处理中";
+                } else {
+                    if ("true".equalsIgnoreCase(typeFilter.getResult())) {
+                        conclusion = 40;
+                        remark = "审批拒绝";
+                    } else {
+                        conclusion = 10;
+                        remark = "审批成功";
+                    }
+                }
             }
         }
 

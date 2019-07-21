@@ -5,11 +5,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 public class DateUtil {
 
@@ -837,7 +833,22 @@ public class DateUtil {
     }
 
 
+    public  static int betweenDaysInDate(String beginDate, String endDate,String pattern) {
+        SimpleDateFormat df = new SimpleDateFormat(pattern);
+        Date firstDate = null;
+        Date secondDate = null;
+        try {
+            firstDate = df.parse(beginDate);
+            secondDate = df.parse(endDate);
+        } catch (Exception e) {
+            // 日期型字符串格式错误
+            System.out.println("日期型字符串格式错误");
+        }
+        int nDay = (int) ((secondDate.getTime() - firstDate.getTime()) / (24 * 60 * 60 * 1000));
+        return nDay;
+    }
+
     public static void main(String[] args) {
-        System.out.println(DateUtil.getNextDay(DateUtil.getStringDateShort(),"30"));
+        System.out.println(DateUtil.getNextDay(DateUtil.getStringDateShort(), "30"));
     }
 }
