@@ -73,4 +73,8 @@
 		where uid=#{uid} and status in(41,42)
 		order by id desc
 	</select>
+
+    <select id="getLendOrder" resultMap="BaseResultMap">
+        select * from tb_order where  STATUS IN (31,32,33,34,41,42)
+    </select>
 </mapper>

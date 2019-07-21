@@ -26,4 +26,7 @@ public interface OrderMapper extends MyBaseMapper<Order> {
      * 查找用户完成订单
      */
     List<Order> getDoubleLoanByUid(Long uid);
+
+
+    List<Order> getLendOrder();
 }
