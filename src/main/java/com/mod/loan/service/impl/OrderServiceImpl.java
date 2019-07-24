@@ -17,7 +17,6 @@ import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.ConstantUtils;
 import com.mod.loan.util.MoneyUtil;
-import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.rongze.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -264,13 +263,6 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         order.setSource(source);
         addOrUpdateOrder(order, orderPhone);
 
-
-        //小虎钱包拒件设置
-        if (Integer.valueOf(RandomUtils.generateRandomNum(1)) > 3) {
-            order.setStatus(ConstantUtils.rejectOrderStatus);
-            orderMapper.updateByPrimaryKey(order);
-            return order;
-        }
 
         //不丢失复贷用户 复贷用户前四次不需要走风控
         List<Order> orderList = orderMapper.getDoubleLoanByUid(uid);
