@@ -12,6 +12,7 @@ import com.mod.loan.mapper.TypeFilterMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.service.*;
 import com.mod.loan.util.DateUtil;
+import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.ThreadPoolUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -90,6 +91,50 @@ public class AuditResultRequestHandler {
         MerchantRate merchantRate = merchantRateService.selectByPrimaryKey(merchantRateId);
         if (merchantRate == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
+        }
+
+        //小虎钱包拒件设置
+        if (Integer.valueOf(RandomUtils.generateRandomNum(1)) > 3) {
+            //单期产品
+            int proType = 1;
+            //审批金额是否固定，0 - 固定
+            int amountType = 0;
+            //审批期限是否固定，0 - 固定
+            int termType = 0;
+            BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
+            if (approvalAmount == null) {
+                throw new BizException("查询审批结论:商户不存在默认借贷金额");
+            }
+            Integer approvalTerm = merchantRate.getProductDay(); //审批期限
+            if (approvalAmount == null) {
+                throw new BizException("查询审批结论:商户不存在默认借贷期限");
+            }
+            //期限单位，1 - 天
+            int termUnit = 1;
+            //是否可再申请 1-是，0-不可以
+            String reapply = "1";
+            Timestamp approvalTime = new Timestamp(System.currentTimeMillis());
+            //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
+            String reapplyTime = DateFormatUtils.format(System.currentTimeMillis() + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
+            //审批结果有效期，往后30天
+            String creditDeadline = DateUtil.getNextDay(DateUtil.getStringDateShort(), "30");
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("reapplytime", reapplyTime);
+            map.put("pro_type", proType);
+            map.put("term_unit", termUnit);
+            map.put("amount_type", amountType);
+            map.put("term_type", termType);
+            map.put("approval_amount", approvalAmount.intValue());
+            map.put("approval_term", approvalTerm.intValue());
+            map.put("credit_deadline", creditDeadline);
+            map.put("refuse_time", approvalTime);
+            map.put("remark", remark);
+            map.put("reapply", reapply);
+            map.put("order_no", orderNo);
+            map.put("conclusion", conclusion);
+            log.info("===============查询审批结论结束====================" + orderNo);
+            return ResponseBean.success(map);
         }
 
         //不丢失复贷用户 复贷用户前四次不需要走规则集以及探针
