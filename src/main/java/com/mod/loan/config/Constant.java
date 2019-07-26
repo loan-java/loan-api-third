@@ -9,7 +9,6 @@ public class Constant {
     public final static String KUAI_QIAN_UID_PFX = "JSD";
 
 
-
     public static String ENVIROMENT;
 
     public static String OSS_STATIC_BUCKET_NAME;
@@ -49,7 +48,7 @@ public class Constant {
     public static String rongZeQueryUrl;
     public static String rongZePublicKey;
 
-    public static String orgPrivateKey;
+    public static String rongzeOrgPrivateKey;
 
     public static String sysDomainHost; //系统域名
 
@@ -73,31 +72,37 @@ public class Constant {
     public static String typeaCerName;
 
     @Value("${typea.member.id:}")
-    public  void setTypaMemberId(String typeaMemberId) {
+    public void setTypaMemberId(String typeaMemberId) {
         Constant.typeaMemberId = typeaMemberId;
     }
+
     @Value("${typea.terminal.id:}")
-    public  void setTypaTerminalId(String typeaTerminalId) {
+    public void setTypaTerminalId(String typeaTerminalId) {
         Constant.typeaTerminalId = typeaTerminalId;
     }
+
     @Value("${typea.versions:}")
-    public  void setTypaVersions(String typeaVersions) {
+    public void setTypaVersions(String typeaVersions) {
         Constant.typeaVersions = typeaVersions;
     }
+
     @Value("${typea.url:}")
-    public  void setTypaUrl(String typeaUrl) {
+    public void setTypaUrl(String typeaUrl) {
         Constant.typeaUrl = typeaUrl;
     }
+
     @Value("${typea.pfx.name:}")
-    public  void setTypaPfxName(String typeaPfxName) {
+    public void setTypaPfxName(String typeaPfxName) {
         Constant.typeaPfxName = typeaPfxName;
     }
+
     @Value("${typea.pfx.pwd:}")
     public void setTypaPfxPwd(String typeaPfxPwd) {
         Constant.typeaPfxPwd = typeaPfxPwd;
     }
+
     @Value("${typea.cer.name:}")
-    public  void setTypaCerName(String typeaCerName) {
+    public void setTypaCerName(String typeaCerName) {
         Constant.typeaCerName = typeaCerName;
     }
 
@@ -156,9 +161,9 @@ public class Constant {
         Constant.rongZeQueryUrl = rongZeQueryUrl;
     }
 
-    @Value("${org.rsa.private.key:}")
-    public void setOrgPrivateKey(String orgPrivateKey) {
-        Constant.orgPrivateKey = orgPrivateKey;
+    @Value("${rongze.org.rsa.private.key:}")
+    public void setOrgPrivateKey(String rongzeOrgPrivateKey) {
+        Constant.rongzeOrgPrivateKey = rongzeOrgPrivateKey;
     }
 
     @Value("${rongze.rsa.public.key:}")

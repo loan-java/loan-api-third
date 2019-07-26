@@ -19,9 +19,7 @@ public class SignUtil {
         if (StringUtils.isBlank(json)) return "";
 
         String pendVertContent = bindPreSignStr(json);
-//        System.out.println("待生成签名的字符串：" + pendVertContent);
-        String sign = RSAUtils.sign(pendVertContent, Constant.orgPrivateKey);
-//        System.out.println("签名sign:" + sign);
+        String sign = RSAUtils.sign(pendVertContent, Constant.rongzeOrgPrivateKey);
         return sign;
     }
 
