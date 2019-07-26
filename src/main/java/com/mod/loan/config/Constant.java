@@ -47,8 +47,15 @@ public class Constant {
     public static String rongZeCallbackUrl;
     public static String rongZeQueryUrl;
     public static String rongZePublicKey;
+    public static String rongZeOrgPrivateKey;
 
-    public static String rongzeOrgPrivateKey;
+
+    public static String bengBengRequestAppId;
+    public static String bengBengCallbackUrl;
+    public static String bengBengQueryUrl;
+    public static String bengBengPublicKey;
+    public static String bengBengOrgPrivateKey;
+
 
     public static String sysDomainHost; //系统域名
 
@@ -106,6 +113,7 @@ public class Constant {
         Constant.typeaCerName = typeaCerName;
     }
 
+
     //    @Value("${chanpay.partner.id}")
 //    public void setChanpayPartnerId(String chanpayPartnerId) {
 //        Constant.chanpayPartnerId = chanpayPartnerId;
@@ -162,9 +170,10 @@ public class Constant {
     }
 
     @Value("${rongze.org.rsa.private.key:}")
-    public void setOrgPrivateKey(String rongzeOrgPrivateKey) {
-        Constant.rongzeOrgPrivateKey = rongzeOrgPrivateKey;
+    public void setRongZeOrgPrivateKey(String rongZeOrgPrivateKey) {
+        Constant.rongZeOrgPrivateKey = rongZeOrgPrivateKey;
     }
+
 
     @Value("${rongze.rsa.public.key:}")
     public void setRongZePublicKey(String rongZePublicKey) {
@@ -280,26 +289,54 @@ public class Constant {
 
     @Value("${oss.static.bucket.name:}")
     public void setOSS_STATIC_BUCKET_NAME(String oSS_STATIC_BUCKET_NAME) {
-        OSS_STATIC_BUCKET_NAME = oSS_STATIC_BUCKET_NAME;
+        Constant.OSS_STATIC_BUCKET_NAME = oSS_STATIC_BUCKET_NAME;
     }
 
     @Value("${oss.static.bucket.name.mobile:}")
     public void setOSS_STATIC_BUCKET_NAME_MOBILE(String oSS_STATIC_BUCKET_NAME_MOBILE) {
-        OSS_STATIC_BUCKET_NAME_MOBILE = oSS_STATIC_BUCKET_NAME_MOBILE;
+        Constant.OSS_STATIC_BUCKET_NAME_MOBILE = oSS_STATIC_BUCKET_NAME_MOBILE;
     }
 
     @Value("${oss.accesskey.id:}")
     public void setOSS_ACCESSKEY_ID(String oSS_ACCESSKEY_ID) {
-        OSS_ACCESSKEY_ID = oSS_ACCESSKEY_ID;
+        Constant.OSS_ACCESSKEY_ID = oSS_ACCESSKEY_ID;
     }
 
     @Value("${oss.accesskey.secret:}")
     public void setOSS_ACCESS_KEY_SECRET(String oSS_ACCESS_KEY_SECRET) {
-        OSS_ACCESS_KEY_SECRET = oSS_ACCESS_KEY_SECRET;
+        Constant.OSS_ACCESS_KEY_SECRET = oSS_ACCESS_KEY_SECRET;
     }
 
     @Value("${jwt.sercetKey:}")
     public void setJwtSercetkey(String jwtSercetkey) {
         JWT_SERCETKEY = jwtSercetkey;
     }
+
+
+    @Value("${bengbeng.request.app.id:}")
+    public void setBengBengRequestAppId(String bengBengRequestAppId) {
+        Constant.bengBengRequestAppId = bengBengRequestAppId;
+    }
+
+    @Value("${bengbeng.callback.url:}")
+    public void setBengBengCallbackUrl(String bengBengCallbackUrl) {
+        Constant.bengBengCallbackUrl = bengBengCallbackUrl;
+    }
+
+    @Value("${bengbeng.query.url:}")
+    public void setBengBengQueryUrl(String bengBengQueryUrl) {
+        Constant.bengBengQueryUrl = bengBengQueryUrl;
+    }
+
+    @Value("${bengbeng.rsa.public.key:}")
+    public void setBengBengPublicKey(String bengBengPublicKey) {
+        Constant.bengBengPublicKey = bengBengPublicKey;
+    }
+
+    @Value("${bengbeng.org.rsa.private.key:}")
+    public void setBengBengOrgPrivateKey(String bengBengOrgPrivateKey) {
+        Constant.bengBengOrgPrivateKey = bengBengOrgPrivateKey;
+    }
+
+
 }
