@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze.handler;
+package com.mod.loan.controller.bengbeng.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.UserOriginEnum;
@@ -56,7 +56,7 @@ public class CertRequestHandler {
         String orderNo = bizData.getString("order_no");
         String userType = "3"; //1-不可申请用户，2-复贷用户，3-正常申请用户
         MerchantRate merchantRate = merchantRateService.findByMerchant(RequestThread.getClientAlias());
-        if(merchantRate == null){
+        if (merchantRate == null) {
             throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷信息");
         }
         User user = userMapper.getMd5PhoneAndIdcard(md5);
@@ -106,17 +106,17 @@ public class CertRequestHandler {
                             log.info(user.getId() + "最后一笔订单已结清");
                             userType = "2";
 
-                            OrderUser ou = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.RZ.getCode()), user.getId());
+                            OrderUser ou = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.BB.getCode()), user.getId());
                             if (ou == null) {
                                 ou = new OrderUser();
                                 ou.setCreateTime(new Date());
                                 ou.setOrderNo(orderNo);
-                                ou.setSource(Integer.valueOf(UserOriginEnum.RZ.getCode()));
+                                ou.setSource(Integer.valueOf(UserOriginEnum.BB.getCode()));
                                 ou.setUid(user.getId());
                                 ou.setMerchantRateId(merchantRate.getId());
                                 orderUserMapper.insertSelective(ou);
                                 //设置缓存
-                                String key=redisMapper.getOrderUserKey(orderNo, UserOriginEnum.RZ.getCode());
+                                String key = redisMapper.getOrderUserKey(orderNo, UserOriginEnum.BB.getCode());
                                 redisMapper.set(key, user.getId());
                             }
                         }
@@ -129,11 +129,11 @@ public class CertRequestHandler {
         int amountType = 0; //审批金额是否固定，0 - 固定
         int termType = 0; //审批期限是否固定，0 - 固定
         BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
-        if(approvalAmount == null) {
+        if (approvalAmount == null) {
             throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷金额");
         }
         Integer approvalTerm = merchantRate.getProductDay(); //审批期限
-        if(approvalAmount == null) {
+        if (approvalAmount == null) {
             throw new BizException("查询复贷和黑名单信息开始:商户不存在默认借贷期限");
         }
         int termUnit = 1; //期限单位，1 - 天
@@ -155,7 +155,7 @@ public class CertRequestHandler {
         }
 
         //将当前订单的借款信息id存缓存，永久
-        String merchatRateKey = redisMapper.getMerchantRateId(orderNo, UserOriginEnum.RZ.getCode());
+        String merchatRateKey = redisMapper.getMerchantRateId(orderNo, UserOriginEnum.BB.getCode());
         redisMapper.set(merchatRateKey, merchantRate.getId());
 
         log.info("查询复贷和黑名单信息结束");

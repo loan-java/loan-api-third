@@ -1,4 +1,4 @@
-package com.mod.loan.controller.rongze.handler;
+package com.mod.loan.controller.bengbeng.handler;
 
 
 import com.alibaba.fastjson.JSONObject;
@@ -66,8 +66,8 @@ public class AuditResultRequestHandler {
 
 
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
-        if (user == null || !user.getUserOrigin().equals(UserOriginEnum.RZ.getCode())) {
-            throw new BizException("查询审批结论:用户不存在/用户非融泽用户,订单号=" + orderNo);
+        if (user == null || !user.getUserOrigin().equals(UserOriginEnum.BB.getCode())) {
+            throw new BizException("查询审批结论:用户不存在/用户非蹦蹦用户,订单号=" + orderNo);
         }
 
         UserIdent userIdent = userIdentService.selectByPrimaryKey(user.getId());
@@ -83,7 +83,7 @@ public class AuditResultRequestHandler {
         String remark = "审批拒绝";
 
         //是否存在关联的借贷信息
-        Long merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        Long merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.BB.getCode()));
         if (merchantRateId == null) {
             throw new BizException("查询审批结论:商户不存在默认借贷信息");
         }
