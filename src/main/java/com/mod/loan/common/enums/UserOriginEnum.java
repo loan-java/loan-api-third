@@ -2,6 +2,7 @@ package com.mod.loan.common.enums;
 
 /**
  * 用户注册渠道
+ *
  * @author kk
  */
 public enum UserOriginEnum {
@@ -10,7 +11,7 @@ public enum UserOriginEnum {
      */
     JH("0", "聚合"),
     RZ("1", "融泽"),
-    BB("2", "蹦蹦");
+    BB("2", "嘣嘣");
 
     private String code;
     private String msg;

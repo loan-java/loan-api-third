@@ -13,7 +13,7 @@ import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.OrderService;
-import com.mod.loan.util.rongze.BizDataUtil;
+import com.mod.loan.util.bengbeng.BizDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
