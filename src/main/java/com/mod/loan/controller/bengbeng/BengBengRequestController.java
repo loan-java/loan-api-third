@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequestMapping("/bengbeng")
-public class RongZeRequestController {
+public class BengBengRequestController {
 
 
     @Resource
