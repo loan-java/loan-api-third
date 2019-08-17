@@ -64,7 +64,7 @@ public class BengBengRequestController {
     @Resource
     private OrderUserMapper orderUserMapper;
 
-    private static String logPre = "融泽入口请求, ";
+    private static String logPre = "蹦蹦入口请求, ";
 
     @RequestMapping("/dispatcherRequest")
     public Object dispatcherRequest(HttpServletRequest request, @RequestBody JSONObject param) {
