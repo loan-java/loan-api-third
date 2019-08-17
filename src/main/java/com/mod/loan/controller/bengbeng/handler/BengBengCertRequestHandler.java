@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class CertRequestHandler {
+public class BengBengCertRequestHandler {
 
     @Resource
     private UserMapper userMapper;
@@ -66,6 +66,7 @@ public class CertRequestHandler {
                 userType = "1";
                 message = "聚合用户，不走当前线路";
             } else {
+                //========================融泽和蹦蹦用户=============================
                 Blacklist blacklist = blacklistService.getByUid(user.getId());
                 if (null != blacklist) {
                     if (1 == blacklist.getType()) {

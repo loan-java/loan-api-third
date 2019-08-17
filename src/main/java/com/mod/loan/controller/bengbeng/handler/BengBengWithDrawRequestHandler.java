@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class WithDrawRequestHandler {
+public class BengBengWithDrawRequestHandler {
 
     @Autowired
     private MerchantRateMapper merchantRateMapper;

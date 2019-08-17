@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class AuditResultRequestHandler {
+public class BengBengAuditResultRequestHandler {
 
     @Resource
     private UserIdentService userIdentService;

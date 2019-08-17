@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class UserInfoBaseRequestHandler {
+public class BengBengUserInfoBaseRequestHandler {
 
     @Autowired
     private UserService userService;
@@ -50,35 +50,18 @@ public class UserInfoBaseRequestHandler {
     public ResponseBean<Map<String, Object>> userInfoBase(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("推送用户基本信息开始");
         JSONObject orderInfo = bizData.getJSONObject("orderInfo");//订单基本信息
         String orderNo = orderInfo.getString("order_no");
-//        Integer isReloan = orderInfo.getInteger("is_reloan");
         String userName = orderInfo.getString("user_name");
         String userMobile = orderInfo.getString("user_mobile");
-//        String applicationAmount = orderInfo.getString("application_amount");
-//        Integer applicationTerm = orderInfo.getInteger("application_term");
-//        Integer termUnit = orderInfo.getInteger("term_unit");
-//        String orderTime = orderInfo.getString("order_time");
-
         JSONObject applyDetail = bizData.getJSONObject("applyDetail");//用户填写的基本信息
-//        String userNameoOwn = applyDetail.getString("user_name");
         String userId = applyDetail.getString("user_id");
         String famadr = applyDetail.getString("famadr");
-//        String validstartdate = applyDetail.getString("validstartdate");
         String validenddate = applyDetail.getString("validenddate");
         String agency = applyDetail.getString("agency");
         String nation = applyDetail.getString("nation");
         String userEducation = applyDetail.getString("user_education");
-//        String isOnType = applyDetail.getString("is_on_type");
-//        String workPeriod = applyDetail.getString("work_period");
         String userIncomeByCard = applyDetail.getString("user_income_by_card");
-//        String operatingYear = applyDetail.getString("operating_year");
-//        String corporateFlow = applyDetail.getString("corporate_flow");
-//        String monthlyAverageIncome = applyDetail.getString("monthly_average_income");
-//        String userSocialSecurity = applyDetail.getString("user_social_security");
-//        JSONObject addInfo = bizData.getJSONObject("addInfo");//抓取信审信息
-
         //开始新增用户
         User user = userService.selectUserByPhone(userMobile, RequestThread.getClientAlias());
         if (user == null) {
@@ -135,10 +118,8 @@ public class UserInfoBaseRequestHandler {
             n = userInfoMapper.updateByPrimaryKey(userInfo);
             if (n == 0) throw new RuntimeException("推送用户基本信息:更新用户详情信息失败");
         }
-        //新增融泽用户订单关联信息
         OrderUser orderUser = orderUserMapper.getUidByOrderNoAndSourceAndUid(orderNo, Integer.valueOf(UserOriginEnum.BB.getCode()), user.getId());
         if (orderUser == null) {
-            //将当前订单的借款信息id存缓存，永久
             String merchatRateKey = redisMapper.getMerchantRateId(orderNo, UserOriginEnum.BB.getCode());
             String  merchantRateId = null;
             if(redisMapper.hasKey(merchatRateKey)) {

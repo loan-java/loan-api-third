@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class RepayRequestHandler extends BaseRequestHandler {
+public class BengBengRepayRequestHandler extends BengBengBaseRequestHandler {
 
     @Autowired
     private OrderService orderService;

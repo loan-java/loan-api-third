@@ -9,10 +9,9 @@ import lombok.extern.slf4j.Slf4j;
  * @ date 2019/5/15 9:03
  */
 @Slf4j
-public class RongZeRequestUtil {
+public class BengBengRequestUtil {
 
     public static String doPost(String url, String method, String bizData) throws Exception {
-        log.info("接口请求融泽开始,请求融泽方法:{}", method);
         return doPost(url, method, bizData, "");
     }
 
@@ -21,9 +20,7 @@ public class RongZeRequestUtil {
     }
 
     private static String doPost(String url, String reqParamsStr) throws Exception {
-        String result = HttpClientUtils.sendPost(url, reqParamsStr.getBytes());
-        //log.info("融泽接口请求结束, result: " + result);
-        log.info("接口请求融泽结束");
+        String result = BengBengHttpClientUtils.sendPost(url, reqParamsStr.getBytes());
         return result;
     }
 
@@ -31,14 +28,14 @@ public class RongZeRequestUtil {
      * 构建请求参数
      */
     public static String buildRequestParams(String method, String bizData, String returnUrl) throws Exception {
-        String despwd = StandardDesUtils.generateDesKey();
-        RequestRongZeBean vo = new RequestRongZeBean();
+        String despwd = BengBengStandardDesUtils.generateDesKey();
+        RequestBengBengBean vo = new RequestBengBengBean();
         vo.setMethod(method);
         vo.setSign_type("RSA");
-        vo.setBiz_data(BizDataUtil.encryptBizData(bizData, despwd));
+        vo.setBiz_data(BengBengBizDataUtil.encryptBizData(bizData, despwd));
         vo.setBiz_enc("1");
         vo.setDes_key(genDescKey(despwd));
-        vo.setApp_id(Constant.rongZeRequestAppId);
+        vo.setApp_id(Constant.bengBengRequestAppId);
         vo.setVersion("1.0");
         vo.setFormat("json");
         vo.setTimestamp(System.currentTimeMillis() + "");
@@ -46,7 +43,7 @@ public class RongZeRequestUtil {
 
         String reqContent = JSONObject.toJSONString(vo);
         //设置签名
-        vo.setSign(SignUtil.genSign(reqContent));
+        vo.setSign(BengBengSignUtil.genSign(reqContent));
         return JSONObject.toJSONString(vo);
     }
 
@@ -56,10 +53,10 @@ public class RongZeRequestUtil {
 
     //生成 RSA 加密后的密钥
     public static String genDescKey(String despwd) throws Exception {
-        return RSAUtils.encrypt(despwd, Constant.rongZePublicKey);
+        return BengBengRSAUtils.encrypt(despwd, Constant.bengBengPublicKey);
     }
 
-    public static class RequestRongZeBean {
+    public static class RequestBengBengBean {
         /**
          * 要请求的 API 方法名称
          */

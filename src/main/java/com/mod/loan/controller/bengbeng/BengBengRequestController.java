@@ -16,8 +16,8 @@ import com.mod.loan.model.User;
 import com.mod.loan.service.MerchantService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.HttpUtils;
-import com.mod.loan.util.bengbeng.BizDataUtil;
-import com.mod.loan.util.bengbeng.SignUtil;
+import com.mod.loan.util.bengbeng.BengBengBizDataUtil;
+import com.mod.loan.util.bengbeng.BengBengSignUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,21 +43,21 @@ public class BengBengRequestController {
     @Resource
     private UserService userService;
     @Resource
-    private RongZeRequestHandler rongZeRequestHandler;
+    private BengBengRequestHandler bengBengRequestHandler;
     @Resource
-    private CertRequestHandler certRequestHandler;
+    private BengBengCertRequestHandler bengBengCertRequestHandler;
     @Resource
-    private UserInfoBaseRequestHandler userInfoBaseRequestHandler;
+    private BengBengUserInfoBaseRequestHandler bengBengUserInfoBaseRequestHandler;
     @Resource
-    private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
+    private BengBengUserInfoAdditRequestHandler bengBengUserInfoAdditRequestHandler;
     @Resource
-    private AuditResultRequestHandler auditResultRequestHandler;
+    private BengBengAuditResultRequestHandler bengBengAuditResultRequestHandler;
     @Resource
-    private WithDrawRequestHandler withDrawRequestHandler;
+    private BengBengWithDrawRequestHandler bengBengWithDrawRequestHandler;
     @Resource
-    private BankRequestHandler bankRequestHandler;
+    private BengBengBankRequestHandler bengBengBankRequestHandler;
     @Resource
-    private RepayRequestHandler repayRequestHandler;
+    private BengBengRepayRequestHandler bengBengRepayRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
@@ -84,13 +84,13 @@ public class BengBengRequestController {
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
             String sign = param.getString("sign");
-            boolean check = SignUtil.checkSign(param.toJSONString(), sign);
+            boolean check = BengBengSignUtil.checkSign(param.toJSONString(), sign);
             if (!check) throw new BizException(ResponseEnum.M4006);
 
             //解密 bizData
             if ("1".equals(param.getString("biz_enc"))) {
                 String bizDataStr = param.getString("biz_data");
-                String bizData = BizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
+                String bizData = BengBengBizDataUtil.decryptBizData(bizDataStr, param.getString("des_key"));
                 param.put("biz_data", bizData);
                 log.warn(logPre + "请求方法:" + method + "解密后的数据：" + param.toJSONString());
             }
@@ -100,44 +100,44 @@ public class BengBengRequestController {
             key = this.binRequestThread(request, param, method);
             switch (method) {
                 case "fund.withdraw.req": //提交用户确认收款信息
-                    result = rongZeRequestHandler.handleOrderSubmit(param);
+                    result = bengBengRequestHandler.handleOrderSubmit(param);
                     break;
                 case "fund.deal.contract": //查询借款合同
-                    result = rongZeRequestHandler.handleQueryContract(param);
+                    result = bengBengRequestHandler.handleQueryContract(param);
                     break;
                 case "fund.order.status": //查询订单状态
-                    result = rongZeRequestHandler.handleQueryOrderStatus(param);
+                    result = bengBengRequestHandler.handleQueryOrderStatus(param);
                     break;
                 case "fund.payment.req": //用户还款
-                    result = rongZeRequestHandler.handleRepayment(param);
+                    result = bengBengRequestHandler.handleRepayment(param);
                     break;
                 case "fund.bank.bind": //用户验证银行卡
-                    result = bankRequestHandler.bankCardCode(param);
+                    result = bengBengBankRequestHandler.bankCardCode(param);
                     break;
                 case "fund.bank.verify": //用户绑定银行卡
-                    result = bankRequestHandler.bankBind(param);
+                    result = bengBengBankRequestHandler.bankBind(param);
                     break;
                 case "fund.payment.plan": //查询还款计划
-                    result = repayRequestHandler.getRepayPlan(param);
+                    result = bengBengRepayRequestHandler.getRepayPlan(param);
                     break;
                 case "fund.payment.result": //查询还款状态
-                    result = repayRequestHandler.getRepayStatus(param);
+                    result = bengBengRepayRequestHandler.getRepayStatus(param);
                     break;
 
                 case "fund.cert.auth": //查询复贷黑名单信息
-                    result = certRequestHandler.certAuth(param);
+                    result = bengBengCertRequestHandler.certAuth(param);
                     break;
                 case "fund.userinfo.base": //提交用户基本信息
-                    result = userInfoBaseRequestHandler.userInfoBase(param);
+                    result = bengBengUserInfoBaseRequestHandler.userInfoBase(param);
                     break;
                 case "fund.userinfo.addit": //查询用户补充信息
-                    result = userInfoAdditRequestHandler.userInfoAddit(param);
+                    result = bengBengUserInfoAdditRequestHandler.userInfoAddit(param);
                     break;
                 case "fund.audit.result": //查询审批结论
-                    result = auditResultRequestHandler.auditResult(param);
+                    result = bengBengAuditResultRequestHandler.auditResult(param);
                     break;
                 case "fund.withdraw.trial": //试算接口
-                    result = withDrawRequestHandler.withdrawTria(param);
+                    result = bengBengWithDrawRequestHandler.withdrawTria(param);
                     break;
                 // TODO: 2019/5/15 其它 method
                 default:

@@ -33,7 +33,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class BankRequestHandler extends BaseRequestHandler {
+public class BengBengBankRequestHandler extends BengBengBaseRequestHandler {
 
     @Autowired
     private UserService userService;

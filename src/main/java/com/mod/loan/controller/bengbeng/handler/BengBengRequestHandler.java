@@ -13,7 +13,7 @@ import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderRepay;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.OrderService;
-import com.mod.loan.util.bengbeng.BizDataUtil;
+import com.mod.loan.util.bengbeng.BengBengBizDataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class RongZeRequestHandler {
+public class BengBengRequestHandler {
 
     @Resource
     private OrderService orderService;
@@ -143,7 +143,7 @@ public class RongZeRequestHandler {
         JSONObject data = parseAndCheckBizData(param);
         String orderNo = data.getString("order_no");
         if (StringUtils.isBlank(orderNo)) throw new BizException("order_no 未传");
-        return BizDataUtil.bindRZOrderNo(orderNo);
+        return BengBengBizDataUtil.bindRZOrderNo(orderNo);
     }
 
     private JSONObject parseAndCheckBizData(JSONObject param) throws BizException {

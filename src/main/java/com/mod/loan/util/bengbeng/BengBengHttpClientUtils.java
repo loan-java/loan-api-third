@@ -13,7 +13,7 @@ import java.net.URL;
  * @描述: http client请求工具类 @作者： 李运期 @创建时间： 2016年9月21日 上午10:41:19
  */
 @Slf4j
-public class HttpClientUtils {
+public class BengBengHttpClientUtils {
 
     /**
      * 默认的编码,解决中文乱码

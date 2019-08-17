@@ -6,13 +6,12 @@ import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
-import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.*;
 import com.mod.loan.model.*;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.ThreadPoolUtils;
 import com.mod.loan.util.aliyun.OSSUtil;
-import com.mod.loan.util.rongze.RongZeRequestUtil;
+import com.mod.loan.util.bengbeng.BengBengRequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class UserInfoAdditRequestHandler {
+public class BengBengUserInfoAdditRequestHandler {
 
     @Resource
     UserService userService;
@@ -48,31 +47,19 @@ public class UserInfoAdditRequestHandler {
     UserAuthInfoMapper userAuthInfoMapper;
 
 
-    @Resource
-    private RedisMapper redisMapper;
-
-
     //推送用户补充信息
     @Transactional
     public ResponseBean<Map<String, Object>> userInfoAddit(JSONObject param) throws BizException {
         Map<String, Object> map = new HashMap<>();
-        String message = "成功";
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
-        log.info("推送用户补充信息开始");
         //机构定制信息
         String orderNo = bizData.getString("order_no");
         String ID_Positive = bizData.getJSONArray("ID_Positive").getString(0);
         String ID_Negative = bizData.getJSONArray("ID_Negative").getString(0);
-//        String photo_hand_ID=bizData.getJSONArray("photo_hand_ID").getString(0);
         String photo_assay = bizData.getJSONArray("photo_assay").getString(bizData.getJSONArray("photo_assay").size() - 1);
         String addr_detail = bizData.getString("addr_detail");
-//        String family_live_type=bizData.getString("family_live_type");
-//        String household_type=bizData.getString("household_type");
         String user_email = bizData.getString("user_email");
         String user_marriage = bizData.getString("user_marriage");
-//        String loan_use=bizData.getString("loan_use");
-//        String credite_status=bizData.getString("credite_status");
-//        String asset_auto_type=bizData.getString("asset_auto_type");
         String contact1A_relationship = bizData.getString("contact1A_relationship");
         String contact1A_name = bizData.getString("contact1A_name");
         String contact1A_number = bizData.getString("contact1A_number");
@@ -82,14 +69,8 @@ public class UserInfoAdditRequestHandler {
         String company_name = bizData.getString("company_name");
         String company_addr_detail = bizData.getString("company_addr_detail");
         String company_number = bizData.getString("company_number");
-//        String company_type=bizData.getString("company_type");
         String position = bizData.getString("position");
-//        String hiredate=bizData.getString("hiredate");
-//        String income_type=bizData.getString("income_type");
         String industry_type = bizData.getString("industry_type");
-//        String amount_of_staff=bizData.getString("amount_of_staff");
-//        String ext=bizData.getString("ext");
-        //开始新增
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null) throw new BizException("推送用户补充信息:用户不存在");
         this.addressList(bizData, user);
@@ -274,7 +255,7 @@ public class UserInfoAdditRequestHandler {
                         JSONObject jsonObject1 = new JSONObject();
                         jsonObject1.put("order_no", orderNo);
                         jsonObject1.put("fileid", str1);
-                        String result1 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
+                        String result1 = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
                         resultJson1 = JSONObject.parseObject(result1);
                         if (resultJson1 == null || !resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200) {
                             throw new BizException("推送用户补充信息:身份证正面信息解析失败" + result1);
@@ -293,7 +274,7 @@ public class UserInfoAdditRequestHandler {
                         JSONObject jsonObject2 = new JSONObject();
                         jsonObject2.put("order_no", orderNo);
                         jsonObject2.put("fileid", str2);
-                        String result2 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
+                        String result2 = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.resource.findfile", jsonObject2.toJSONString());
                         resultJson2 = JSONObject.parseObject(result2);
                         if (resultJson2 == null || !resultJson2.containsKey("code") || !resultJson2.containsKey("data") || resultJson2.getInteger("code") != 200) {
                             throw new BizException("推送用户补充信息:身份证背面信息解析失败" + result2);
@@ -312,7 +293,7 @@ public class UserInfoAdditRequestHandler {
                         JSONObject jsonObject3 = new JSONObject();
                         jsonObject3.put("order_no", orderNo);
                         jsonObject3.put("fileid", str3);
-                        String result3 = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
+                        String result3 = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.resource.findfile", jsonObject3.toJSONString());
                         resultJson3 = JSONObject.parseObject(result3);
                         if (resultJson3 == null || !resultJson3.containsKey("code") || !resultJson3.containsKey("data") || resultJson3.getInteger("code") != 200) {
                             throw new BizException("推送用户补充信息:身份证活体信息解析失败" + result3);
@@ -353,7 +334,7 @@ public class UserInfoAdditRequestHandler {
                     JSONObject jsonObject1 = new JSONObject();
                     jsonObject1.put("order_no", orderNo);
                     jsonObject1.put("type", "1");
-                    String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+                    String mxMobile = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.charge.data", jsonObject1.toJSONString());
                     //判断运营商数据
                     JSONObject jsonObject = JSONObject.parseObject(mxMobile);
                     if (!jsonObject.containsKey("code") || !jsonObject.containsKey("data") || jsonObject.getInteger("code") != 200) {

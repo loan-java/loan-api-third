@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RongZeRequestUtil {
 
     public static String doPost(String url, String method, String bizData) throws Exception {
-        log.info("接口请求融泽开始,请求融泽方法:{}", method);
         return doPost(url, method, bizData, "");
     }
 
@@ -22,8 +21,6 @@ public class RongZeRequestUtil {
 
     private static String doPost(String url, String reqParamsStr) throws Exception {
         String result = HttpClientUtils.sendPost(url, reqParamsStr.getBytes());
-        //log.info("融泽接口请求结束, result: " + result);
-        log.info("接口请求融泽结束");
         return result;
     }
 

@@ -2,6 +2,7 @@ package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.TypeFilterMapper;
 import com.mod.loan.model.TypeFilter;
@@ -10,6 +11,7 @@ import com.mod.loan.service.TypeFilterService;
 import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.baofoo.rsa.RsaCodingUtil;
 import com.mod.loan.util.baofoo.util.SecurityUtil;
+import com.mod.loan.util.bengbeng.BengBengRequestUtil;
 import com.mod.loan.util.rongze.RongZeRequestUtil;
 import com.mod.loan.util.typeA.HttpUtils;
 import com.mod.loan.util.typeA.MD5Utils;
@@ -257,7 +259,12 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             JSONObject jsonObject1 = new JSONObject();
             jsonObject1.put("order_no", orderNo);
             jsonObject1.put("type", "2");
-            String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+            String mxMobile = null;
+            if(UserOriginEnum.RZ.getCode().equals(user.getUserOrigin())) {
+                mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+            }else if(UserOriginEnum.BB.getCode().equals(user.getUserOrigin())) {
+                mxMobile = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.charge.data", jsonObject1.toJSONString());
+            }
             JSONObject jsonObject = JSONObject.parseObject(mxMobile);
             String dataStr = jsonObject.getString("data");
             JSONObject all = JSONObject.parseObject(dataStr);
