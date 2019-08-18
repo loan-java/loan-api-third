@@ -61,6 +61,7 @@ public class Constant {
 
 
     public static String companyName;//公司名称
+    public static String companyBengBengName;//公司名称
 
     //畅捷支付
 //    public static String chanpayPartnerId;
@@ -137,6 +138,15 @@ public class Constant {
     @Value("${chanpay.org.rsa.private.key:}")
     public void setChanpayOrgPrivateKey(String chanpayOrgPrivateKey) {
         Constant.chanpayOrgPrivateKey = chanpayOrgPrivateKey;
+    }
+
+    public  String getCompanyBengBengName() {
+        return companyBengBengName;
+    }
+
+    @Value("${company.bengbengname:}")
+    public  void setCompanyBengBengName(String companyBengBengName) {
+        Constant.companyBengBengName = companyBengBengName;
     }
 
     @Value("${company.name:}")
