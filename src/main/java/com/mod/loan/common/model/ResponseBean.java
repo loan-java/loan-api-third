@@ -41,7 +41,7 @@ public class ResponseBean<T> {
     }
 
     public static <T> ResponseBean<T> fail(ResponseEnum r) {
-        return new ResponseBean<>(r.getCodeInt(), r.getMessage(), null);
+        return new ResponseBean<>(r.getCodeInt(), r.getMsg(), null);
     }
 
     public static <T> ResponseBean<T> fail(int code, String msg, T data) {
