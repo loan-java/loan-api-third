@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.mod.loan</groupId>
-    <artifactId>loan-rongze-third</artifactId>
+    <artifactId>loan-api-third</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
     <repositories>
@@ -25,7 +25,7 @@
     </parent>
 
     <properties>
-        <project.name>loan-rongze-third</project.name>
+        <project.name>loan-api-third</project.name>
         <java.version>1.8</java.version>
         <mybatis-spring-boot-starter.version>1.3.1</mybatis-spring-boot-starter.version>
         <tk.mybatis.version>3.4.0</tk.mybatis.version>
