@@ -82,7 +82,7 @@ public class UserRealNameController {
 
         ResultMessage m = loginCheck.check(request, jsonObject, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         User user = userMapper.selectByPrimaryKey(RequestThread.getUid());

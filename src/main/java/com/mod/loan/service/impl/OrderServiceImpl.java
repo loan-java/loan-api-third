@@ -123,7 +123,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
             JSONObject res = JSONObject.parseObject(JSON.toJSONString(message.getData()));
             return order;
         }
-        throw new BizException(message.getStatus(), message.getMessage());
+        throw new BizException(message.getStatus(), message.getMsg());
     }
 
     @Override

@@ -133,7 +133,7 @@ public class BankRequestHandler extends BaseRequestHandler {
             return ResponseBean.success(map);
         }
 
-        throw new BizException(message.getStatus(), message.getMessage());
+        throw new BizException(message.getStatus(), message.getMsg());
     }
 
     /**
@@ -208,7 +208,7 @@ public class BankRequestHandler extends BaseRequestHandler {
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             map.put("deal_result", "1");
         } else {
-            throw new BizException(message.getStatus(), message.getMessage());
+            throw new BizException(message.getStatus(), message.getMsg());
         }
         log.info("绑定银行卡结束");
         return ResponseBean.success(map);

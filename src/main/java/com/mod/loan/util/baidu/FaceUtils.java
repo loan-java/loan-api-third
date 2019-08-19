@@ -36,7 +36,7 @@ public class FaceUtils {
         //质量检测参考
         if(JSONPath.read(ress, "$.result") == null){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请上传人脸信息");
+            faceDTO.setMsg("请上传人脸信息");
             return  faceDTO;
         }
 
@@ -66,77 +66,77 @@ public class FaceUtils {
 
         if(compare(ILLUMINATION,illumination)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请保持光照充足");
+            faceDTO.setMsg("请保持光照充足");
             return  faceDTO;
         }
         
         if(compare(left_eye,LEFT_EYE)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡眼睛");
+            faceDTO.setMsg("请不要遮挡眼睛");
             return  faceDTO;
         }
         if(compare(right_eye,RIGHT_EYE)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡眼睛");
+            faceDTO.setMsg("请不要遮挡眼睛");
             return  faceDTO;
         }
         if(compare(nose,NOSE)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡鼻子");
+            faceDTO.setMsg("请不要遮挡鼻子");
             return  faceDTO;
         }
         if(compare(mouth,MOUTH)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡嘴部");
+            faceDTO.setMsg("请不要遮挡嘴部");
             return  faceDTO;
         }
         if(compare(left_cheek,LEFT_CHEEK)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡脸颊");
+            faceDTO.setMsg("请不要遮挡脸颊");
             return  faceDTO;
         }
         if(compare(right_cheek,RIGHT_CHEEK)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡脸颊");
+            faceDTO.setMsg("请不要遮挡脸颊");
             return  faceDTO;
         }
         if(compare(chin_contour,CHIN_CONTOUR)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("请不要遮挡下巴");
+            faceDTO.setMsg("请不要遮挡下巴");
             return  faceDTO;
         }
 
         if(compare(blur,BLUR)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("图片较模糊");
+            faceDTO.setMsg("图片较模糊");
             return  faceDTO;
         }
 
         if(compare(roll,ROLL)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("不要倾斜头部");
+            faceDTO.setMsg("不要倾斜头部");
             return  faceDTO;
         }
         if(compare(pitch,PITCH)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("不要倾斜头部");
+            faceDTO.setMsg("不要倾斜头部");
             return  faceDTO;
         }
         if(compare(yaw,YAW)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("不要倾斜头部");
+            faceDTO.setMsg("不要倾斜头部");
             return  faceDTO;
         }
 
         if(compare(FACE_LIVENESS,face_liveness)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("人脸模糊");
+            faceDTO.setMsg("人脸模糊");
             return  faceDTO;
         }
 
         if(compare(COMPLETENESS,completeness)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("人脸模糊");
+            faceDTO.setMsg("人脸模糊");
             return  faceDTO;
         }
 
@@ -144,7 +144,7 @@ public class FaceUtils {
 
         if(compare(FACE_PROBABILITY,face_probability)){
             faceDTO.setStatus(ResponseEnum.M4000.getCode());
-            faceDTO.setMessage("人脸模糊");
+            faceDTO.setMsg("人脸模糊");
             return  faceDTO;
         }
 

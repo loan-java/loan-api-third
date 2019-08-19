@@ -55,7 +55,7 @@ public class UserController {
 
         ResultMessage m = loginCheck.check(request, param, false);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
         String phone = param.getString("mobile");
 

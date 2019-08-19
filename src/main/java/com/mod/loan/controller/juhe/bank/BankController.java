@@ -89,7 +89,7 @@ public class BankController {
 
         ResultMessage m = loginCheck.check(request, param, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         String cardNo = Base64Util.juHeRsaDecode(param.getString("cardNo"));
@@ -160,7 +160,7 @@ public class BankController {
             return ResultMap.success();
         }
 
-        return ResultMap.fail(message.getStatus(), message.getMessage());
+        return ResultMap.fail(message.getStatus(), message.getMsg());
     }
 
     /**
@@ -174,7 +174,7 @@ public class BankController {
 
         ResultMessage m = loginCheck.check(request, param, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         String cardNo = Base64Util.juHeRsaDecode(param.getString("cardNo"));
@@ -233,6 +233,6 @@ public class BankController {
             return object;
         }
 
-        return ResultMap.fail(message.getStatus(), message.getMessage());
+        return ResultMap.fail(message.getStatus(), message.getMsg());
     }
 }

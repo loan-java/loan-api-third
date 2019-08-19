@@ -58,7 +58,7 @@ public class OrderController {
 
         ResultMessage m = loginCheck.check(request, map, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         if (map.size() < 1) {
@@ -110,7 +110,7 @@ public class OrderController {
 
         ResultMessage m = loginCheck.check(request, jsonObject, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
         Map<String, Object> data = new HashMap<>();
         ArrayList loanAmountInfo = new ArrayList();

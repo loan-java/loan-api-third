@@ -44,7 +44,7 @@ public class UserAddressListController {
 
         ResultMessage m = loginCheck.check(request, map, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         if (map.size() == 0) {

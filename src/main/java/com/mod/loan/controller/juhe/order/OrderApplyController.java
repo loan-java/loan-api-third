@@ -110,7 +110,7 @@ public class OrderApplyController {
 
         ResultMessage m = loginCheck.check(request, param, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         String loanAmount = param.getString("loanAmount");
@@ -260,7 +260,7 @@ public class OrderApplyController {
         logger.info("===============================");
         ResultMessage m = loginCheck.check(request, param, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
 
         String orderNo = param.getString("orderNo");
@@ -299,7 +299,7 @@ public class OrderApplyController {
             return object;
         }
         logger.info("=====还款失败=====");
-        return ResultMap.fail(message.getStatus(), message.getMessage());
+        return ResultMap.fail(message.getStatus(), message.getMsg());
     }
 
 }

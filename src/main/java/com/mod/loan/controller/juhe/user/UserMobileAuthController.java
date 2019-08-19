@@ -59,7 +59,7 @@ public class UserMobileAuthController {
 
         ResultMessage m = loginCheck.check(request, jsonObject, true);
         if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMessage());
+            return ResultMap.fail(m.getStatus(), m.getMsg());
         }
         if (jsonObject.size() == 0) {
             return ResultMap.fail("4000", "请求参数不能为空");
