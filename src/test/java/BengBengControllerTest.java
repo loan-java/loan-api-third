@@ -64,7 +64,7 @@ public class BengBengControllerTest extends BaseSpringBootJunitTest {
 
     @Test
     public void certauth() throws Exception {
-        String param="{\"method\":\"fund.cert.auth\",\"sign\":\"Vs6jHKpVhHe7YWtu/U7q23Ch6zFOrVoOGDsM3clDdN8fAyKM0k3dSOQmujF5RqfpgxG5qlKMkz2VMg+God/qYCdoiPxrg8y6LqVCCC9sGuSJZv92Br/ZNUQhQWTkmd3WVWD6QxdtSQn1Y1nqiC2nnTmEOti1IuD5kuI3MG5DxpY=\",\"merchant_id\":\"Hsd0515\",\"des_key\":\"U8hwcs2zkpeLoDHQtkji+C081eHIdYEkhdwmsFSOb96e1Yt2OmanwpVLrFvimhe4pKNZeYTDNGapu3XXowSgtIFJ9gZraJUloPd9SuJ0twAPtzlxOk3+p9dGnSg1OqTzRH72L8PFlRRagguDXajDS6iraQqI9NQBvVyPVfNkd1A=\",\"biz_data\":\"WAV+oSgtqjqUQPCFRrGLfW9DQLIlJn7NxHWWUl2GSP7TXNI9nPfek0vR4hxKIEuxUD3smOK0AdpsGzebr1R3oM35BBPXEzE65q84nhjzbncaQUAtYE2ek98quOh/f2uoa6Uqied88+W7NYr1p9qz08Cd8+2TLJq5d09mo5Oel/NZJnr+Wv30Wgjmv0+b0INOQky0nemEasG51HrKFOjYWsfX8fqvjoZZS0nbzSkixAVmQh7ZEsJ6USVgNHvf6vPx\",\"biz_enc\":\"1\"}";
+        String param="{\"method\":\"fund.cert.auth\",\"source_id\":\"synb\",\"des_key\":\"ZOBZkLdaWZ6ALMiMQ/pMGfPmupl28Gai7ZM7U06KBnuyyLjVlrg9GP9XgyGFZ6PAfeFwMyOWl0ncyNBOw6gFX5obUewVZQnu6xGzJVNEvB1TNDTxlJgkJShh1DfFROpP83XajB/PixJYIaKNRYsCKwkCbdN46SmhifkCJZiDClQ=\",\"merchant_id\":\"huashidai001\",\"biz_data\":\"4a6s/QKs8a5VwPZzfdmdLaIWqbgERc5xLwe2EBhYKJuaBqtBT8hYkESlofFQb+0PwPzHF/7i/909gor9hVhtZpxkST7UKelmgL9Lm3Ij5wyvH+X8KlOwM2+bL3hZrB25cbPg3sCueJyAKqLEEqJ3z6J9rj4oRBLfeb919gJXbNO1f0JqzLPzFitsX1nImeGyL8Urwncl1xEGgCCK3DDXtmkvUpTZH8zo\",\"biz_enc\":\"1\"}";
         post(param);
     }
 

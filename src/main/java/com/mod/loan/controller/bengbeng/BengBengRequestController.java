@@ -83,9 +83,9 @@ public class BengBengRequestController {
 
             if (StringUtils.isBlank(method)) throw new BizException(ResponseEnum.M5000);
 
-            String sign = param.getString("sign");
-            boolean check = BengBengSignUtil.checkSign(param.toJSONString(), sign);
-            if (!check) throw new BizException(ResponseEnum.M4006);
+//            String sign = param.getString("sign");
+//            boolean check = BengBengSignUtil.checkSign(param.toJSONString(), sign);
+//            if (!check) throw new BizException(ResponseEnum.M4006);
 
             //解密 bizData
             if ("1".equals(param.getString("biz_enc"))) {
