@@ -54,23 +54,24 @@ public class BengBengUserInfoAdditRequestHandler {
         JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
         //机构定制信息
         String orderNo = bizData.getString("order_no");
-        String ID_Positive = bizData.getJSONArray("ID_Positive").getString(0);
-        String ID_Negative = bizData.getJSONArray("ID_Negative").getString(0);
-        String photo_assay = bizData.getJSONArray("photo_assay").getString(bizData.getJSONArray("photo_assay").size() - 1);
-        String addr_detail = bizData.getString("addr_detail");
-        String user_email = bizData.getString("user_email");
-        String user_marriage = bizData.getString("user_marriage");
-        String contact1A_relationship = bizData.getString("contact1A_relationship");
-        String contact1A_name = bizData.getString("contact1A_name");
-        String contact1A_number = bizData.getString("contact1A_number");
-        String emergency_contact_personA_relationship = bizData.getString("emergency_contact_personA_relationship");
-        String emergency_contact_personA_name = bizData.getString("emergency_contact_personA_name");
-        String emergency_contact_personA_phone = bizData.getString("emergency_contact_personA_phone");
-        String company_name = bizData.getString("company_name");
-        String company_addr_detail = bizData.getString("company_addr_detail");
-        String company_number = bizData.getString("company_number");
-        String position = bizData.getString("position");
-        String industry_type = bizData.getString("industry_type");
+        JSONObject mechanism_custom_info = bizData.getJSONObject("mechanism_custom_info");
+        String ID_Positive = mechanism_custom_info.getJSONArray("ID_Positive").getString(0);
+        String ID_Negative = mechanism_custom_info.getJSONArray("ID_Negative").getString(0);
+        String photo_assay = mechanism_custom_info.getJSONArray("photo_assay").getString(mechanism_custom_info.getJSONArray("photo_assay").size() - 1);
+        String addr_detail = mechanism_custom_info.getString("addr_detail");
+        String user_email = mechanism_custom_info.getString("user_email");
+        String user_marriage = mechanism_custom_info.getString("user_marriage");
+        String contact1A_relationship = mechanism_custom_info.getString("contact1A_relationship");
+        String contact1A_name = mechanism_custom_info.getString("contact1A_name");
+        String contact1A_number = mechanism_custom_info.getString("contact1A_number");
+        String emergency_contact_personA_relationship = mechanism_custom_info.getString("emergency_contact_personA_relationship");
+        String emergency_contact_personA_name = mechanism_custom_info.getString("emergency_contact_personA_name");
+        String emergency_contact_personA_phone = mechanism_custom_info.getString("emergency_contact_personA_phone");
+        String company_name = mechanism_custom_info.getString("company_name");
+        String company_addr_detail = mechanism_custom_info.getString("company_addr_detail");
+        String company_number = mechanism_custom_info.getString("company_number");
+        String position = mechanism_custom_info.getString("position");
+        String industry_type = mechanism_custom_info.getString("industry_type");
         User user = userService.selectByPrimaryKey(RequestThread.getUid());
         if (user == null) throw new BizException("推送用户补充信息:用户不存在");
         this.addressList(bizData, user);
@@ -175,7 +176,8 @@ public class BengBengUserInfoAdditRequestHandler {
     @Transactional
     public void addressList(JSONObject param, User user) throws BizException {
         try {
-            JSONObject contacts = param.getJSONObject("contacts");
+            JSONObject mobile_device_info = param.getJSONObject("mobile_device_info");
+            JSONObject contacts = mobile_device_info.getJSONObject("contacts");
             JSONArray jsonArray = contacts.getJSONArray("phone_list");
             JSONArray addArray = new JSONArray();
             if (jsonArray != null) {
