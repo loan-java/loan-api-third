@@ -9,7 +9,7 @@ import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
 import com.mod.loan.config.Constant;
 import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.controller.rongze.handler.BankRequestHandler;
+import com.mod.loan.controller.rongze.handler.RongZeBankRequestHandlerRongZe;
 import com.mod.loan.controller.rongze.handler.*;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Merchant;
@@ -46,19 +46,19 @@ public class RongZeRequestController {
     @Resource
     private RongZeRequestHandler rongZeRequestHandler;
     @Resource
-    private CertRequestHandler certRequestHandler;
+    private RongZeCertRequestHandler rongZeCertRequestHandler;
     @Resource
-    private UserInfoBaseRequestHandler userInfoBaseRequestHandler;
+    private RongZeUserInfoBaseRequestHandler rongZeUserInfoBaseRequestHandler;
     @Resource
-    private UserInfoAdditRequestHandler userInfoAdditRequestHandler;
+    private RongZeUserInfoAdditRequestHandler rongZeUserInfoAdditRequestHandler;
     @Resource
-    private AuditResultRequestHandler auditResultRequestHandler;
+    private RongZeAuditResultRequestHandler rongZeAuditResultRequestHandler;
     @Resource
-    private WithDrawRequestHandler withDrawRequestHandler;
+    private RongZeWithDrawRequestHandler rongZeWithDrawRequestHandler;
     @Resource
-    private BankRequestHandler bankRequestHandler;
+    private RongZeBankRequestHandlerRongZe rongZeBankRequestHandler;
     @Resource
-    private RepayRequestHandler repayRequestHandler;
+    private RepayRequestHandlerRongZe repayRequestHandler;
 
     @Autowired
     private MerchantService merchantService;
@@ -113,10 +113,10 @@ public class RongZeRequestController {
                     result = rongZeRequestHandler.handleRepayment(param);
                     break;
                 case "fund.bank.bind": //用户验证银行卡
-                    result = bankRequestHandler.bankCardCode(param);
+                    result = rongZeBankRequestHandler.bankCardCode(param);
                     break;
                 case "fund.bank.verify": //用户绑定银行卡
-                    result = bankRequestHandler.bankBind(param);
+                    result = rongZeBankRequestHandler.bankBind(param);
                     break;
                 case "fund.payment.plan": //查询还款计划
                     result = repayRequestHandler.getRepayPlan(param);
@@ -126,19 +126,19 @@ public class RongZeRequestController {
                     break;
 
                 case "fund.cert.auth": //查询复贷黑名单信息
-                    result = certRequestHandler.certAuth(param);
+                    result = rongZeCertRequestHandler.certAuth(param);
                     break;
                 case "fund.userinfo.base": //提交用户基本信息
-                    result = userInfoBaseRequestHandler.userInfoBase(param);
+                    result = rongZeUserInfoBaseRequestHandler.userInfoBase(param);
                     break;
                 case "fund.userinfo.addit": //查询用户补充信息
-                    result = userInfoAdditRequestHandler.userInfoAddit(param);
+                    result = rongZeUserInfoAdditRequestHandler.userInfoAddit(param);
                     break;
                 case "fund.audit.result": //查询审批结论
-                    result = auditResultRequestHandler.auditResult(param);
+                    result = rongZeAuditResultRequestHandler.auditResult(param);
                     break;
                 case "fund.withdraw.trial": //试算接口
-                    result = withDrawRequestHandler.withdrawTria(param);
+                    result = rongZeWithDrawRequestHandler.withdrawTria(param);
                     break;
                 // TODO: 2019/5/15 其它 method
                 default:

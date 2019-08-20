@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class UserInfoAdditRequestHandler {
+public class RongZeUserInfoAdditRequestHandler {
 
     @Resource
     UserService userService;

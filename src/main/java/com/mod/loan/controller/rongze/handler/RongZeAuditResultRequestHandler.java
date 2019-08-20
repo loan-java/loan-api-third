@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class AuditResultRequestHandler {
+public class RongZeAuditResultRequestHandler {
 
     @Resource
     private UserIdentService userIdentService;

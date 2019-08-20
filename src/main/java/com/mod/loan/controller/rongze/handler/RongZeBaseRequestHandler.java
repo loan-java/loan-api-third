@@ -5,7 +5,7 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import org.apache.commons.lang.StringUtils;
 
-public class BaseRequestHandler {
+public class RongZeBaseRequestHandler {
 
     protected JSONObject parseAndCheckBizData(JSONObject param) throws BizException {
         JSONObject data = parseBizData(param);

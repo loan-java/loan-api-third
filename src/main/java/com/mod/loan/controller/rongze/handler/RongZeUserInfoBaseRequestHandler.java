@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class UserInfoBaseRequestHandler {
+public class RongZeUserInfoBaseRequestHandler {
 
     @Autowired
     private UserService userService;

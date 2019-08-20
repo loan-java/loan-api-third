@@ -29,8 +29,8 @@ import java.util.Map;
  * @ date 2019/5/19 14:08
  */
 @RestController
-@RequestMapping("/contract")
-public class ContractController {
+@RequestMapping("/rongze_contract")
+public class RongZeContractController {
 
     @Resource
     private UserService userService;

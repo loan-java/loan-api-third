@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class CertRequestHandler {
+public class RongZeCertRequestHandler {
 
     @Resource
     private UserMapper userMapper;
