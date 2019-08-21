@@ -352,7 +352,7 @@ public class RongZeUserInfoAdditRequestHandler {
                 try {
                     JSONObject jsonObject1 = new JSONObject();
                     jsonObject1.put("order_no", orderNo);
-                    jsonObject1.put("type", "2");
+                    jsonObject1.put("type", "1");
                     String mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
                     //判断运营商数据
                     JSONObject jsonObject = JSONObject.parseObject(mxMobile);

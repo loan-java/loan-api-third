@@ -258,7 +258,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             }
             JSONObject jsonObject1 = new JSONObject();
             jsonObject1.put("order_no", orderNo);
-            jsonObject1.put("type", "2");
+            jsonObject1.put("type", "1");
             String mxMobile = null;
             if(UserOriginEnum.RZ.getCode().equals(user.getUserOrigin())) {
                 mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());

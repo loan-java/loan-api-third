@@ -46,7 +46,7 @@ public class BengBengCommonTest extends BaseSpringBootJunitTest {
     public void req() throws Exception {
         JSONObject jsonObject1 = new JSONObject();
         jsonObject1.put("order_no", "1674262731316867072");
-        jsonObject1.put("type", "2");
+        jsonObject1.put("type", "1");
         String mxMobile = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.charge.data", jsonObject1.toJSONString());
         //判断运营商数据
         System.out.println(mxMobile);
