@@ -1,4 +1,7 @@
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mod.loan.common.enums.UserOriginEnum;
+import com.mod.loan.common.exception.BizException;
 import com.mod.loan.config.Constant;
 import com.mod.loan.util.bengbeng.BengBengBizDataUtil;
 import com.mod.loan.util.bengbeng.BengBengRequestUtil;
@@ -45,11 +48,16 @@ public class BengBengCommonTest extends BaseSpringBootJunitTest {
     @Test
     public void req() throws Exception {
         JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put("order_no", "1674262731316867072");
-        jsonObject1.put("type", "1");
+        jsonObject1.put("order_no", "SN201908261643125274");
+        jsonObject1.put("type", "2");
         String mxMobile = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.charge.data", jsonObject1.toJSONString());
-        //判断运营商数据
-        System.out.println(mxMobile);
+        JSONObject jsonObject = JSONObject.parseObject(mxMobile);
+        String dataStr = jsonObject.getString("data");
+        JSONObject all = JSONObject.parseObject(dataStr);
+        JSONObject report = new JSONObject();
+        report = all.getJSONObject("report_data");
+        JSONArray applicationCheck = report.getJSONArray("application_check");
+        System.out.println(applicationCheck.toJSONString());
     }
 
 

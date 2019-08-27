@@ -258,7 +258,7 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             }
             JSONObject jsonObject1 = new JSONObject();
             jsonObject1.put("order_no", orderNo);
-            jsonObject1.put("type", "1");
+            jsonObject1.put("type", "2");
             String mxMobile = null;
             if(UserOriginEnum.RZ.getCode().equals(user.getUserOrigin())) {
                 mxMobile = RongZeRequestUtil.doPost(Constant.rongZeQueryUrl, "api.charge.data", jsonObject1.toJSONString());
@@ -268,8 +268,13 @@ public class TypeFilterServiceImpl implements TypeFilterService {
             JSONObject jsonObject = JSONObject.parseObject(mxMobile);
             String dataStr = jsonObject.getString("data");
             JSONObject all = JSONObject.parseObject(dataStr);
-            JSONObject data = all.getJSONObject("data");
-            JSONObject report = data.getJSONObject("report");
+            JSONObject report = new JSONObject();
+            if(UserOriginEnum.RZ.getCode().equals(user.getUserOrigin())) {
+                JSONObject data = all.getJSONObject("data");
+                report = data.getJSONObject("report");
+            }else if(UserOriginEnum.BB.getCode().equals(user.getUserOrigin())) {
+                report = all.getJSONObject("report_data");
+            }
             JSONArray applicationCheck = report.getJSONArray("application_check");
             //todo 暂时没法决定 是否模拟器
 

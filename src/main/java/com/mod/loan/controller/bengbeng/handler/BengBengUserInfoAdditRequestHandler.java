@@ -344,8 +344,7 @@ public class BengBengUserInfoAdditRequestHandler {
                     }
                     String dataStr = jsonObject.getString("data");
                     JSONObject all = JSONObject.parseObject(dataStr);
-                    JSONObject data = all.getJSONObject("data");
-                    JSONObject report = data.getJSONObject("report");
+                    JSONObject report = all.getJSONObject("raw_data");
                     JSONObject members = report.getJSONObject("members");
                     //上传
                     String mxMobilePath = OSSUtil.uploadStr(members.toJSONString(), user.getId());
