@@ -139,7 +139,7 @@ public class BengBengControllerTest extends BaseSpringBootJunitTest {
     @Test
     public void getRzInforR() throws Exception {
         JSONObject jsonObject1=new JSONObject();
-        jsonObject1.put("order_no","1658473363288821760");
+        jsonObject1.put("order_no","SN201908261643125274");
         jsonObject1.put("type","1");
         String mxMobile = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.charge.data", jsonObject1.toJSONString());
         //判断运营商数据
@@ -149,8 +149,7 @@ public class BengBengControllerTest extends BaseSpringBootJunitTest {
         }
         String dataStr = jsonObject.getString("data");
         JSONObject all = JSONObject.parseObject(dataStr);
-        JSONObject data = all.getJSONObject("data");
-        JSONObject report = data.getJSONObject("report");
+        JSONObject report = all.getJSONObject("raw_data");
         JSONObject members = report.getJSONObject("members");
         //上传
         String mxMobilePath = OSSUtil.uploadStr(members.toJSONString(),999L);
