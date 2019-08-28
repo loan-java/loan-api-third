@@ -200,7 +200,7 @@ public class BengBengRequestController {
             log.info("商户【" + RequestThread.getClientAlias() + "】不存在，未配置");
             throw new BizException("商户不存在");
         }
-        log.info("融泽请求方法名:" + method + ",redis的缓存key值:" + key + ",用户的id：" + uid);
+        log.info("蹦蹦请求方法名:" + method + ",redis的缓存key值:" + key + ",用户的id：" + uid);
         return key;
     }
 
@@ -208,7 +208,7 @@ public class BengBengRequestController {
         if (e instanceof BizException)
             log.info(getPreLog() + e.getMessage() + ",相关数据：" + info);
         else
-            log.error("融泽入口请求系统异常, " + getPreLog() + e.getMessage() + ",相关数据：" + info, e);
+            log.error("蹦蹦入口请求系统异常, " + getPreLog() + e.getMessage() + ",相关数据：" + info, e);
     }
 
     private String getPreLog() {
