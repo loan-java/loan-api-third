@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +115,6 @@ public class BengBengAuditResultRequestHandler {
             int termUnit = 1;
             //是否可再申请 1-是，0-不可以
             String reapply = "1";
-            Timestamp approvalTime = new Timestamp(System.currentTimeMillis());
             //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
             String reapplyTime = DateFormatUtils.format(System.currentTimeMillis() + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
             //审批结果有效期，往后30天
@@ -131,7 +129,7 @@ public class BengBengAuditResultRequestHandler {
             map.put("approval_amount", approvalAmount.intValue());
             map.put("approval_term", approvalTerm.intValue());
             map.put("credit_deadline", creditDeadline);
-            map.put("refuse_time", approvalTime);
+            map.put("refuse_time", System.currentTimeMillis() / 1000);
             map.put("remark", remark);
             map.put("reapply", reapply);
             map.put("order_no", orderNo);
@@ -153,10 +151,10 @@ public class BengBengAuditResultRequestHandler {
             conclusion = 30;
             remark = "审批处理中";
         } else {
-            if("true".equals(typeFilter.getResult())){
+            if ("true".equals(typeFilter.getResult())) {
                 conclusion = 40;
                 remark = "审批拒绝";
-            }else{
+            } else {
                 //开始探针逻辑
                 typeFilter = new TypeFilter();
                 typeFilter.setOrderNo(orderNo);
@@ -203,7 +201,6 @@ public class BengBengAuditResultRequestHandler {
         int termUnit = 1;
         //是否可再申请 1-是，0-不可以
         String reapply = "1";
-        Timestamp approvalTime = new Timestamp(System.currentTimeMillis());
         //可再申请的时间，yyyy- MM-dd，比如（2020-10- 10）
         String reapplyTime = DateFormatUtils.format(System.currentTimeMillis() + (1000L * 3600 * 24 * 7), "yyyy-MM-dd");
         //审批结果有效期，往后30天
@@ -218,7 +215,7 @@ public class BengBengAuditResultRequestHandler {
         map.put("approval_amount", approvalAmount);
         map.put("approval_term", approvalTerm);
         map.put("credit_deadline", creditDeadline);
-        map.put("refuse_time", approvalTime);
+        map.put("refuse_time", System.currentTimeMillis() / 1000);
         map.put("remark", remark);
         map.put("reapply", reapply);
         map.put("order_no", orderNo);

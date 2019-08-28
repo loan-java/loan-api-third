@@ -117,7 +117,7 @@ public class BengBengRequestHandler {
         Map<String, Object> map = new HashMap<>();
         map.put("order_no", orderNo);
         map.put("order_status", status);
-        map.put("update_time", updateTime);
+        map.put("update_time", updateTime / 1000);
         map.put("remark", remark);
         return ResponseBean.success(map);
     }

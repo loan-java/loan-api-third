@@ -58,7 +58,7 @@ public class RongZeRequestController {
     @Resource
     private RongZeBankRequestHandlerRongZe rongZeBankRequestHandler;
     @Resource
-    private RepayRequestHandlerRongZe repayRequestHandler;
+    private RongZeRepayRequestHandler repayRequestHandler;
 
     @Autowired
     private MerchantService merchantService;

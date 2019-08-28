@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,45 +34,45 @@ public class BengBengWithDrawRequestHandler {
     //试算接口
     public ResponseBean<Map<String, Object>> withdrawTria(JSONObject param) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        JSONObject bizData =  JSONObject.parseObject(param.getString("biz_data"));
+        JSONObject bizData = JSONObject.parseObject(param.getString("biz_data"));
         String orderNo = bizData.getString("order_no");
 
         log.info("===============试算接口开始====================");
         String loanAmount = bizData.getString("loan_amount");
-        if(loanAmount == null || "".equals(loanAmount)){
+        if (loanAmount == null || "".equals(loanAmount)) {
             throw new BizException("试算接口:申请借贷金额不能为空");
         }
         Integer loanTerm = bizData.getInteger("loan_term");
-        if(loanTerm == null){
+        if (loanTerm == null) {
             throw new BizException("试算接口:申请借贷期限不能为空");
         }
         //====================================================
         //是否存在关联的借贷信息
-        Long  merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.BB.getCode()));
-        if(merchantRateId == null){
+        Long merchantRateId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.BB.getCode()));
+        if (merchantRateId == null) {
             throw new BizException("试算接口:商户不存在默认借贷信息");
         }
         MerchantRate merchantRate = merchantRateMapper.selectByPrimaryKey(merchantRateId);
-        if(merchantRate == null){
+        if (merchantRate == null) {
             throw new BizException("试算接口:商户不存在默认借贷信息");
         }
         BigDecimal approvalAmount = merchantRate.getProductMoney(); //审批金额
-        if(approvalAmount == null) {
+        if (approvalAmount == null) {
             throw new BizException("试算接口:商户不存在默认借贷金额");
         }
         Integer approvalTerm = merchantRate.getProductDay(); //审批期限
-        if(approvalAmount == null) {
+        if (approvalAmount == null) {
             throw new BizException("试算接口:商户不存在默认借贷期限");
         }
         //====================================================
         //按6天算
         Integer borrowDay = loanTerm;
-        if(borrowDay.intValue() != approvalTerm.intValue()) {
+        if (borrowDay.intValue() != approvalTerm.intValue()) {
             throw new BizException("试算接口:商户实际借贷期限：" + approvalTerm.intValue() + ",现在借款期限：" + borrowDay.intValue());
         }
         //借款金额
         BigDecimal borrowMoney = new BigDecimal(loanAmount);
-        if(borrowMoney.intValue() != approvalAmount.intValue()) {
+        if (borrowMoney.intValue() != approvalAmount.intValue()) {
             throw new BizException("试算接口:商户实际借贷金额：" + approvalAmount.intValue() + ",现在借款金额：" + borrowMoney.intValue());
         }
         //综合费率
@@ -83,7 +82,7 @@ public class BengBengWithDrawRequestHandler {
         // 综合费用
         BigDecimal totalFee = MoneyUtil.totalFee(borrowMoney, totalRate);
         // 利息
-        BigDecimal interestFee = MoneyUtil.interestFee(borrowMoney, borrowDay, interestRate );
+        BigDecimal interestFee = MoneyUtil.interestFee(borrowMoney, borrowDay, interestRate);
         // 实际到账
         BigDecimal actualMoney = MoneyUtil.actualMoney(borrowMoney, totalFee);
         // 应还金额
@@ -103,7 +102,7 @@ public class BengBengWithDrawRequestHandler {
         one.put("principal", borrowMoney.setScale(2).toString());//本金，单位元，保留小数点后 2 位
 //        trial_result_data.put("interest", order.getInterestRate().toString());//利息，单位元，保留小数点后 2 位
         one.put("otherfee", totalFee.setScale(2).toString());//除去本金+利息的其他费用，保留小数点后 2 位
-        one.put("can_repay_time", new Timestamp(repayTime.getTime()));//应还款日期，精确到毫秒（比如 153907308680
+        one.put("can_repay_time", repayTime.getTime() / 1000);//应还款日期，精确到秒（比如 153907308
         one.put("period_no", 1);//还款计划编号,期数
         trial_result_data.add(one);
         map.put("trial_result_data", trial_result_data);
