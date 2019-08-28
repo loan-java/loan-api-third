@@ -117,8 +117,8 @@ public class BengBengControllerTest extends BaseSpringBootJunitTest {
     @Test
     public void getRzInfor() throws Exception {
         JSONObject jsonObject1=new JSONObject();
-        jsonObject1.put("order_no","1658473363288821760");
-        jsonObject1.put("fileid","15564321122325608");
+        jsonObject1.put("order_no","SN201908261643125274");
+        jsonObject1.put("fileid","380b648c7f4d5d5a4e482999dac5f46b");
         String result1 = BengBengRequestUtil.doPost(Constant.bengBengQueryUrl, "api.resource.findfile", jsonObject1.toJSONString());
         JSONObject resultJson1 = JSONObject.parseObject(result1);
         if(!resultJson1.containsKey("code") || !resultJson1.containsKey("data") || resultJson1.getInteger("code") != 200){

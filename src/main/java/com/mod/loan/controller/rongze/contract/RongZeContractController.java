@@ -52,7 +52,7 @@ public class RongZeContractController {
      */
     @RequestMapping("/queryLoanInfo")
     public Object queryLoanInfo(long uid, String orderNo, int source) throws BizException {
-        String JF = Constant.companyName; //甲方
+        String JF = Constant.companyRongZeName; //甲方
         String YF = ""; //乙方
         String idCardNo = ""; //乙方身份证号
         String bankCardNo = ""; //乙方收款/扣款银行卡号

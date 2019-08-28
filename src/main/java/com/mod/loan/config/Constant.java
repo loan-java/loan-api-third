@@ -60,7 +60,7 @@ public class Constant {
     public static String sysDomainHost; //系统域名
 
 
-    public static String companyName;//公司名称
+    public static String companyRongZeName;//公司名称
     public static String companyBengBengName;//公司名称
 
     //畅捷支付
@@ -149,9 +149,9 @@ public class Constant {
         Constant.companyBengBengName = companyBengBengName;
     }
 
-    @Value("${company.name:}")
-    public void setCompanyName(String companyName) {
-        Constant.companyName = companyName;
+    @Value("${company.rongzename:}")
+    public void setCompanyRongZeName(String companyRongZeName) {
+        Constant.companyRongZeName = companyRongZeName;
     }
 
     @Value("${oss.endpoint.in:}")
