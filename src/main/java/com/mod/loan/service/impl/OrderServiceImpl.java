@@ -2,7 +2,10 @@ package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.*;
+import com.mod.loan.common.enums.PbResultEnum;
+import com.mod.loan.common.enums.PolicyResultEnum;
+import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.enums.RiskAuditSourceEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.mapper.BaseServiceImpl;
 import com.mod.loan.common.message.RiskAuditMessage;
@@ -144,7 +147,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         }
 
         //是否存在关联的借贷信息===============================================================
-        Long productId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, Integer.parseInt(UserOriginEnum.RZ.getCode()));
+        Long productId = orderUserMapper.getMerchantRateByOrderNoAndSource(orderNo, source);
         if (productId == null) {
             throw new BizException("推送用户确认收款信息:商户不存在默认借贷信息");
         }
