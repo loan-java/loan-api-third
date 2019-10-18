@@ -17,7 +17,7 @@ public class UploadServiceImpl implements UploadService {
     public String uploadFile(String filePath, MultipartFile file) {
         if (createLocalFile(filePath, file)) {
             try {
-                return Constant.FILE_VISIT_HOST + "/file/visit?file=" + URLEncoder.encode(filePath + "/" + file.getOriginalFilename(), "UTF-8");
+                return Constant.FILE_VISIT_HOST + "/file/visit?f=" + URLEncoder.encode(filePath + "/" + file.getOriginalFilename(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 log.error("UploadServiceImpl.uploadFile URLEncoder.encode fail", e);
                 return null;
@@ -33,11 +33,11 @@ public class UploadServiceImpl implements UploadService {
      * @param file     文件
      */
     private boolean createLocalFile(String filePath, MultipartFile file) {
-        File localFile = new File(filePath);
+        File localFile = new File(Constant.FILE_SAVE_PATH + filePath);
         //先创建目录
         localFile.mkdirs();
         String originalFilename = file.getOriginalFilename();
-        String path = filePath + "/" + originalFilename;
+        String path = Constant.FILE_SAVE_PATH + filePath + "/" + originalFilename;
         localFile = new File(path);
         FileOutputStream fos = null;
         InputStream in = null;

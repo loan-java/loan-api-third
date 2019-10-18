@@ -2,6 +2,7 @@ package com.mod.loan.controller.upload;
 
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.config.Constant;
 import com.mod.loan.service.UploadService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class FileController {
         File file = null;
         FileInputStream fis = null;
         try {
-            file = new File(f);
+            file = new File(Constant.FILE_SAVE_PATH + f);
             if (!file.exists()) {
                 return;
             }
