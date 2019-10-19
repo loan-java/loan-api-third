@@ -14,6 +14,7 @@ import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.check.LoginCheck;
 import com.mod.loan.model.User;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.CheckUtils;
 import com.mod.loan.util.jwtUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -89,4 +90,56 @@ public class UserController {
         object.put("data", map);
         return object;
     }
+
+
+
+    @RequestMapping(value = "user_judge_register")
+    @Api
+    public ResultMessage user_judge_register(String phone) {
+        if (!CheckUtils.isMobiPhoneNum(phone)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "手机号码错误");
+        }
+        if (userService.selectUserByPhone(phone, RequestThread.getClientAlias()) != null) {
+            return new ResultMessage(ResponseEnum.M2001);
+        }
+        return new ResultMessage(ResponseEnum.M2000);
+    }
+
+    @RequestMapping(value = "user_login")
+    @Api
+    public ResultMessage user_login(String phone, String password) {
+        if (StringUtils.isBlank(phone)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "用户名不能为空");
+        }
+        if (StringUtils.isBlank(password)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "密码不能为空");
+        }
+        User user = userService.selectUserByPhone(phone, RequestThread.getClientAlias());
+        if (user == null) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "用户不存在");
+        }
+        long increment = NumberUtils.toLong(redisMapper.get(RedisConst.USER_LOGIN + user.getId()));
+        if (increment > 5) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "错误次数过多，请稍后重试");
+        }
+        if (!password.equals(user.getUserPwd())) {
+            increment = redisMapper.increment(RedisConst.USER_LOGIN + user.getId(), 1L, 3600);
+            if (increment > 5) {// 一个小时登录错误次数超过5次
+                return new ResultMessage(ResponseEnum.M4000.getCode(), "错误次数过多，请稍后重试");
+            }
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "密码错误");
+        }
+
+        // 返回用户的一些信息
+        String token = jwtUtil.generToken(user.getId().toString(), phone, RequestThread.getClientType(),
+                RequestThread.getClientAlias(), RequestThread.getClientVersion());
+        Map<String, Object> userdata = new HashMap<>();
+        userdata.put("token", token);
+        userdata.put("uid", user.getId().toString());
+        redisMapper.set(RedisConst.USER_TOKEN_PREFIX + user.getId(), token, 3 * 86400);
+        return new ResultMessage(ResponseEnum.M2000, userdata);
+    }
+
+
+
 }
