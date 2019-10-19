@@ -176,6 +176,36 @@ public class UserController {
         return new ResultMessage(ResponseEnum.M2000);
     }
 
+    @RequestMapping(value = "user_register")
+    @Api
+    public ResultMessage user_register(String phone, String password, String phone_code, String origin) {
+        if (StringUtils.isBlank(origin)) {
+            origin = RequestThread.getClientType();
+        }
+        if (!CheckUtils.isMobiPhoneNum(phone)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "手机号码错误");
+        }
+        if (StringUtils.isBlank(password)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "密码不能为空");
+        }
+        if (password.length() < 6) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "密码至少6位");
+        }
+        String redis_phone_code = redisMapper.get(RedisConst.USER_PHONE_CODE + phone);
+        if (redis_phone_code == null) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "验证码错误");
+        }
+        if (!redis_phone_code.equals(phone_code)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "验证码错误");
+        }
+        if (userService.selectUserByPhone(phone, RequestThread.getClientAlias()) != null) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "手机号已注册");
+        }
+        userService.addUser(phone, password, origin, RequestThread.getClientAlias(), null);
+        redisMapper.remove(RedisConst.USER_PHONE_CODE + phone);
+        return new ResultMessage(ResponseEnum.M2000);
+    }
+
     @RequestMapping(value = "user_login")
     @Api
     public ResultMessage user_login(String phone, String password) {
