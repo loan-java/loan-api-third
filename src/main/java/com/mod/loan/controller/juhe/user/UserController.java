@@ -19,7 +19,7 @@ import com.mod.loan.service.UserService;
 import com.mod.loan.util.CheckUtils;
 import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.jwtUtil;
-import com.mod.loan.util.sms.EnumSmsTemplate;
+import com.mod.loan.util.sms.SmsTemplate;
 import com.mod.loan.util.sms.SmsMessage;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -142,12 +142,12 @@ public class UserController {
         if (!NumberUtils.isDigits(graph_code)) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "验证码错误");
         }
-        EnumSmsTemplate enumSmsType = EnumSmsTemplate.getTemplate(sms_type);
+        SmsTemplate enumSmsType = SmsTemplate.getTemplate(sms_type);
         if (enumSmsType == null) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "短信事件类型错误");
         }
         // 注册类型,判断用户是否存在
-        if ("1001".equals(sms_type) && userService.selectUserByPhone(phone, RequestThread.getClientAlias()) != null) {
+        if ("001".equals(sms_type) && userService.selectUserByPhone(phone, RequestThread.getClientAlias()) != null) {
             return new ResultMessage(ResponseEnum.M2001);
         }
         String redis_graph_code = redisMapper.get(RedisConst.USER_GRAPH_CODE + phone);
