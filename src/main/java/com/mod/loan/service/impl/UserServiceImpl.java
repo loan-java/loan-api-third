@@ -47,7 +47,9 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long> implements User
         user.setUserPwd(password);
         user.setUserOrigin(userOrigin);
         user.setMerchant(merchant);
-        user.setCommonInfo(param.toJSONString());
+        if (param != null) {
+            user.setCommonInfo(param.toJSONString());
+        }
         userMapper.insertSelective(user);
         UserIdent userIdent = new UserIdent();
         userIdent.setUid(user.getId());
