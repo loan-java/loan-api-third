@@ -7,6 +7,7 @@ import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
 import com.mod.loan.mapper.OrderUserMapper;
 import com.mod.loan.model.Order;
@@ -127,8 +128,8 @@ public class BengBengRequestHandler {
         String orderNo = getOrderNo(param);
         checkAndGetUserId(orderNo);
 
-        Order order = orderService.repayOrder(orderNo, OrderSourceEnum.BENGBENG.getSoruce());
-
+        ResultMessage message = orderService.repayOrder(orderNo, OrderSourceEnum.BENGBENG.getSoruce());
+        Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.BENGBENG.getSoruce());
         OrderRepay orderRepay = orderRepayService.selectByOrderId(order.getId());
 
         Map<String, Object> map = new HashMap<>();

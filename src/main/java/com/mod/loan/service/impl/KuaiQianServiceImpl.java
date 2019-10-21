@@ -13,10 +13,8 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.mapper.OrderMapper;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderRepay;
-import com.mod.loan.model.User;
-import com.mod.loan.model.UserBank;
+import com.mod.loan.model.*;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.*;
 import com.mod.loan.util.StringUtil;
 import com.mod.loan.util.TimeUtils;
@@ -64,7 +62,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
      * @return ResultMessage
      */
     @Override
-    public ResultMessage sendKuaiQianSms(Long uid, String cardNo, String cardPhone) {
+    public ResultMessage sendKuaiQianSms(Long uid, String cardNo, String cardPhone, Bank bank) {
         User user = userService.selectByPrimaryKey(uid);
 
         TransInfo transInfo = new TransInfo();
@@ -129,11 +127,15 @@ public class KuaiQianServiceImpl implements KuaiQianService {
             if ("00".equals(respXml.get("responseCode"))) {
                 /* 进行数据库的逻辑操作，比如更新数据库或插入记录。 */
                 System.out.println("卡信息验证交易成功");
-
-                JSONObject object = new JSONObject();
-                object.put("externalRefNumber", externalRefNumber);
-                object.put("token", respXml.get("token"));
-                redisMapper.set(RedisConst.user_bank_bind + uid, object.toJSONString(), 600);
+                UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
+                userBankInfoVO.setUid(uid);
+                userBankInfoVO.setCardCode(bank.getCode());
+                userBankInfoVO.setCardName(bank.getBankName());
+                userBankInfoVO.setCardNo(cardNo);
+                userBankInfoVO.setCardPhone(cardPhone);
+                userBankInfoVO.setExternalRefNumber(externalRefNumber);
+                userBankInfoVO.setToken(respXml.get("token").toString());
+                redisMapper.set(RedisConst.user_bank_bind + uid, userBankInfoVO, 600);
                 return new ResultMessage(ResponseEnum.M2000);
             }
         }
@@ -148,15 +150,10 @@ public class KuaiQianServiceImpl implements KuaiQianService {
      *
      * @param validateCode 验证码
      * @param uid          用户id
-     * @param bindInfo     redis信息
-     * @param cardNo       银行卡号
-     * @param cardPhone    手机号
-     * @param bankCode     银行卡编码
-     * @param bankName     银行名称
      * @return ResultMessage
      */
     @Override
-    public ResultMessage bindKuaiQianSms(String validateCode, Long uid, String bindInfo, String cardNo, String cardPhone, String bankCode, String bankName) {
+    public ResultMessage bindKuaiQianSms(String validateCode, Long uid, UserBankInfoVO userBankInfoVO) {
         TransInfo transInfo = new TransInfo();
 
         //版本号
@@ -168,11 +165,11 @@ public class KuaiQianServiceImpl implements KuaiQianService {
         //客户号
         String customerId = Constant.KUAI_QIAN_UID_PFX + uid.toString();
 
-        JSONObject object = JSON.parseObject(bindInfo);
+
         //外部跟踪编号
-        String externalRefNumber = object.getString("externalRefNumber");
+        String externalRefNumber = userBankInfoVO.getExternalRefNumber();
         //安全校验值
-        String token = object.getString("token");
+        String token = userBankInfoVO.getToken();
 
         //设置手机动态鉴权节点
         transInfo.setRecordeText_1("indAuthDynVerifyContent");
@@ -189,10 +186,10 @@ public class KuaiQianServiceImpl implements KuaiQianService {
         str1Xml.append("<terminalId>").append(terminalId).append("</terminalId>");
         str1Xml.append("<customerId>").append(customerId).append("</customerId>");
         str1Xml.append("<externalRefNumber>").append(externalRefNumber).append("</externalRefNumber>");
-        str1Xml.append("<pan>").append(cardNo).append("</pan>");
+        str1Xml.append("<pan>").append(userBankInfoVO.getCardNo()).append("</pan>");
         str1Xml.append("<validCode>").append(validateCode).append("</validCode>");
         str1Xml.append("<token>").append(token).append("</token>");
-        str1Xml.append("<phoneNO>").append(cardPhone).append("</phoneNO>");
+        str1Xml.append("<phoneNO>").append(userBankInfoVO.getCardPhone()).append("</phoneNO>");
         str1Xml.append("</indAuthDynVerifyContent>");
         str1Xml.append("</MasMessage>");
 
@@ -219,10 +216,10 @@ public class KuaiQianServiceImpl implements KuaiQianService {
                 System.out.println("卡信息验证交易成功");
 
                 UserBank userBank = new UserBank();
-                userBank.setCardCode(bankCode);
-                userBank.setCardName(bankName);
-                userBank.setCardNo(cardNo);
-                userBank.setCardPhone(cardPhone);
+                userBank.setCardCode(userBankInfoVO.getCardCode());
+                userBank.setCardName(userBankInfoVO.getCardName());
+                userBank.setCardNo(userBankInfoVO.getCardNo());
+                userBank.setCardPhone(userBankInfoVO.getCardPhone());
                 userBank.setCardStatus(1);
                 userBank.setCreateTime(new Date());
                 userBank.setForeignId(respXml.get("payToken").toString());
@@ -240,7 +237,6 @@ public class KuaiQianServiceImpl implements KuaiQianService {
     }
 
 
-
     @Override
     public ResultMessage repay(Order order) {
 
@@ -249,8 +245,8 @@ public class KuaiQianServiceImpl implements KuaiQianService {
         long uid = order.getUid();
 
         UserBank userBank = userBankService.selectUserCurrentBankCard(uid);
-        if(userBank == null) {
-            logger.info("用户: "+uid+", 未绑定银行卡信息, userBank null");
+        if (userBank == null) {
+            logger.info("用户: " + uid + ", 未绑定银行卡信息, userBank null");
             return new ResultMessage(ResponseEnum.M3003);
         }
         TransInfo transInfo = new TransInfo();

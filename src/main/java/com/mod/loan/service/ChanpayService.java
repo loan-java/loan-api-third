@@ -1,13 +1,15 @@
 package com.mod.loan.service;
 
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.model.Bank;
 import com.mod.loan.model.Order;
+import com.mod.loan.model.vo.UserBankInfoVO;
 
 public interface ChanpayService {
 
-    ResultMessage bindCardRequest(String orderNo, long uid, String bankCardNo, String mobileNo);
+    ResultMessage bindCardRequest(Long uid, String cardNo, String cardPhone, Bank bank);
 
-    ResultMessage bindCardConfirm(long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
+    ResultMessage bindCardConfirm(String validateCode, Long uid, UserBankInfoVO userBankInfoVO);
 
     /**
      * 还款

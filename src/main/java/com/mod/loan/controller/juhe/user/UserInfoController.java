@@ -33,7 +33,7 @@ import java.util.Date;
 @RequestMapping(value = "userInfo")
 public class UserInfoController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static Logger logger = LoggerFactory.getLogger(JuHeUserController.class);
 
     @Autowired
     private UserInfoMapper userInfoMapper;

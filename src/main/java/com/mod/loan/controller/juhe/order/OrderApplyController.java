@@ -264,10 +264,9 @@ public class OrderApplyController {
         }
 
         String orderNo = param.getString("orderNo");
-        Order order = orderService.repayOrder(orderNo, OrderSourceEnum.JUHE.getSoruce());
-        ResultMessage message = null;
+        Order order = orderService.findOrderByOrderNoAndSource(orderNo, OrderSourceEnum.JUHE.getSoruce());
+        ResultMessage message = orderService.repayOrder(orderNo, OrderSourceEnum.JUHE.getSoruce());
         logger.info("还款Constant.merchant参数：" + Constant.merchant);
-        logger.info("============================================================");
         Merchant merchant = merchantService.findMerchantByAlias(Constant.merchant);
         if (merchant != null) {
             logger.info("还款Merchant参数：" + merchant.toString());

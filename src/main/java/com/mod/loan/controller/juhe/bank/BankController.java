@@ -11,10 +11,9 @@ import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.check.LoginCheck;
-import com.mod.loan.model.Merchant;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.User;
-import com.mod.loan.model.UserBank;
+import com.mod.loan.mapper.BankMapper;
+import com.mod.loan.model.*;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.*;
 import com.mod.loan.util.Base64Util;
 import com.mod.loan.util.CheckUtils;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
@@ -69,10 +67,13 @@ public class BankController {
     @Autowired
     private BaofooService baofooService;
 
-    @Resource
+    @Autowired
     private YeePayService yeePayService;
-    @Resource
+    @Autowired
     private ChanpayService chanpayService;
+
+    @Autowired
+    private BankMapper bankMapper;
 
     /**
      * 银行卡鉴权发送验证码
@@ -94,10 +95,10 @@ public class BankController {
 
         String cardNo = Base64Util.juHeRsaDecode(param.getString("cardNo"));
         String bankMobile = Base64Util.juHeRsaDecode(param.getString("bankMobile"));
-//        String cardNo = param.getString("cardNo");
-//        String bankMobile = param.getString("bankMobile");
+        //todo 确定cardcode字段
+        String bankCode = Base64Util.juHeRsaDecode(param.getString("cardCode"));
 
-        log.info("cardNo =" + cardNo + ", bankMobile = " + bankMobile);
+        log.info("cardNo =" + cardNo + ", bankMobile = " + bankMobile + "，bankCode =" + bankCode);
 
         if (!GetBankUtil.checkBankCard(cardNo)) {
             return ResultMap.fail(ResponseEnum.M4000.getCode(), "银行卡号不正确");
@@ -131,26 +132,33 @@ public class BankController {
         if (userBank != null && userBank.getCardNo().equals(cardNo)) {
             return ResultMap.fail(ResponseEnum.M4000.getCode(), "当前银行卡已绑定");
         }
+
+        Bank bank = bankMapper.selectByPrimaryKey(bankCode);
+        if (bank == null || bank.getBankStatus() == 0) {
+            return ResultMap.fail(ResponseEnum.M4005.getCode(), "不支持该银行");
+        }
+
         Long uid = RequestThread.getUid();
         if (!redisMapper.lock(RedisConst.lock_user_bind_card_code + uid, 2)) {
             return ResultMap.fail(ResponseEnum.M4005.getCode(), "操作过于频繁");
         }
+
 
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         Order order = orderService.findUserLatestOrder(RequestThread.getUid());
         switch (merchant.getBindType()) {
             case 4:
-                message = baofooService.sendBaoFooSms(RequestThread.getUid(), cardNo, bankMobile);
+                message = baofooService.sendBaoFooSms(RequestThread.getUid(), cardNo, bankMobile, bank);
                 break;
             case 5:
-                message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), cardNo, bankMobile);
+                message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), cardNo, bankMobile, bank);
                 break;
             case 6:
-                message = chanpayService.bindCardRequest(order.getOrderNo(), RequestThread.getUid(), cardNo, bankMobile);
+                message = chanpayService.bindCardRequest(RequestThread.getUid(), cardNo, bankMobile, bank);
                 break;
             case 7:
-                message = yeePayService.requestBindCard(RequestThread.getUid(), order.getOrderNo(), cardNo, bankMobile);
+                message = yeePayService.requestBindCard(RequestThread.getUid(), cardNo, bankMobile, bank);
                 break;
             default:
                 return ResultMap.fail(ResponseEnum.M4000.getCode(), "支付渠道异常");
@@ -204,21 +212,21 @@ public class BankController {
         if (!redisMapper.lock(RedisConst.lock_user_bind_card_code + uid, 2)) {
             return ResultMap.fail(ResponseEnum.M4005.getCode(), "操作过于频繁");
         }
-
+        UserBankInfoVO userBankInfoVO = JSON.parseObject(bindInfo, UserBankInfoVO.class);
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         switch (merchant.getBindType()) {
             case 4:
-                message = baofooService.bindBaoFooSms(smsCode, uid, bindInfo, cardNo, bankMobile, bankCode, bankName);
+                message = baofooService.bindBaoFooSms(smsCode, uid, userBankInfoVO);
                 break;
             case 5:
-                message = kuaiQianService.bindKuaiQianSms(smsCode, uid, bindInfo, cardNo, bankMobile, bankCode, bankName);
+                message = kuaiQianService.bindKuaiQianSms(smsCode, uid, userBankInfoVO);
                 break;
             case 6:
-                message = chanpayService.bindCardConfirm(uid, smsCode, bankCode, bankName, cardNo, bankMobile);
+                message = chanpayService.bindCardConfirm(smsCode, uid, userBankInfoVO);
                 break;
             case 7:
-                message = yeePayService.confirmBindCard(uid, smsCode, bankCode, bankName, cardNo, bankMobile);
+                message = yeePayService.confirmBindCard(smsCode, uid, userBankInfoVO);
                 break;
             default:
                 return ResultMap.fail(ResponseEnum.M4000.getCode(), "支付渠道异常");

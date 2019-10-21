@@ -12,10 +12,8 @@ import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
 import com.mod.loan.controller.check.Log;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderRepay;
-import com.mod.loan.model.User;
-import com.mod.loan.model.UserBank;
+import com.mod.loan.model.*;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.BaofooService;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
@@ -64,7 +62,7 @@ public class BaofooServiceImpl implements BaofooService {
     private RedisMapper redisMapper;
 
     @Override
-    public ResultMessage sendBaoFooSms(Long uid, String cardNo, String cardPhone) {
+    public ResultMessage sendBaoFooSms(Long uid, String cardNo, String cardPhone, Bank bank) {
         ResultMessage message = null;
         String response = "";
 
@@ -158,7 +156,15 @@ public class BaofooServiceImpl implements BaofooService {
 
                 readySignVO.setUnique_code(SecurityUtil.Base64Decode(
                         SecurityUtil.AesDecrypt(readySignVO.getUnique_code(), rAesKey)));
-                redisMapper.set(RedisConst.user_bank_bind + uid, readySignVO, 600);
+
+                UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
+                userBankInfoVO.setUid(uid);
+                userBankInfoVO.setCardCode(bank.getCode());
+                userBankInfoVO.setCardName(bank.getBankName());
+                userBankInfoVO.setCardNo(cardNo);
+                userBankInfoVO.setCardPhone(cardPhone);
+                userBankInfoVO.setUnique_code(readySignVO.getUnique_code());
+                redisMapper.set(RedisConst.user_bank_bind + uid, userBankInfoVO, 600);
                 return new ResultMessage(ResponseEnum.M2000);
             } else {
                 log.error("宝付鉴权绑卡短信发送失败，请求参数为={},响应参数为={}",
@@ -174,10 +180,8 @@ public class BaofooServiceImpl implements BaofooService {
     }
 
     @Override
-    public ResultMessage bindBaoFooSms(String validateCode, Long uid, String bindInfo, String cardNo,
-                                       String cardPhone, String bankCode, String bankName) {
+    public ResultMessage bindBaoFooSms(String validateCode, Long uid, UserBankInfoVO userBankInfoVO) {
         ResultMessage message = null;
-        ReadySignVO readySignVO = JSONObject.parseObject(bindInfo, ReadySignVO.class);
         try {
             //报文发送日期时间
             String sendTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
@@ -193,7 +197,7 @@ public class BaofooServiceImpl implements BaofooService {
             //公钥加密
             dgtlEnvlp = RsaCodingUtil.encryptByPubCerFile(SecurityUtil.Base64Encode(dgtlEnvlp), cerpath);
             //预签约唯一码(预绑卡返回的值)[格式：预签约唯一码|短信验证码]
-            String uniqueCode = readySignVO.getUnique_code() + "|" + validateCode;
+            String uniqueCode = userBankInfoVO.getUnique_code() + "|" + validateCode;
             //先BASE64后进行AES加密
             uniqueCode = SecurityUtil.AesEncrypt(SecurityUtil.Base64Encode(uniqueCode), aesKey);
 
@@ -253,10 +257,10 @@ public class BaofooServiceImpl implements BaofooService {
                 //签约协议号
                 String protocolNo = SecurityUtil.Base64Decode(SecurityUtil.AesDecrypt(returnData.get("protocol_no"), rAesKey));
                 UserBank userBank = new UserBank();
-                userBank.setCardCode(bankCode);
-                userBank.setCardName(bankName);
-                userBank.setCardNo(cardNo);
-                userBank.setCardPhone(cardPhone);
+                userBank.setCardCode(userBankInfoVO.getCardCode());
+                userBank.setCardName(userBankInfoVO.getCardName());
+                userBank.setCardNo(userBankInfoVO.getCardNo());
+                userBank.setCardPhone(userBankInfoVO.getCardPhone());
                 userBank.setCardStatus(1);
                 userBank.setCreateTime(new Date());
                 userBank.setForeignId(protocolNo);

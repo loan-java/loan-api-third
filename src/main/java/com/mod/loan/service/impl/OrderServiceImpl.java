@@ -81,7 +81,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public Order repayOrder(String orderNo, int source) throws BizException {
+    public ResultMessage repayOrder(String orderNo, int source) throws BizException {
 
         Order order = findOrderByOrderNoAndSource(orderNo, source);
         if (order == null) throw new BizException("订单不存在");
@@ -124,7 +124,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
         log.info("还款结果message=" + JSONObject.toJSONString(message));
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {
             JSONObject res = JSONObject.parseObject(JSON.toJSONString(message.getData()));
-            return order;
+            return message;
         }
         throw new BizException(message.getStatus(), message.getMsg());
     }

@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author chenanle
  */
 @RestController
-@RequestMapping(value = "user")
+@RequestMapping(value = "/userAddress")
 public class UserAddressListController {
 
     private static Logger logger = LoggerFactory.getLogger(UserAddressListController.class);

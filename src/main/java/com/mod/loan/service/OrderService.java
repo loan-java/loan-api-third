@@ -3,6 +3,7 @@ package com.mod.loan.service;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.mapper.BaseService;
 import com.mod.loan.common.model.ResponseBean;
+import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderPay;
 import com.mod.loan.model.OrderPhone;
@@ -18,7 +19,7 @@ public interface OrderService extends BaseService<Order,Long> {
      * @return
      * @throws BizException
      */
-    Order repayOrder(String orderNo, int source) throws BizException;
+    ResultMessage repayOrder(String orderNo, int source) throws BizException;
 
     /**
      * 根据订单编号查订单

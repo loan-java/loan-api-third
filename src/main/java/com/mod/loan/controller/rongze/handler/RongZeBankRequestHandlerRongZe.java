@@ -1,5 +1,6 @@
 package com.mod.loan.controller.rongze.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
@@ -13,6 +14,7 @@ import com.mod.loan.model.Bank;
 import com.mod.loan.model.Merchant;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.User;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.*;
 import com.mod.loan.util.GetBankUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +61,7 @@ public class RongZeBankRequestHandlerRongZe extends RongZeBaseRequestHandler {
     @Autowired
     private RedisMapper redisMapper;
 
-    @Resource
+    @Autowired
     private BankMapper bankMapper;
 
     /**
@@ -75,6 +77,8 @@ public class RongZeBankRequestHandlerRongZe extends RongZeBaseRequestHandler {
         String bankCard = data.getString("bank_card");
         //预留手机号 可能为空
         String userMobile = data.getString("user_mobile");
+
+        String bankCode = data.getString("open_bank");
 
         if (!GetBankUtil.checkBankCard(bankCard)) {
             throw new BizException("银行卡号不正确");
@@ -101,6 +105,12 @@ public class RongZeBankRequestHandlerRongZe extends RongZeBaseRequestHandler {
             throw new BizException("实名认证未完成");
         }
 
+        Bank bank = bankMapper.selectByPrimaryKey(bankCode);
+        if (bank == null || bank.getBankStatus() == 0) {
+            throw new BizException("不支持该银行");
+        }
+
+
         if (StringUtils.isBlank(userMobile)) {
             userMobile = user.getUserPhone();
         }
@@ -110,16 +120,16 @@ public class RongZeBankRequestHandlerRongZe extends RongZeBaseRequestHandler {
         log.info("merchant=" + JSONObject.toJSONString(merchant));
         switch (merchant.getBindType()) {
             case 4:
-                message = baofooService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile);
+                message = baofooService.sendBaoFooSms(RequestThread.getUid(), bankCard, userMobile, bank);
                 break;
             case 5:
-                message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), bankCard, userMobile);
+                message = kuaiQianService.sendKuaiQianSms(RequestThread.getUid(), bankCard, userMobile, bank);
                 break;
             case 6:
-                message = chanpayService.bindCardRequest(orderNo, RequestThread.getUid(), bankCard, userMobile);
+                message = chanpayService.bindCardRequest(RequestThread.getUid(), bankCard, userMobile, bank);
                 break;
             case 7:
-                message = yeePayService.requestBindCard(RequestThread.getUid(), orderNo, bankCard, userMobile);
+                message = yeePayService.requestBindCard(RequestThread.getUid(), bankCard, userMobile, bank);
                 break;
             default:
                 throw new BizException("支付渠道异常");
@@ -184,20 +194,21 @@ public class RongZeBankRequestHandlerRongZe extends RongZeBaseRequestHandler {
             userMobile = user.getUserPhone();
         }
 
+        UserBankInfoVO userBankInfoVO = JSON.parseObject(bindInfo, UserBankInfoVO.class);
         ResultMessage message;
         Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         switch (merchant.getBindType()) {
             case 4:
-                message = baofooService.bindBaoFooSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
+                message = baofooService.bindBaoFooSms(verifyCode, uid, userBankInfoVO);
                 break;
             case 5:
-                message = kuaiQianService.bindKuaiQianSms(verifyCode, uid, bindInfo, bankCard, userMobile, openBank, bankName);
+                message = kuaiQianService.bindKuaiQianSms(verifyCode, uid, userBankInfoVO);
                 break;
             case 6:
-                message = chanpayService.bindCardConfirm(uid, verifyCode, openBank, bankName, bankCard, userMobile);
+                message = chanpayService.bindCardConfirm(verifyCode, uid, userBankInfoVO);
                 break;
             case 7:
-                message = yeePayService.confirmBindCard(uid, verifyCode, openBank, bankName, bankCard, userMobile);
+                message = yeePayService.confirmBindCard(verifyCode, uid, userBankInfoVO);
                 break;
             default:
                 throw new BizException("支付渠道异常");

@@ -13,14 +13,13 @@ import com.mod.loan.config.Constant;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderRepay;
-import com.mod.loan.model.User;
-import com.mod.loan.model.UserBank;
+import com.mod.loan.model.*;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.service.YeePayService;
+import com.mod.loan.util.StringUtil;
 import com.mod.loan.util.yeepay.StringResultDTO;
 import com.mod.loan.util.yeepay.YeePayApiRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -56,23 +55,30 @@ public class YeePayServiceImpl implements YeePayService {
      * 绑卡
      */
     @Override
-    public ResultMessage requestBindCard(long uid, String orderNo, String cardno, String phone) {
+    public ResultMessage requestBindCard(Long uid, String cardNo, String cardPhone, Bank bank) {
         try {
             User user = userService.selectByPrimaryKey(uid);
             if (user == null) {
                 throw new BizException("用户(" + uid + ")不存在");
             }
             String timeStr = System.currentTimeMillis() + "";
-            orderNo += timeStr.substring(timeStr.length() - 6);
+            String orderNo = StringUtil.getOrderNumber("c");
             String identityid = ("dev".equals(Constant.ENVIROMENT) ? "YBTest" : "YB") + uid;
             String idcardno = user.getUserCertNo();
             String username = user.getUserName();
 
-            StringResultDTO resultDTO = YeePayApiRequest.bindCardRequest(orderNo, identityid, cardno, idcardno, username, phone);
+            StringResultDTO resultDTO = YeePayApiRequest.bindCardRequest(orderNo, identityid, cardNo, idcardno, username, cardPhone);
             if ("FAIL".equals(resultDTO.getStatus()) || "TIME_OUT".equals(resultDTO.getStatus())) {
                 log.info("易宝绑卡请求异常，uid={}, errorcode={}, error={}", uid, resultDTO.getErrorcode(), resultDTO.getErrormsg());
                 return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + resultDTO.getErrormsg());
             }
+
+            UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
+            userBankInfoVO.setUid(uid);
+            userBankInfoVO.setCardCode(bank.getCode());
+            userBankInfoVO.setCardName(bank.getBankName());
+            userBankInfoVO.setCardNo(cardNo);
+            userBankInfoVO.setCardPhone(cardPhone);
             redisMapper.set(RedisConst.user_bank_bind + uid, resultDTO.getRequestno(), 600);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + e.getMessage());
@@ -85,12 +91,10 @@ public class YeePayServiceImpl implements YeePayService {
      */
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public ResultMessage confirmBindCard(long uid, String smsCode,
-                                         String bankCode, String bankName,
-                                         String cardNo, String cardPhone) {
+    public ResultMessage confirmBindCard(String validateCode, Long uid, UserBankInfoVO userBankInfoVO) {
         try {
             String orderNo = redisMapper.get(RedisConst.user_bank_bind + uid);
-            StringResultDTO result = YeePayApiRequest.bindCardConfirm(orderNo, smsCode);
+            StringResultDTO result = YeePayApiRequest.bindCardConfirm(orderNo, validateCode);
             if (!"BIND_SUCCESS".equalsIgnoreCase(result.getStatus())) {
                 log.error("易宝确认绑卡失败, uid={}, result={}", uid, JSON.toJSONString(result));
                 throw new BizException(result.getErrorcode());
@@ -98,10 +102,10 @@ public class YeePayServiceImpl implements YeePayService {
 
             String protocolNo = result.getYborderid();
             UserBank userBank = new UserBank();
-            userBank.setCardCode(bankCode);
-            userBank.setCardName(bankName);
-            userBank.setCardNo(cardNo);
-            userBank.setCardPhone(cardPhone);
+            userBank.setCardCode(userBankInfoVO.getCardCode());
+            userBank.setCardName(userBankInfoVO.getCardName());
+            userBank.setCardNo(userBankInfoVO.getCardNo());
+            userBank.setCardPhone(userBankInfoVO.getCardPhone());
             userBank.setCardStatus(1);
             userBank.setCreateTime(new Date());
             userBank.setForeignId(protocolNo);

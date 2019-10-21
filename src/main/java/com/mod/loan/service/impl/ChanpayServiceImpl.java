@@ -10,14 +10,13 @@ import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
 import com.mod.loan.config.redis.RedisMapper;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderRepay;
-import com.mod.loan.model.User;
-import com.mod.loan.model.UserBank;
+import com.mod.loan.model.*;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.ChanpayService;
 import com.mod.loan.service.OrderRepayService;
 import com.mod.loan.service.UserBankService;
 import com.mod.loan.service.UserService;
+import com.mod.loan.util.StringUtil;
 import com.mod.loan.util.chanpay.ChanpayApiRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -51,7 +50,7 @@ public class ChanpayServiceImpl implements ChanpayService {
     private RedisMapper redisMapper;
 
     @Override
-    public ResultMessage bindCardRequest(String orderNo, long uid, String bankCardNo, String mobileNo) {
+    public ResultMessage bindCardRequest(Long uid, String cardNo, String cardPhone, Bank bank) {
         try {
             User user = userService.selectByPrimaryKey(uid);
             if (user == null) throw new BizException("用户(" + uid + ")不存在");
@@ -61,11 +60,17 @@ public class ChanpayServiceImpl implements ChanpayService {
             String username = user.getUserName();
 
             String timeStr = System.currentTimeMillis() + "";
-            orderNo += timeStr.substring(timeStr.length() - 6);
+            String orderNo = StringUtil.getOrderNumber("c");
 
-            chanpayApiRequest.bindCardRequest(orderNo, userId, bankCardNo, idCardNo, username, mobileNo);
+            chanpayApiRequest.bindCardRequest(orderNo, userId, cardNo, idCardNo, username, cardPhone);
 
-            redisMapper.set(RedisConst.user_bank_bind + uid, orderNo, 600);
+            UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
+            userBankInfoVO.setUid(uid);
+            userBankInfoVO.setCardCode(bank.getCode());
+            userBankInfoVO.setCardName(bank.getBankName());
+            userBankInfoVO.setCardNo(cardNo);
+            userBankInfoVO.setCardPhone(cardPhone);
+            redisMapper.set(RedisConst.user_bank_bind + uid, userBankInfoVO, 600);
 
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "畅捷绑卡请求失败: " + e.getMessage());
@@ -75,21 +80,21 @@ public class ChanpayServiceImpl implements ChanpayService {
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public ResultMessage bindCardConfirm(long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone) {
+    public ResultMessage bindCardConfirm(String validateCode, Long uid, UserBankInfoVO userBankInfoVO) {
         try {
             String orderNo = redisMapper.get(RedisConst.user_bank_bind + uid);
             if (StringUtils.isBlank(orderNo)) {
                 return new ResultMessage(ResponseEnum.M4000.getCode(), "请重新绑卡");
             }
 
-            ChanpayApiRequest.BindCardResponse response = chanpayApiRequest.bindCardConfirm(orderNo, smsCode);
+            ChanpayApiRequest.BindCardResponse response = chanpayApiRequest.bindCardConfirm(orderNo, validateCode);
             //签约协议号
             String protocolNo = response.getOrderTrxid();
             UserBank userBank = new UserBank();
-            userBank.setCardCode(bankCode);
-            userBank.setCardName(bankName);
-            userBank.setCardNo(cardNo);
-            userBank.setCardPhone(cardPhone);
+            userBank.setCardCode(userBankInfoVO.getCardCode());
+            userBank.setCardName(userBankInfoVO.getCardName());
+            userBank.setCardNo(userBankInfoVO.getCardNo());
+            userBank.setCardPhone(userBankInfoVO.getCardPhone());
             userBank.setCardStatus(1);
             userBank.setCreateTime(new Date());
             userBank.setForeignId(protocolNo);

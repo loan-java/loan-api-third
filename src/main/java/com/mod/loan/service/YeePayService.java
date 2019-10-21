@@ -1,7 +1,9 @@
 package com.mod.loan.service;
 
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.model.Bank;
 import com.mod.loan.model.Order;
+import com.mod.loan.model.vo.UserBankInfoVO;
 
 /**
  * @ author liujianjian
@@ -11,12 +13,12 @@ public interface YeePayService {
     /**
      * 绑卡请求
      */
-    ResultMessage requestBindCard(long uid, String orderNo, String cardno, String phone);
+    ResultMessage requestBindCard(Long uid, String cardNo, String cardPhone, Bank bank);
 
     /**
      * 绑卡确认
      */
-    ResultMessage confirmBindCard(long uid, String smsCode, String bankCode, String bankName, String cardNo, String cardPhone);
+    ResultMessage confirmBindCard(String validateCode, Long uid, UserBankInfoVO userBankInfoVO);
 
     /**
      * 还款

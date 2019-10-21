@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<property name="PROJECT"  value="loan-api-third"/>
-	<property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/" />  <!-- 日志路径 -->
+	<!--<property name="LOG_PATH" value="/home/developer/logs/${PROJECT}/" />  &lt;!&ndash; 日志路径 &ndash;&gt;-->
+
+	<property name="LOG_PATH" value="/Users/shuailijie/Desktop/log/${PROJECT}/" />
 
 	<property name="LOG_PATH_INFO" value="${LOG_PATH}/${PROJECT}-info.log" />
 	<property name="LOG_PATH_ERROR" value="${LOG_PATH}/${PROJECT}-error.log" />

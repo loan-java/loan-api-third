@@ -1,7 +1,9 @@
 package com.mod.loan.service;
 
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.model.Bank;
 import com.mod.loan.model.Order;
+import com.mod.loan.model.vo.UserBankInfoVO;
 
 /**
  * @ author liujianjian
@@ -9,10 +11,9 @@ import com.mod.loan.model.Order;
  */
 public interface BaofooService {
 
-    ResultMessage sendBaoFooSms(Long uid, String cardNo, String cardPhone);
+    ResultMessage sendBaoFooSms(Long uid, String cardNo, String cardPhone, Bank bank);
 
-    ResultMessage bindBaoFooSms(String validateCode, Long uid, String bindInfo, String cardNo,
-                                String cardPhone, String bankCode, String bankName);
+    ResultMessage bindBaoFooSms(String validateCode, Long uid, UserBankInfoVO userBankInfoVO);
 
     /**
      * 还款

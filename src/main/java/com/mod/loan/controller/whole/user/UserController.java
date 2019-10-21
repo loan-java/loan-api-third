@@ -1,14 +1,9 @@
-package com.mod.loan.controller.juhe.user;
+package com.mod.loan.controller.whole.user;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.mod.loan.common.annotation.Api;
-import com.mod.loan.common.annotation.LoginRequired;
 import com.mod.loan.common.enums.ResponseEnum;
-import com.mod.loan.common.enums.UserOriginEnum;
 import com.mod.loan.common.model.RequestThread;
-import com.mod.loan.common.model.ResultMap;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.rabbitmq.RabbitConst;
 import com.mod.loan.config.redis.RedisConst;
@@ -19,21 +14,19 @@ import com.mod.loan.service.UserService;
 import com.mod.loan.util.CheckUtils;
 import com.mod.loan.util.RandomUtils;
 import com.mod.loan.util.jwtUtil;
-import com.mod.loan.util.sms.SmsTemplate;
 import com.mod.loan.util.sms.SmsMessage;
+import com.mod.loan.util.sms.SmsTemplate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -59,52 +52,6 @@ public class UserController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    /**
-     * 登陆授权
-     */
-    @RequestMapping(value = "/userLogin")
-    @LoginRequired(check = false)
-    @Api
-    public JSONObject userLogin(HttpServletRequest request, @RequestBody JSONObject param) {
-        logger.info("=====登陆授权=====");
-        logger.info("请求参数：" + JSON.toJSONString(param));
-
-        ResultMessage m = loginCheck.check(request, param, false);
-        if (!ResponseEnum.M2000.getCode().equals(m.getStatus())) {
-            return ResultMap.fail(m.getStatus(), m.getMsg());
-        }
-        String phone = param.getString("mobile");
-
-        if (StringUtils.isBlank(phone)) {
-            return ResultMap.fail(ResponseEnum.M4000.getCode(), "手机号不能为空");
-        }
-
-        User user = userService.selectUserByPhone(phone, RequestThread.getClientAlias());
-
-        if (user == null) {
-            user = userService.addUser(phone, "", UserOriginEnum.JH.getCode(), RequestThread.getClientAlias(), param);
-        } else {
-            user.setCommonInfo(param.toJSONString());
-            userService.updateByPrimaryKey(user);
-        }
-
-        long increment = NumberUtils.toLong(redisMapper.get(RedisConst.USER_LOGIN + user.getId()));
-        if (increment > 5) {
-            return ResultMap.fail(ResponseEnum.M4000.getCode(), "错误次数过多，请稍后重试");
-        }
-
-        // 返回用户的一些信息
-        String token = jwtUtil.generToken(user.getId().toString(), phone, RequestThread.getClientType(),
-                RequestThread.getClientAlias(), RequestThread.getClientVersion());
-        redisMapper.set(RedisConst.USER_TOKEN_PREFIX + user.getId(), token, 3 * 86400);
-
-        JSONObject object = ResultMap.success();
-        Map<String, Object> map = new HashMap<>(2);
-        map.put("token", token);
-        map.put("userId", user.getId().toString());
-        object.put("data", map);
-        return object;
-    }
 
     @RequestMapping(value = "user_graph_code")
     @Api

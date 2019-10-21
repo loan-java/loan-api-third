@@ -1,13 +1,15 @@
 import com.alibaba.fastjson.JSON;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.mapper.BankMapper;
 import com.mod.loan.mapper.OrderMapper;
 import com.mod.loan.mapper.OrderPhoneMapper;
+import com.mod.loan.model.Bank;
 import com.mod.loan.model.Order;
 import com.mod.loan.model.OrderPhone;
+import com.mod.loan.model.vo.UserBankInfoVO;
 import com.mod.loan.service.OrderService;
 import com.mod.loan.service.YeePayService;
-import com.mod.loan.util.rongze.BizDataUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,6 +30,10 @@ public class YeePayTest extends BaseSpringBootJunitTest {
     @Autowired
     private OrderPhoneMapper orderPhoneMapper;
 
+
+    @Autowired
+    private BankMapper bankMapper;
+
     //绑卡请求
     @Test
     public void requestBindCard() {
@@ -35,7 +41,8 @@ public class YeePayTest extends BaseSpringBootJunitTest {
         String orderNo = "1661269536227111226";
         String cardno = "6214835899276321";
         String phone = "15867122886";
-        ResultMessage message = yeePayService.requestBindCard(uid, orderNo, cardno, phone);
+        Bank bank = bankMapper.selectByPrimaryKey("CMB");
+        ResultMessage message = yeePayService.requestBindCard(uid, cardno, phone, bank);
         System.out.println(JSON.toJSONString(message));
     }
 
@@ -48,7 +55,12 @@ public class YeePayTest extends BaseSpringBootJunitTest {
         String bankName = "招商银行";
         String cardNo = "6214835899276321";
         String cardPhone = "15867122886";
-        ResultMessage message = yeePayService.confirmBindCard(uid, smsCode, bankCode, bankName, cardNo, cardPhone);
+        UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
+        userBankInfoVO.setCardCode(bankCode);
+        userBankInfoVO.setCardName(bankName);
+        userBankInfoVO.setCardNo(cardNo);
+        userBankInfoVO.setCardPhone(cardPhone);
+        ResultMessage message = yeePayService.confirmBindCard(smsCode, uid, userBankInfoVO);
         System.out.println(JSON.toJSONString(message));
     }
 
