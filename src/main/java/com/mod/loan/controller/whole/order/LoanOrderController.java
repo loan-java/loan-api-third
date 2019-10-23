@@ -43,7 +43,7 @@ public class LoanOrderController {
     private OrderService orderService;
     @Autowired
     private UserIdentService userIdentService;
-    
+
     @Autowired
     private MerchantRateService merchantRateService;
     @Autowired
