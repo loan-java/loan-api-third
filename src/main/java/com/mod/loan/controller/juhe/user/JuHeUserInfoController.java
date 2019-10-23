@@ -31,7 +31,7 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping(value = "userInfo")
-public class UserInfoController {
+public class JuHeUserInfoController {
 
     private static Logger logger = LoggerFactory.getLogger(JuHeUserController.class);
 

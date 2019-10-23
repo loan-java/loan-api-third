@@ -50,9 +50,9 @@ import java.util.Map;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/order")
-public class OrderApplyController {
+public class JuHeOrderApplyController {
 
-    private static Logger logger = LoggerFactory.getLogger(OrderApplyController.class);
+    private static Logger logger = LoggerFactory.getLogger(JuHeOrderApplyController.class);
 
     @Autowired
     private UserService userService;

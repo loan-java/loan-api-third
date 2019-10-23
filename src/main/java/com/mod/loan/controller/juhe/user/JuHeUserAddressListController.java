@@ -26,9 +26,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping(value = "/userAddress")
-public class UserAddressListController {
+public class JuHeUserAddressListController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserAddressListController.class);
+    private static Logger logger = LoggerFactory.getLogger(JuHeUserAddressListController.class);
 
     @Autowired
     private UserAddressListMapper userAddressListMapper;

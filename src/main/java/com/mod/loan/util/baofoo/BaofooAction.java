@@ -1,7 +1,7 @@
 package com.mod.loan.util.baofoo;
 
 
-import com.mod.loan.controller.juhe.order.OrderApplyController;
+import com.mod.loan.controller.juhe.order.JuHeOrderApplyController;
 import com.mod.loan.util.baofoo.util.FormatUtil;
 import com.mod.loan.util.baofoo.util.PathUtil;
 
@@ -57,8 +57,8 @@ public class BaofooAction implements Filter {
         try {
             if (target.endsWith(".action")) {
                 String mName = target.substring(target.lastIndexOf("/") + 1, target.indexOf("."));
-                OrderApplyController wc = OrderApplyController.class.newInstance();
-                Method m = OrderApplyController.class.getDeclaredMethod(mName, HttpServletRequest.class, HttpServletResponse.class);
+                JuHeOrderApplyController wc = JuHeOrderApplyController.class.newInstance();
+                Method m = JuHeOrderApplyController.class.getDeclaredMethod(mName, HttpServletRequest.class, HttpServletResponse.class);
                 Object obg = m.invoke(wc, request, response);
                 response.setContentType("text/html;charset=UTF-8");
                 String str = (String) obg;

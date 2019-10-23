@@ -30,9 +30,9 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping(value = "userRealName")
-public class UserRealNameController {
+public class JuHeUserRealNameController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserRealNameController.class);
+    private static Logger logger = LoggerFactory.getLogger(JuHeUserRealNameController.class);
 
     @Autowired
     private UserMapper userMapper;

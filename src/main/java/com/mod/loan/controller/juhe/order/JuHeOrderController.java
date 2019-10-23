@@ -32,9 +32,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = "order")
-public class OrderController {
+public class JuHeOrderController {
 
-    private static Logger logger = LoggerFactory.getLogger(OrderController.class);
+    private static Logger logger = LoggerFactory.getLogger(JuHeOrderController.class);
 
     @Autowired
     private OrderMapper orderMapper;

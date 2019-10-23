@@ -43,8 +43,7 @@ public class LoanOrderController {
     private OrderService orderService;
     @Autowired
     private UserIdentService userIdentService;
-    @Value("${server.h5.url}")
-    private String h5_url;
+    
     @Autowired
     private MerchantRateService merchantRateService;
     @Autowired

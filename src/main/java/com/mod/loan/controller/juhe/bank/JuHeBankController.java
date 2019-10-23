@@ -41,8 +41,8 @@ import java.util.Map;
  */
 @CrossOrigin("*")
 @RestController
-public class BankController {
-    private static Logger log = LoggerFactory.getLogger(BankController.class);
+public class JuHeBankController {
+    private static Logger log = LoggerFactory.getLogger(JuHeBankController.class);
     private static String bank_url = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardNo=%s&cardBinCheck=true";
     private static String alipay_cookie_spanner = "";
 

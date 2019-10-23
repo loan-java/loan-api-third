@@ -34,9 +34,9 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping(value = "/userMobile")
-public class UserMobileAuthController {
+public class JuHeUserMobileAuthController {
 
-    private static Logger logger = LoggerFactory.getLogger(UserMobileAuthController.class);
+    private static Logger logger = LoggerFactory.getLogger(JuHeUserMobileAuthController.class);
 
     @Autowired
     private MoxieMobileMapper moxieMobileMapper;
