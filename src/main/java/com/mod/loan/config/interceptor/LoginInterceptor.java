@@ -40,44 +40,44 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-     RequestThread.remove();// 移除本地线程变量
-		String ip = HttpUtils.getIpAddr(request, ".");
-		String clientVersion = request.getParameter("version");
-		String clientType = request.getParameter("type");
-		String clientAlias = request.getParameter("alias");
-		RequestThread.setClientVersion(clientVersion);
-		RequestThread.setClientType(clientType);
-		RequestThread.setClientAlias(clientAlias);
-		RequestThread.setIp(ip);
-		RequestThread.setRequestTime(System.currentTimeMillis());
-		HandlerMethod hm = (HandlerMethod) handler;
-		Api api = hm.getMethodAnnotation(Api.class);
-		if (api != null) {
-			if (StringUtils.isEmpty(clientType) || !("android".equals(clientType) || "ios".equals(clientType))) {
-				printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的type"));
-				return false;
-			}
-			if (StringUtils.isEmpty(clientVersion)) {
-				printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的version"));
-				return false;
-			}
-			if (StringUtils.isEmpty(clientAlias)) {
-				printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的alias"));
-				return false;
-			}
-			Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
-			if (merchant == null || merchant.getMerchantStatus() != 1) {
-				printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的alias"));
-				return false;
-			}
-		}
-		LoginRequired lr = hm.getMethodAnnotation(LoginRequired.class);
-		if (lr != null && lr.check() && !isLogin(request)) {
-			printMessage(response, new ResultMessage(ResponseEnum.M4002));
-			return false;
-		}
+        RequestThread.remove();// 移除本地线程变量
+        String ip = HttpUtils.getIpAddr(request, ".");
+        String clientVersion = request.getParameter("version");
+        String clientType = request.getParameter("type");
+        String clientAlias = request.getParameter("alias");
+        RequestThread.setClientVersion(clientVersion);
+        RequestThread.setClientType(clientType);
+        RequestThread.setClientAlias(clientAlias);
+        RequestThread.setIp(ip);
+        RequestThread.setRequestTime(System.currentTimeMillis());
+        HandlerMethod hm = (HandlerMethod) handler;
+        Api api = hm.getMethodAnnotation(Api.class);
+        if (api != null) {
+            if (StringUtils.isEmpty(clientType) || !("android".equals(clientType) || "ios".equals(clientType))) {
+                printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的type"));
+                return false;
+            }
+            if (StringUtils.isEmpty(clientVersion)) {
+                printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的version"));
+                return false;
+            }
+            if (StringUtils.isEmpty(clientAlias)) {
+                printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的alias"));
+                return false;
+            }
+            Merchant merchant = merchantService.findMerchantByAlias(clientAlias);
+            if (merchant == null || merchant.getMerchantStatus() != 1) {
+                printMessage(response, new ResultMessage(ResponseEnum.M4000.getCode(), "无效的alias"));
+                return false;
+            }
+        }
+        LoginRequired lr = hm.getMethodAnnotation(LoginRequired.class);
+        if (lr != null && lr.check() && !isLogin(request)) {
+            printMessage(response, new ResultMessage(ResponseEnum.M4002));
+            return false;
+        }
         printMessage(response, new ResultMessage(ResponseEnum.M2000));
-		return true;
+        return true;
     }
 
     private boolean checkHeaderAuth(HttpServletRequest request) throws Exception {
