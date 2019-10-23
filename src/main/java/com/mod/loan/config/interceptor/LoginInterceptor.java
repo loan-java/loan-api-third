@@ -76,7 +76,6 @@ public class LoginInterceptor implements HandlerInterceptor {
             printMessage(response, new ResultMessage(ResponseEnum.M4002));
             return false;
         }
-        printMessage(response, new ResultMessage(ResponseEnum.M2000));
         return true;
     }
 
