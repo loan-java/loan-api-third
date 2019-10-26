@@ -208,8 +208,10 @@ public class BankController {
                 message = chanpayService.bindCardRequest(RequestThread.getUid(), cardNo, cardPhone, bank);
                 break;
             case 7:
-                message = yeePayService.requestBindCard(RequestThread.getUid(), cardNo, cardPhone, bank);
-                break;
+                //todo 宝付绑卡流程
+//                message = yeePayService.requestBindCard(RequestThread.getUid(), cardNo, cardPhone, bank);
+//                break;
+                return new ResultMessage(ResponseEnum.M2000);
             default:
                 log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", merchant.getMerchantAlias(), bindType);
                 message = new ResultMessage(ResponseEnum.M4000);
@@ -272,8 +274,10 @@ public class BankController {
                 message = chanpayService.bindCardConfirm(validateCode, uid, userBankInfoVO);
                 break;
             case 7:
-                message = yeePayService.confirmBindCard(validateCode, uid, userBankInfoVO);
-                break;
+                //todo 宝付绑卡流程
+//                message = yeePayService.confirmBindCard(validateCode, uid, userBankInfoVO);
+//                break;
+                return new ResultMessage(ResponseEnum.M2000);
             default:
                 log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", merchant.getMerchantAlias(), bindType);
                 message = new ResultMessage(ResponseEnum.M4000);
