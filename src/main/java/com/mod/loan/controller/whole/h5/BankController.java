@@ -150,9 +150,11 @@ public class BankController {
         record.setUid(RequestThread.getUid());
         record.setCardStatus(1);
         UserBank userBank = userBankService.selectOne(record);
+        User user = userService.selectByPrimaryKey(RequestThread.getUid());
         data.put("cardName", userBank.getCardName());
         data.put("cardNo",
                 userBank.getCardNo().substring(userBank.getCardNo().length() - 4, userBank.getCardNo().length()));
+        data.put("userName", user.getUserName());
         data.put("cardPhone", StringReplaceUtil.phoneReplaceWithStar(userBank.getCardPhone()));
         return new ResultMessage(ResponseEnum.M2000, data);
     }
