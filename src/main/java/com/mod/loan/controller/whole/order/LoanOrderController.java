@@ -20,7 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,7 +59,7 @@ public class LoanOrderController {
         map.put("descTop", "填写身份资料即可借款");
         map.put("descMid", "获取额度");
         map.put("descBottom", "目前已有50000+人在这里成功借款");
-        map.put("amount", "1000-5000");
+        map.put("amount", "2000-20000");
         //todo 增加跳转前缀
         map.put("url", "user/cert_center.html");
         if (StringUtils.isBlank(token)) {
@@ -167,10 +166,9 @@ public class LoanOrderController {
             loanBefore.setEventDescribe(String.format("申请周转资金%s元，周期%s天，服务费%s元，到账%s元", order.getBorrowMoney(), order.getBorrowDay(), order.getTotalFee(), order.getActualMoney()));
 
             LoanBefore loanBefore2 = new LoanBefore();
-            loanBefore2.setEvent("初审通过");
+            loanBefore2.setEvent("初审失败");
             loanBefore2.setEventTime(TimeUtils.parseTime(order.getAuditTime(), TimeUtils.dateformat0));
-            loanBefore2.setEventDescribe("鑫乐贷、朱八戒等40+优质资金方可供您借款，点击详情查看");
-
+            loanBefore2.setEventDescribe("请重新提交申请审核");
             loanBeforeList.add(loanBefore);
             loanBeforeList.add(loanBefore2);
 
