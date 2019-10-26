@@ -3,6 +3,7 @@ package com.mod.loan.controller.whole.h5;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.annotation.LoginRequired;
+import com.mod.loan.common.enums.MerchantEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,8 +211,15 @@ public class BankController {
                 break;
             case 7:
                 //todo 宝付绑卡流程
-//                message = yeePayService.requestBindCard(RequestThread.getUid(), cardNo, cardPhone, bank);
-//                break;
+                //message = yeePayService.requestBindCard(RequestThread.getUid(), cardNo, cardPhone, bank);
+                //break;
+                UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
+                userBankInfoVO.setUid(uid);
+                userBankInfoVO.setCardCode(bank.getCode());
+                userBankInfoVO.setCardName(bank.getBankName());
+                userBankInfoVO.setCardNo(cardNo);
+                userBankInfoVO.setCardPhone(cardPhone);
+                redisMapper.set(RedisConst.user_bank_bind + uid, userBankInfoVO, 600);
                 return new ResultMessage(ResponseEnum.M2000);
             default:
                 log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", merchant.getMerchantAlias(), bindType);
@@ -275,8 +284,19 @@ public class BankController {
                 break;
             case 7:
                 //todo 宝付绑卡流程
-//                message = yeePayService.confirmBindCard(validateCode, uid, userBankInfoVO);
-//                break;
+                // message = yeePayService.confirmBindCard(validateCode, uid, userBankInfoVO);
+                //break;
+                UserBank userBank = new UserBank();
+                userBank.setCardCode(userBankInfoVO.getCardCode());
+                userBank.setCardName(userBankInfoVO.getCardName());
+                userBank.setCardNo(userBankInfoVO.getCardNo());
+                userBank.setCardPhone(userBankInfoVO.getCardPhone());
+                userBank.setCardStatus(1);
+                userBank.setCreateTime(new Date());
+                userBank.setForeignId(String.valueOf(System.currentTimeMillis()));
+                userBank.setUid(uid);
+                userBank.setBindType(MerchantEnum.yeepay.getCode());
+                userService.insertUserBank(uid, userBank);
                 return new ResultMessage(ResponseEnum.M2000);
             default:
                 log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", merchant.getMerchantAlias(), bindType);

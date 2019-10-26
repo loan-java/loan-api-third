@@ -79,7 +79,7 @@ public class YeePayServiceImpl implements YeePayService {
             userBankInfoVO.setCardName(bank.getBankName());
             userBankInfoVO.setCardNo(cardNo);
             userBankInfoVO.setCardPhone(cardPhone);
-            redisMapper.set(RedisConst.user_bank_bind + uid, resultDTO.getRequestno(), 600);
+            redisMapper.set(RedisConst.user_bank_bind + uid, userBankInfoVO, 600);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡请求失败: " + e.getMessage());
         }

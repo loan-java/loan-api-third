@@ -1,30 +1,28 @@
-//package com.mod.loan.controller.whole.app;
-//
-//import com.mod.loan.common.annotation.Api;
-//import com.mod.loan.common.enums.ResponseEnum;
-//import com.mod.loan.common.model.RequestThread;
-//import com.mod.loan.common.model.ResultMessage;
-//import com.mod.loan.model.AppStartup;
-//import com.mod.loan.model.Merchant;
-//import com.mod.loan.service.AppService;
-//import com.mod.loan.service.MerchantService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.CrossOrigin;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RestController;
-//
-//import java.util.HashMap;
-//import java.util.Map;
-//
-//@CrossOrigin("*")
-//@RestController
-//public class ConfigController {
-//
-//	@Autowired
+package com.mod.loan.controller.whole.app;
+
+import com.mod.loan.common.annotation.Api;
+import com.mod.loan.common.enums.ResponseEnum;
+import com.mod.loan.common.model.RequestThread;
+import com.mod.loan.common.model.ResultMessage;
+import com.mod.loan.model.Merchant;
+import com.mod.loan.service.MerchantService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@CrossOrigin("*")
+@RestController
+public class ConfigController {
+
+    //	@Autowired
 //	private AppService appService;
-//	@Autowired
-//	private MerchantService merchantService;
-//
+    @Autowired
+    private MerchantService merchantService;
+
 //	/**
 //	 * 启动页，首页图片弹窗
 //	 * @return
@@ -64,19 +62,19 @@
 //	public ResultMessage check_version() {
 //		return new ResultMessage(ResponseEnum.M2000, appService.findNewVersion(RequestThread.getClientAlias(), RequestThread.getClientType()));
 //	}
-//
-//	@RequestMapping(value = "mechant_info")
-//	@Api
-//	public ResultMessage mechant_info() {
-//		Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
-//		Map<String, String> data=new HashMap<>();
-//		data.put("alias", merchant.getMerchantAlias());
-//		data.put("company", merchant.getMerchantName());
-//		if ("ios".equals(RequestThread.getClientType())) {
-//			data.put("app", merchant.getMerchantAppIos());
-//		}else {
-//			data.put("app", merchant.getMerchantApp());
-//		}
-//		return new ResultMessage(ResponseEnum.M2000, data);
-//	}
-//}
+
+    @RequestMapping(value = "mechant_info")
+    @Api
+    public ResultMessage mechant_info() {
+        Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
+        Map<String, String> data = new HashMap<>();
+        data.put("alias", merchant.getMerchantAlias());
+        data.put("company", merchant.getMerchantName());
+        if ("ios".equals(RequestThread.getClientType())) {
+            data.put("app", merchant.getMerchantAppIos());
+        } else {
+            data.put("app", merchant.getMerchantApp());
+        }
+        return new ResultMessage(ResponseEnum.M2000, data);
+    }
+}
