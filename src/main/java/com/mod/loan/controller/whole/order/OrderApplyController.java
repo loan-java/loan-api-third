@@ -1,6 +1,7 @@
 package com.mod.loan.controller.whole.order;
 
 import com.mod.loan.common.annotation.LoginRequired;
+import com.mod.loan.common.enums.OrderSourceEnum;
 import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.message.RiskAuditMessage;
@@ -180,6 +181,7 @@ public class OrderApplyController {
         order.setMerchant(RequestThread.getClientAlias());
         order.setProductId(productId);
         order.setUserType(userType);
+        order.setSource(OrderSourceEnum.WHOLE.getSoruce());
         order.setPaymentType(PaymentTypeEnum.getName(merchant.getBindType()));
         OrderPhone orderPhone = new OrderPhone();
         orderPhone.setParamValue(paramValue);

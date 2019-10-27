@@ -7,7 +7,8 @@ public enum OrderSourceEnum {
 
     JUHE(0, "聚合"),
     RONGZE(1, "融泽"),
-    BENGBENG(2, "蹦蹦");
+    BENGBENG(2, "蹦蹦"),
+    WHOLE(3, "全流程");
 
     private Integer soruce;
     private String desc;
