@@ -1,7 +1,7 @@
 package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.MerchantEnum;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
@@ -99,7 +99,7 @@ public class ChanpayServiceImpl implements ChanpayService {
             userBank.setCreateTime(new Date());
             userBank.setForeignId(protocolNo);
             userBank.setUid(uid);
-            userBank.setBindType(MerchantEnum.chanpay.getCode());
+            userBank.setBindType(PaymentTypeEnum.chanpay.getCode());
             userService.insertUserBank(uid, userBank);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "畅捷绑卡确认失败: " + e.getMessage());

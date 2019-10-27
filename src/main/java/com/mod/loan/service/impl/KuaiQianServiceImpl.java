@@ -3,7 +3,7 @@ package com.mod.loan.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.enums.JuHeCallBackEnum;
-import com.mod.loan.common.enums.MerchantEnum;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
 import com.mod.loan.common.model.RequestThread;
@@ -224,7 +224,7 @@ public class KuaiQianServiceImpl implements KuaiQianService {
                 userBank.setCreateTime(new Date());
                 userBank.setForeignId(respXml.get("payToken").toString());
                 userBank.setUid(uid);
-                userBank.setBindType(MerchantEnum.kuaiqian.getCode());
+                userBank.setBindType(PaymentTypeEnum.kuaiqian.getCode());
                 userService.insertUserBank(uid, userBank);
                 redisMapper.remove(RedisConst.user_bank_bind + uid);
                 return new ResultMessage(ResponseEnum.M2000, userBank.getId());

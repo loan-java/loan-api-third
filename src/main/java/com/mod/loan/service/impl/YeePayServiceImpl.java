@@ -3,7 +3,7 @@ package com.mod.loan.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.mod.loan.common.enums.MerchantEnum;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.exception.BizException;
 import com.mod.loan.common.message.OrderRepayQueryMessage;
@@ -110,7 +110,7 @@ public class YeePayServiceImpl implements YeePayService {
             userBank.setCreateTime(new Date());
             userBank.setForeignId(protocolNo);
             userBank.setUid(uid);
-            userBank.setBindType(MerchantEnum.yeepay.getCode());
+            userBank.setBindType(PaymentTypeEnum.yeepay.getCode());
             userService.insertUserBank(uid, userBank);
         } catch (Exception e) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "易宝绑卡确认失败: " + e.getMessage());

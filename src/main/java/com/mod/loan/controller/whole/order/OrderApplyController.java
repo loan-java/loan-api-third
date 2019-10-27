@@ -1,6 +1,7 @@
 package com.mod.loan.controller.whole.order;
 
 import com.mod.loan.common.annotation.LoginRequired;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.message.RiskAuditMessage;
 import com.mod.loan.common.model.RequestThread;
@@ -56,6 +57,9 @@ public class OrderApplyController {
     RabbitTemplate rabbitTemplate;
     @Autowired
     RedisMapper redisMapper;
+
+    @Autowired
+    private MerchantService merchantService;
 
     /**
      * h5 借款确认 获取费用明细
@@ -153,6 +157,7 @@ public class OrderApplyController {
         BigDecimal actualMoney = MoneyUtil.actualMoney(merchantRate.getProductMoney(), totalFee);// 实际到账
         BigDecimal shouldRepay = MoneyUtil.shouldrepay(merchantRate.getProductMoney(), interestFee, new BigDecimal(0),
                 new BigDecimal(0));// 应还金额
+        Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
         // 判断客群
         Integer userType = orderService.judgeUserTypeByUid(uid);
         order.setOrderNo(StringUtil.getOrderNumber("b"));
@@ -175,6 +180,7 @@ public class OrderApplyController {
         order.setMerchant(RequestThread.getClientAlias());
         order.setProductId(productId);
         order.setUserType(userType);
+        order.setPaymentType(PaymentTypeEnum.getName(merchant.getBindType()));
         OrderPhone orderPhone = new OrderPhone();
         orderPhone.setParamValue(paramValue);
         orderPhone.setPhoneModel(phoneModel + "|" + phoneMemory);

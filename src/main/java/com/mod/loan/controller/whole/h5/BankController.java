@@ -3,7 +3,7 @@ package com.mod.loan.controller.whole.h5;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mod.loan.common.annotation.LoginRequired;
-import com.mod.loan.common.enums.MerchantEnum;
+import com.mod.loan.common.enums.PaymentTypeEnum;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
@@ -297,7 +297,7 @@ public class BankController {
                 userBank.setCreateTime(new Date());
                 userBank.setForeignId(String.valueOf(System.currentTimeMillis()));
                 userBank.setUid(uid);
-                userBank.setBindType(MerchantEnum.yeepay.getCode());
+                userBank.setBindType(PaymentTypeEnum.yeepay.getCode());
                 userService.insertUserBank(uid, userBank);
                 return new ResultMessage(ResponseEnum.M2000);
             default:

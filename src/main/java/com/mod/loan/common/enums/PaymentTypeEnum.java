@@ -1,27 +1,24 @@
 package com.mod.loan.common.enums;
 
-public enum MerchantEnum {
-    helibao(1, "", "合利宝"),
-    fuyou(2, "", "富友"),
-    huiju(3, "", "汇聚"),
-    baofoo(4, "", "宝付"),
-    kuaiqian(5, "", "快钱"),
-    chanpay(6, "", "畅捷"),
-    yeepay(7, "", "易宝"),
+public enum PaymentTypeEnum {
+    baofoo(4, "baofoo", "宝付"),
+    kuaiqian(5, "kuaiqian", "快钱"),
+    chanpay(6, "chanpay", "畅捷"),
+    yeepay(7, "yeepay", "易宝"),
     ;
 
     private Integer code;
     private String name;
     private String desc;
 
-    MerchantEnum(Integer code, String name, String desc) {
+    PaymentTypeEnum(Integer code, String name, String desc) {
         this.code = code;
         this.name = name;
         this.desc = desc;
     }
 
     public static String getDescByName(String name) {
-        for (MerchantEnum e : MerchantEnum.values()) {
+        for (PaymentTypeEnum e : PaymentTypeEnum.values()) {
             if (e.getName().equals(name)) {
                 return e.getDesc();
             }
@@ -30,9 +27,18 @@ public enum MerchantEnum {
     }
 
     public static String getDesc(Integer code) {
-        for (MerchantEnum status : MerchantEnum.values()) {
+        for (PaymentTypeEnum status : PaymentTypeEnum.values()) {
             if (status.getCode().equals(code)) {
                 return status.getDesc();
+            }
+        }
+        return null;
+    }
+
+    public static String getName(Integer code) {
+        for (PaymentTypeEnum status : PaymentTypeEnum.values()) {
+            if (status.getCode().equals(code)) {
+                return status.getName();
             }
         }
         return null;
