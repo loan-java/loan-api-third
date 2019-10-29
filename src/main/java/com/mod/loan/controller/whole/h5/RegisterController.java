@@ -95,7 +95,7 @@ public class RegisterController {
         String randomNum = RandomUtils.generateRandomNum(4);
         // 发送验证码，5分钟内有效
         redisMapper.set(RedisConst.USER_PHONE_CODE + phone, randomNum, 300);
-        rabbitTemplate.convertAndSend(RabbitConst.queue_sms, new SmsMessage(alias, SmsTemplate.T001.getKey(), phone, randomNum + "|5分钟"));
+        rabbitTemplate.convertAndSend(RabbitConst.queue_sms, new SmsMessage(alias, SmsTemplate.T001.getKey(), phone, "您的验证码为：" + randomNum + "，为保证验证安全，请在5分钟内进行验证，如非本人操作请忽略此短信。"));
         return new ResultMessage(ResponseEnum.M2000);
     }
 

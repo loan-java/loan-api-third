@@ -63,9 +63,7 @@ public class UserController {
         }
         // 生产验证码字符串并保存到session中
         String createText = defaultKaptcha.createText();
-        // logger.info(createText);
         redisMapper.set(RedisConst.USER_GRAPH_CODE + phone, createText, 120);
-        // request.getSession().setAttribute("vrifyCode", createText);
         // 使用生产的验证码字符串返回一个BufferedImage对象并转为byte写入到byte数组中
         BufferedImage challenge = defaultKaptcha.createImage(createText);
         ImageIO.write(challenge, "jpg", jpegOutputStream);
@@ -107,7 +105,7 @@ public class UserController {
         // 发送验证码，5分钟内有效
         redisMapper.set(RedisConst.USER_PHONE_CODE + phone, randomNum, 300);
         rabbitTemplate.convertAndSend(RabbitConst.queue_sms,
-                new SmsMessage(RequestThread.getClientAlias(), enumSmsType.getKey(), phone, randomNum + "|5分钟"));
+                new SmsMessage(RequestThread.getClientAlias(), enumSmsType.getKey(), phone, "您的验证码为：" + randomNum + "，为保证验证安全，请在5分钟内进行验证，如非本人操作请忽略此短信。"));
         redisMapper.remove(RedisConst.USER_GRAPH_CODE + phone);
         return new ResultMessage(ResponseEnum.M2000);
     }
