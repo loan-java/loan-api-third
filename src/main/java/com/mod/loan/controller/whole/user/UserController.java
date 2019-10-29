@@ -2,6 +2,7 @@ package com.mod.loan.controller.whole.user;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.mod.loan.common.annotation.Api;
+import com.mod.loan.common.annotation.LoginRequired;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
@@ -189,4 +190,11 @@ public class UserController {
     }
 
 
+    @RequestMapping(value = "user_loginout")
+    @LoginRequired(check = true)
+    @Api
+    public ResultMessage user_loginout() {
+        redisMapper.remove(RedisConst.USER_TOKEN_PREFIX + RequestThread.getUid());
+        return new ResultMessage(ResponseEnum.M2000);
+    }
 }
