@@ -119,7 +119,7 @@ public class OrderServiceImpl extends BaseServiceImpl<Order, Long> implements Or
                     throw new BizException("支付渠道异常");
             }
         } else {
-            message = kuaiQianService.repay(order);
+            message = yeePayService.repay(order);
         }
         log.info("还款结果message=" + JSONObject.toJSONString(message));
         if (ResponseEnum.M2000.getCode().equals(message.getStatus())) {

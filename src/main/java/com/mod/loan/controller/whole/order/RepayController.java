@@ -65,7 +65,7 @@ public class RepayController {
      */
     @LoginRequired(check = true)
     @RequestMapping(value = "order_repay")
-    public ResultMessage order_repay_fuyou(@RequestParam(required = true) Long orderId, @RequestParam(required = true) String cardNo,
+    public ResultMessage order_repay(@RequestParam(required = true) Long orderId, @RequestParam(required = true) String cardNo,
                                            @RequestParam(required = true) String cardName) throws IOException {
         ResultMessage message = null;
         Long uid = RequestThread.getUid();
