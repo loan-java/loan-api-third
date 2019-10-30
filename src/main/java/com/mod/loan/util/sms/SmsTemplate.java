@@ -1,9 +1,9 @@
 package com.mod.loan.util.sms;
 
 public enum SmsTemplate {
-    T001("001"),//普通短信
-    T002("002"),//打款还款提示
-    T005("005"),//逾期提示
+    T001("001"),//注册短信
+    T002("002"),//找回密码提示
+    T005("005"),//催收提示
     ;
     private String key;  //自有模板key
 
