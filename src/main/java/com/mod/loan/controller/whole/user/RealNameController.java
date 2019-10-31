@@ -14,10 +14,11 @@ import com.mod.loan.mapper.UserInfoMapper;
 import com.mod.loan.model.*;
 import com.mod.loan.model.dto.UserContact;
 import com.mod.loan.service.OrderService;
+import com.mod.loan.service.UploadService;
 import com.mod.loan.service.UserService;
 import com.mod.loan.util.CheckUtils;
+import com.mod.loan.util.DateUtil;
 import com.mod.loan.util.StringReplaceUtil;
-import com.mod.loan.util.aliyun.OSSUtil;
 import com.mod.loan.util.baidu.FaceUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -59,6 +61,9 @@ public class RealNameController {
     UserAddressListMapper addressListMapper;
     @Autowired
     UserService userService;
+
+    @Resource
+    private UploadService uploadService;
 
     @Api
     @LoginRequired(check = true)
@@ -310,7 +315,7 @@ public class RealNameController {
             if (userIdentRecord.getLiveness() == 2) {
                 return new ResultMessage(ResponseEnum.M4000.getCode(), "请不要重复认证");
             }
-            String filePath = OSSUtil.upload(file);
+            String filePath = uploadService.uploadFile(DateUtil.getStringDateShort(), file);
             if (StringUtils.isBlank(filePath)) {
                 return new ResultMessage(ResponseEnum.M4000.getCode(), "认证失败！");
             }

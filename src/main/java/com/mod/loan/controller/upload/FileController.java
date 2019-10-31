@@ -4,13 +4,16 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.config.Constant;
 import com.mod.loan.service.UploadService;
+import com.mod.loan.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +26,7 @@ public class FileController {
 
     @PostMapping(value = "/upload")
     public ResultMessage upload(@RequestParam("file") MultipartFile file) {
-        String path = uploadService.uploadFile("/test", file);
+        String path = uploadService.uploadFile(DateUtil.getStringDateShort(), file);
         if (StringUtils.isBlank(path)) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "上传失败！");
         }
