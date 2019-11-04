@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mod.loan.mapper.AppVersionMapper">
+  <resultMap id="BaseResultMap" type="com.mod.loan.model.AppVersion">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="version_alias" jdbcType="VARCHAR" property="versionAlias" />
+    <result column="version_type" jdbcType="VARCHAR" property="versionType" />
+    <result column="version_name" jdbcType="VARCHAR" property="versionName" />
+    <result column="version_code" jdbcType="INTEGER" property="versionCode" />
+    <result column="version_force" jdbcType="TINYINT" property="versionForce" />
+    <result column="version_status" jdbcType="TINYINT" property="versionStatus" />
+    <result column="version_url" jdbcType="VARCHAR" property="versionUrl" />
+    <result column="version_content" jdbcType="VARCHAR" property="versionContent" />
+    <result column="app_market" jdbcType="VARCHAR" property="appMarket" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  
+  <select id="findNewVersion"  resultMap="BaseResultMap">
+  select version_alias,version_name,version_code,version_force,version_url,version_content,app_market from tb_app_version 
+  where version_status=1 and version_alias=#{versionAlias} and version_type=#{versionType} order by version_code desc limit 1
+  </select>
+</mapper>

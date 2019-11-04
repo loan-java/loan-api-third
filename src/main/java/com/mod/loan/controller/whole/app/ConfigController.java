@@ -5,6 +5,7 @@ import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
 import com.mod.loan.model.Merchant;
+import com.mod.loan.service.AppService;
 import com.mod.loan.service.MerchantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,12 +19,13 @@ import java.util.Map;
 @RestController
 public class ConfigController {
 
-    //	@Autowired
-//	private AppService appService;
+    @Autowired
+    private AppService appService;
+
     @Autowired
     private MerchantService merchantService;
 
-//	/**
+    //	/**
 //	 * 启动页，首页图片弹窗
 //	 * @return
 //	 */
@@ -57,11 +59,11 @@ public class ConfigController {
 //		return new ResultMessage(ResponseEnum.M2000, data);
 //	}
 //
-//	@RequestMapping(value = "check_version")
-//	@Api
-//	public ResultMessage check_version() {
-//		return new ResultMessage(ResponseEnum.M2000, appService.findNewVersion(RequestThread.getClientAlias(), RequestThread.getClientType()));
-//	}
+    @RequestMapping(value = "check_version")
+    @Api
+    public ResultMessage check_version() {
+        return new ResultMessage(ResponseEnum.M2000, appService.findNewVersion(RequestThread.getClientAlias(), RequestThread.getClientType()));
+    }
 
     @RequestMapping(value = "mechant_info")
     @Api
