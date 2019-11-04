@@ -35,11 +35,11 @@ public class UploadServiceImpl implements UploadService {
      * @param index
      */
     private boolean createLocalFile(String filePath, MultipartFile file, long index) {
-        File localFile = new File(Constant.FILE_SAVE_PATH + filePath);
+        File localFile = new File(Constant.FILE_SAVE_PATH + "/" + filePath);
         //先创建目录
         localFile.mkdirs();
         String originalFilename = file.getOriginalFilename();
-        String path = Constant.FILE_SAVE_PATH + filePath + "/" + index + "-" + originalFilename;
+        String path = Constant.FILE_SAVE_PATH + "/" + filePath + "/" + index + "-" + originalFilename;
         localFile = new File(path);
         FileOutputStream fos = null;
         InputStream in = null;
