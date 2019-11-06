@@ -102,6 +102,7 @@ public class LoanOrderController {
         Order order = orderService.findUserLatestOrder(uid);
         if (null == order || 41 == order.getStatus() || 42 == order.getStatus()) {
             map.put("orderStatus", 0);//0-首页显示获取额度
+            map.put("url", "order/store_order_apply");
             return new ResultMessage(ResponseEnum.M2000.getCode(), map);
         }
         map.put("orderId", order.getId());
@@ -173,17 +174,7 @@ public class LoanOrderController {
             loanBeforeList.add(loanBefore2);
 
             map.put("orderStatus", 2);//2-审核失败图
-
-            Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
-            if (StringUtils.isBlank(merchant.getMerchantMarket())) {
-                //todo 跳转前缀增加
-                map.put("url", "market.html?");
-            } else if ("order".equals(merchant.getMerchantMarket())) {
-                map.put("url", "order/store_order_detail.html?orderId=" + order.getId());
-            } else {
-                map.put("url", merchant.getMerchantMarket());
-            }
-
+            map.put("url", "order/store_order_detail?orderId=" + order.getId());
             map.put("loanBeforeList", loanBeforeList);
             return new ResultMessage(ResponseEnum.M2000, map);
         }
@@ -201,8 +192,7 @@ public class LoanOrderController {
                 map.put("remainDays", remainDays);
             }
             map.put("orderStatus", 3);//3-我要还款
-            //todo 跳转前缀增加
-            map.put("url", "order/store_order_detail.html?orderId=" + order.getId());
+            map.put("url", "order/store_order_detail?orderId=" + order.getId());
             return new ResultMessage(ResponseEnum.M2000, map);
         }
         if (33 == order.getStatus() || 34 == order.getStatus()) {//逾期或坏账
@@ -212,8 +202,7 @@ public class LoanOrderController {
                 map.put("remainDays", order.getOverdueDay());
             }
             map.put("orderStatus", 4);//4-逾期还款
-            //todo 跳转前缀增加
-            map.put("url", "order/store_order_detail.html?orderId=" + order.getId());
+            map.put("url", "order/store_order_detail?orderId=" + order.getId());
         }
         return new ResultMessage(ResponseEnum.M2000, map);
     }
