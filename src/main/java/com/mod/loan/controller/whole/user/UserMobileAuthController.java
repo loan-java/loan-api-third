@@ -107,8 +107,19 @@ public class UserMobileAuthController {
                 || StringUtils.isBlank(password) || StringUtils.isBlank(mobile)) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "参数解析错误");
         }
+        User user = userMapper.selectByPrimaryKey(RequestThread.getUid());
+        UserIdent userIdent = userIdentMapper.selectByPrimaryKey(RequestThread.getUid());
+        if (user == null || userIdent == null) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "用户信息不存在");
+        }
 
-        caoPanShouService.pullUserMobileAuth(identityNo, identityName, password, mobile);
+        ResultMessage resultMessage = caoPanShouService.pullUserMobileAuth(identityNo, identityName, password, mobile);
+        if (resultMessage.getCode() != 2000) {
+            userIdent.setMobile(3);
+            userIdent.setMobileTime(new Date());
+            userIdentMapper.updateByPrimaryKeySelective(userIdent);
+            return resultMessage;
+        }
 
         return new ResultMessage(ResponseEnum.M2000);
     }
