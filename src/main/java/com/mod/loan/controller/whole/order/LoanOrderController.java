@@ -158,6 +158,7 @@ public class LoanOrderController {
             DateTime dd1 = new DateTime(order.getCreateTime());
             if (dd1.withMillisOfDay(0).plusDays(7).isBeforeNow()) {
                 map.put("orderStatus", 0);////0-首页显示获取额度
+                map.put("url", "order/store_order_apply");
                 return new ResultMessage(ResponseEnum.M2000.getCode(), map);
             }
 
