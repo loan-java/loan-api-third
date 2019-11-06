@@ -15,7 +15,7 @@ public class UserIdent {
     private Long uid;
 
     /**
-     * 是否实名认证,0，未认证，1认证中,2认证成功 ,3认证失败,4已失效 
+     * 是否实名认证 [0:未认证，1: 认证中, 2: 认证成功, 3: 认证失败, 4: 已失效]
      */
     @Column(name = "real_name")
     private Integer realName;
@@ -27,7 +27,7 @@ public class UserIdent {
     private Date realNameTime;
 
     /**
-     * 是否个人信息认证0，未认证，1认证中,2认证成功 ,3认证失败,4已失效
+     * 是否个人信息认证 [0:未认证，1: 认证中, 2: 认证成功, 3: 认证失败, 4: 已失效]
      */
     @Column(name = "user_details")
     private Integer userDetails;
@@ -39,7 +39,7 @@ public class UserIdent {
     private Date userDetailsTime;
 
     /**
-     * 绑卡：0，未认证，1认证中,2认证成功 ,3认证失败,4已失效
+     * 绑卡 [0:未认证，1: 认证中, 2: 认证成功, 3: 认证失败, 4: 已失效]
      */
     private Integer bindbank;
 
@@ -50,7 +50,7 @@ public class UserIdent {
     private Date bindbankTime;
 
     /**
-     * 是否运营商手机认证0，未认证   ,2认证成功 
+     * 运营商手机认证状态 [0:未认证，1: 认证中, 2: 认证成功, 3: 认证失败, 4: 已失效]
      */
     private Integer mobile;
 
@@ -61,7 +61,7 @@ public class UserIdent {
     private Date mobileTime;
 
     /**
-     * 是否人脸识别认证0，未认证，1认证中,2认证成功 ,3认证失败,4已失效
+     * 是否人脸识别认证 [0:未认证，1: 认证中, 2: 认证成功, 3: 认证失败, 4: 已失效]
      */
     private Integer liveness;
 

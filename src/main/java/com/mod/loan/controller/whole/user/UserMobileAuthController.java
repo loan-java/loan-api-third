@@ -13,6 +13,7 @@ import com.mod.loan.mapper.UserMapper;
 import com.mod.loan.model.MoxieMobile;
 import com.mod.loan.model.User;
 import com.mod.loan.model.UserIdent;
+import com.mod.loan.service.CaoPanShouService;
 import com.mod.loan.util.Base64Util;
 import com.mod.loan.util.aliyun.OSSUtil;
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
@@ -36,14 +38,14 @@ public class UserMobileAuthController {
 
     private static Logger logger = LoggerFactory.getLogger(UserMobileAuthController.class);
 
-    @Autowired
+    @Resource
     private MoxieMobileMapper moxieMobileMapper;
-
-    @Autowired
+    @Resource
     private UserIdentMapper userIdentMapper;
-
-    @Autowired
+    @Resource
     private UserMapper userMapper;
+    @Resource
+    private CaoPanShouService caoPanShouService;
 
 
     @Api
@@ -62,14 +64,13 @@ public class UserMobileAuthController {
         }
 
 
-
         User user = userMapper.selectByPrimaryKey(RequestThread.getUid());
         UserIdent userIdent = userIdentMapper.selectByPrimaryKey(RequestThread.getUid());
         if (user == null && userIdent == null) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "用户不存在");
         }
 
-        String mxMobilePath = OSSUtil.uploadStr(Base64Util.decode(mxMobile.getBytes()),user.getId());
+        String mxMobilePath = OSSUtil.uploadStr(Base64Util.decode(mxMobile.getBytes()), user.getId());
         if (StringUtils.isBlank(mxMobilePath)) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "文件上传失败");
         }
@@ -84,6 +85,30 @@ public class UserMobileAuthController {
         userIdent.setMobileTime(new Date());
         userIdentMapper.updateByPrimaryKeySelective(userIdent);
         moxieMobileMapper.insertSelective(moxieMobile);
+
+        return new ResultMessage(ResponseEnum.M2000);
+    }
+
+    @Api
+    @LoginRequired
+    @RequestMapping(value = "pullUserMobileAuth")
+    public ResultMessage pullUserMobileAuth(@RequestBody JSONObject jsonObject) {
+        logger.info("=====拉取运营商认证=====");
+        logger.info("请求参数：" + JSON.toJSONString(jsonObject));
+
+        if (jsonObject.size() == 0) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "请求参数不能为空");
+        }
+        String identityNo = jsonObject.getString("identityNo");  // 身份证号
+        String identityName = jsonObject.getString("identityName");// 姓名
+        String password = jsonObject.getString("password");    // 服务密码
+        String mobile = jsonObject.getString("mobile");      // 手机号
+        if (StringUtils.isBlank(identityNo) || StringUtils.isBlank(identityName)
+                || StringUtils.isBlank(password) || StringUtils.isBlank(mobile)) {
+            return new ResultMessage(ResponseEnum.M4000.getCode(), "参数解析错误");
+        }
+
+        caoPanShouService.pullUserMobileAuth(identityNo, identityName, password, mobile);
 
         return new ResultMessage(ResponseEnum.M2000);
     }

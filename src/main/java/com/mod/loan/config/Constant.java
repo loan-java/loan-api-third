@@ -81,6 +81,19 @@ public class Constant {
     public static String typeaPfxPwd;
     public static String typeaCerName;
 
+    // 操盘手配置
+    public static String CAO_PAN_SHOU_APP_ID;
+    public static String CAO_PAN_SHOU_APP_SECRET;
+
+    @Value("${cao.pan.shou.app.id:}")
+    public void setCaoPanShouAppId(String caoPanShouAppId) {
+        Constant.CAO_PAN_SHOU_APP_ID = caoPanShouAppId;
+    }
+    @Value("${cao.pan.shou.app.secret:}")
+    public void setCaoPanShouAppSecret(String caoPanShouAppSecret) {
+        Constant.CAO_PAN_SHOU_APP_SECRET = caoPanShouAppSecret;
+    }
+
     @Value("${file.visit.host:}")
     public void setFileVisitHost(String fileVisitHost) {
         Constant.FILE_VISIT_HOST = fileVisitHost;
