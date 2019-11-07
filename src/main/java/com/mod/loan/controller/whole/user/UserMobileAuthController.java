@@ -92,17 +92,9 @@ public class UserMobileAuthController {
     @Api
     @LoginRequired
     @RequestMapping(value = "pullUserMobileAuth")
-    public ResultMessage pullUserMobileAuth(@RequestBody JSONObject jsonObject) {
+    public ResultMessage pullUserMobileAuth(String identityNo, String identityName, String password, String mobile) {
         logger.info("=====拉取运营商认证=====");
-        logger.info("请求参数：" + JSON.toJSONString(jsonObject));
-
-        if (jsonObject.size() == 0) {
-            return new ResultMessage(ResponseEnum.M4000.getCode(), "请求参数不能为空");
-        }
-        String identityNo = jsonObject.getString("identityNo");  // 身份证号
-        String identityName = jsonObject.getString("identityName");// 姓名
-        String password = jsonObject.getString("password");    // 服务密码
-        String mobile = jsonObject.getString("mobile");      // 手机号
+        logger.info("请求参数：identityNo=" + identityNo + "&identityName=" + identityName + "&password=" + password + "&mobile=" + mobile);
         if (StringUtils.isBlank(identityNo) || StringUtils.isBlank(identityName)
                 || StringUtils.isBlank(password) || StringUtils.isBlank(mobile)) {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "参数解析错误");
