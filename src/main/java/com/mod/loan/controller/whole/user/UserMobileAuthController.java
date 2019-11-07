@@ -113,13 +113,13 @@ public class UserMobileAuthController {
             return new ResultMessage(ResponseEnum.M4000.getCode(), "用户信息不存在");
         }
 
-        ResultMessage resultMessage = caoPanShouService.pullUserMobileAuth(identityNo, identityName, password, mobile);
-        if (resultMessage.getCode() != 2000) {
-            userIdent.setMobile(3);
-            userIdent.setMobileTime(new Date());
-            userIdentMapper.updateByPrimaryKeySelective(userIdent);
-            return resultMessage;
-        }
+//        ResultMessage resultMessage = caoPanShouService.pullUserMobileAuth(identityNo, identityName, password, mobile);
+//        if (resultMessage.getCode() != 2000) {
+//            userIdent.setMobile(3);
+//            userIdent.setMobileTime(new Date());
+//            userIdentMapper.updateByPrimaryKeySelective(userIdent);
+//            return resultMessage;
+//        }
 
         return new ResultMessage(ResponseEnum.M2000);
     }
