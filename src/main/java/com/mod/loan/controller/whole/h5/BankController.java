@@ -29,10 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 用户银行卡绑定
@@ -199,8 +196,7 @@ public class BankController {
         if (!redisMapper.lock(RedisConst.lock_user_bind_card_code + uid, 2)) {
             return new ResultMessage(ResponseEnum.M4005);
         }
-        Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
-        Integer bindType = merchant.getBindType() == null ? 4 : merchant.getBindType();
+        Integer bindType = Optional.ofNullable(merchantService.findMerchantByAlias(RequestThread.getClientAlias())).map(merchant -> merchant.getBindType()).orElse(7);
         switch (bindType) {
             case 4:
                 message = baofooService.sendBaoFooSms(RequestThread.getUid(), cardNo, cardPhone, bank);
@@ -212,7 +208,7 @@ public class BankController {
                 message = chanpayService.bindCardRequest(RequestThread.getUid(), cardNo, cardPhone, bank);
                 break;
             case 7:
-                //todo 宝付绑卡流程
+                //todo 易宝绑卡流程
                 //message = yeePayService.requestBindCard(RequestThread.getUid(), cardNo, cardPhone, bank);
                 //break;
                 UserBankInfoVO userBankInfoVO = new UserBankInfoVO();
@@ -224,7 +220,7 @@ public class BankController {
                 redisMapper.set(RedisConst.user_bank_bind + uid, userBankInfoVO, 600);
                 return new ResultMessage(ResponseEnum.M2000);
             default:
-                log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", merchant.getMerchantAlias(), bindType);
+                log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", RequestThread.getClientAlias(), bindType);
                 message = new ResultMessage(ResponseEnum.M4000);
                 break;
         }
@@ -235,18 +231,15 @@ public class BankController {
     @LoginRequired(check = true)
     public ResultMessage bank_card_info() {
         Long uid = RequestThread.getUid();
-        String string = redisMapper.get(RedisConst.user_bank_bind + uid);
-        UserBankInfoVO userBankInfoVO = JSON.parseObject(string, UserBankInfoVO.class);
-        if (userBankInfoVO == null) {
-            return new ResultMessage(ResponseEnum.M4000.getCode(), "绑卡信息不存在");
-        }
         User user = userService.selectByPrimaryKey(uid);
-        Map<String, String> data = new HashMap<>();
-        data.put("bankName", userBankInfoVO.getCardName());
-        data.put("cardNo", userBankInfoVO.getCardNo());
-        data.put("userName", user.getUserName());
-        data.put("userPhone", userBankInfoVO.getCardPhone());
-        return new ResultMessage(ResponseEnum.M2000, data);
+        String string = redisMapper.get(RedisConst.user_bank_bind + uid);
+        return Optional.ofNullable(JSON.parseObject(string, UserBankInfoVO.class)).map(userBankInfoVO -> {
+            Map<String, String> data = new HashMap<>();
+            data.put("cardNo", userBankInfoVO.getCardNo());
+            data.put("userName", user.getUserName());
+            data.put("userPhone", userBankInfoVO.getCardPhone());
+            return new ResultMessage(ResponseEnum.M2000, data);
+        }).orElse(new ResultMessage(ResponseEnum.M4000.getCode(), "绑卡信息不存在"));
     }
 
     @RequestMapping(value = "bank_bind")
@@ -272,8 +265,7 @@ public class BankController {
             return new ResultMessage(ResponseEnum.M4005);
         }
         UserBankInfoVO userBankInfoVO = JSON.parseObject(bindInfo, UserBankInfoVO.class);
-        Merchant merchant = merchantService.findMerchantByAlias(RequestThread.getClientAlias());
-        Integer bindType = merchant.getBindType() == null ? 4 : merchant.getBindType();
+        Integer bindType = Optional.ofNullable(merchantService.findMerchantByAlias(RequestThread.getClientAlias())).map(merchant -> merchant.getBindType()).orElse(7);
         switch (bindType) {
             case 4:
                 message = baofooService.bindBaoFooSms(validateCode, uid, userBankInfoVO);
@@ -285,7 +277,7 @@ public class BankController {
                 message = chanpayService.bindCardConfirm(validateCode, uid, userBankInfoVO);
                 break;
             case 7:
-                //todo 宝付绑卡流程
+                //todo 易宝绑卡流程
                 // message = yeePayService.confirmBindCard(validateCode, uid, userBankInfoVO);
                 //break;
                 UserBank userBank = new UserBank();
@@ -301,7 +293,7 @@ public class BankController {
                 userService.insertUserBank(uid, userBank);
                 return new ResultMessage(ResponseEnum.M2000);
             default:
-                log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", merchant.getMerchantAlias(), bindType);
+                log.error("绑卡异常,该商户未开通相关绑卡渠道,merchant={},bindType={}", RequestThread.getClientAlias(), bindType);
                 message = new ResultMessage(ResponseEnum.M4000);
                 break;
         }
