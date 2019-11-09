@@ -9,6 +9,8 @@ public enum RiskAuditSourceEnum {
      */
     JU_HE(0, "聚合"),
     RONG_ZE(1, "融泽"),
+    BENG_BENG(2, "蹦蹦"),
+    WHOLE(4, "全流程"),
     ;
 
     private Integer code;
