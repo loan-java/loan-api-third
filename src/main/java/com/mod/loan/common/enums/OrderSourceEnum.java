@@ -29,6 +29,12 @@ public enum OrderSourceEnum {
         return RONGZE.getSoruce() == source;
     }
 
+
+    public static boolean isWhole(int source) {
+        return WHOLE.getSoruce() == source;
+    }
+
+
     public Integer getSoruce() {
         return soruce;
     }
