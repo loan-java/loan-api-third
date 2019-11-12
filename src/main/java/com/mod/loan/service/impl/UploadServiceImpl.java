@@ -18,7 +18,7 @@ public class UploadServiceImpl implements UploadService {
         long index = System.currentTimeMillis();
         if (createLocalFile(filePath, file, index)) {
             try {
-                return Constant.FILE_VISIT_HOST + "/file/visit?f=" + URLEncoder.encode(filePath + "/" + index + "-" + file.getOriginalFilename(), "UTF-8");
+                return Constant.FILE_VISIT_HOST + "/file/visit?f=" + URLEncoder.encode(filePath + "/" + index + file.getOriginalFilename(), "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 log.error("UploadServiceImpl.uploadFile URLEncoder.encode fail", e);
                 return null;
@@ -38,8 +38,7 @@ public class UploadServiceImpl implements UploadService {
         File localFile = new File(Constant.FILE_SAVE_PATH + "/" + filePath);
         //先创建目录
         localFile.mkdirs();
-        String originalFilename = file.getOriginalFilename();
-        String path = Constant.FILE_SAVE_PATH + "/" + filePath + "/" + index + "-" + originalFilename;
+        String path = Constant.FILE_SAVE_PATH + "/" + filePath + "/" + index + file.getOriginalFilename();
         localFile = new File(path);
         FileOutputStream fos = null;
         InputStream in = null;
