@@ -39,7 +39,7 @@ public class UploadServiceImpl implements UploadService {
         //先创建目录
         localFile.mkdirs();
         String originalFilename = file.getOriginalFilename();
-        String path = Constant.FILE_SAVE_PATH + "/" + filePath + "/" + originalFilename + "-" + index;
+        String path = Constant.FILE_SAVE_PATH + "/" + filePath + "/" + index + "-" + originalFilename;
         localFile = new File(path);
         FileOutputStream fos = null;
         InputStream in = null;
