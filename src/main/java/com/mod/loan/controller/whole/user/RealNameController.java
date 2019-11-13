@@ -262,7 +262,7 @@ public class RealNameController {
         user.setUserName(userName.trim());
         user.setUserCertNo(userCertNo.trim());
         user.setIa(ia);
-        user.setIndate(indate);
+        user.setIndate(indate.split("-")[1]);
         user.setAddress(address);
         user.setNation(nation);
         user.setImgCertFront(imgCertFront);
