@@ -19,7 +19,6 @@ import com.mod.loan.util.aliyun.OSSUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -107,9 +106,9 @@ public class UserMobileAuthController {
 
 //        ResultMessage resultMessage = caoPanShouService.pullUserMobileAuth(identityNo, identityName, password, mobile);
 //        if (resultMessage.getCode() != 2000) {
-//            userIdent.setMobile(3);
-//            userIdent.setMobileTime(new Date());
-//            userIdentMapper.updateByPrimaryKeySelective(userIdent);
+        userIdent.setMobile(2);
+        userIdent.setMobileTime(new Date());
+        userIdentMapper.updateByPrimaryKeySelective(userIdent);
 //            return resultMessage;
 //        }
 
