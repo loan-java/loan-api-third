@@ -5,10 +5,7 @@ import com.mod.loan.common.annotation.LoginRequired;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
-import com.mod.loan.model.MerchantRate;
-import com.mod.loan.model.Order;
-import com.mod.loan.model.OrderPay;
-import com.mod.loan.model.UserIdent;
+import com.mod.loan.model.*;
 import com.mod.loan.model.dto.LoanBefore;
 import com.mod.loan.model.dto.OrderStatusDTO;
 import com.mod.loan.service.MerchantRateService;
@@ -196,8 +193,7 @@ public class LoanOrderController {
                 map.put("remainDays", remainDays);
             }
             map.put("orderStatus", 3);//3-我要还款
-            map.put("url", " order/store_pay_repay?orderId=" + order.getId() + "&repayMoney=" + StringUtil.moneyFormat(order.getShouldRepay()));
-
+            map.put("url", "order/store_order_detail?orderId=" + order.getId());
             return new ResultMessage(ResponseEnum.M2000, map);
         }
         if (33 == order.getStatus() || 34 == order.getStatus()) {//逾期或坏账
@@ -207,7 +203,7 @@ public class LoanOrderController {
                 map.put("remainDays", order.getOverdueDay());
             }
             map.put("orderStatus", 4);//4-逾期还款
-            map.put("url", " order/store_pay_repay?orderId=" + order.getId() + "&repayMoney=" + StringUtil.moneyFormat(order.getShouldRepay()));
+            map.put("url", "order/store_order_detail?orderId=" + order.getId());
         }
         return new ResultMessage(ResponseEnum.M2000, map);
     }
