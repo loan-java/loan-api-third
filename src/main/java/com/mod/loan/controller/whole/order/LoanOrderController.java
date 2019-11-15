@@ -76,7 +76,7 @@ public class LoanOrderController {
         String uid = String.valueOf(verifyToken.get("uid"));
         String merchant = String.valueOf(verifyToken.get("clientAlias"));
         UserIdent userIdent = userIdentService.selectByPrimaryKey(Long.parseLong(uid));
-        if (2 == userIdent.getRealName() && 2 == userIdent.getUserDetails() && 2 == userIdent.getMobile() && 2 == userIdent.getLiveness() && 2 == userIdent.getAlipay()) {
+        if (2 == userIdent.getRealName() && 2 == userIdent.getUserDetails() && 2 == userIdent.getMobile() && 2 == userIdent.getLiveness()) {
             Integer borrowType = orderService.countPaySuccessByUid(Long.parseLong(uid));
             MerchantRate merchantRate = merchantRateService.findByMerchantAndBorrowType(merchant, borrowType);
             BigDecimal money = merchantRate.getProductMoney();
