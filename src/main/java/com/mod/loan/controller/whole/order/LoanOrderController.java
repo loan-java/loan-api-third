@@ -5,7 +5,11 @@ import com.mod.loan.common.annotation.LoginRequired;
 import com.mod.loan.common.enums.ResponseEnum;
 import com.mod.loan.common.model.RequestThread;
 import com.mod.loan.common.model.ResultMessage;
-import com.mod.loan.model.*;
+import com.mod.loan.config.Constant;
+import com.mod.loan.model.MerchantRate;
+import com.mod.loan.model.Order;
+import com.mod.loan.model.OrderPay;
+import com.mod.loan.model.UserIdent;
 import com.mod.loan.model.dto.LoanBefore;
 import com.mod.loan.model.dto.OrderStatusDTO;
 import com.mod.loan.service.MerchantRateService;
@@ -102,7 +106,7 @@ public class LoanOrderController {
         Order order = orderService.findUserLatestOrder(uid);
         if (null == order || 41 == order.getStatus() || 42 == order.getStatus()) {
             map.put("orderStatus", 0);//0-首页显示获取额度
-            map.put("url", "order/store_order_apply");
+            map.put("url", Constant.SERVER_H5_URL + "order/store_order_apply");
             return new ResultMessage(ResponseEnum.M2000.getCode(), map);
         }
         map.put("orderId", order.getId());
@@ -158,7 +162,7 @@ public class LoanOrderController {
             DateTime dd1 = new DateTime(order.getCreateTime());
             if (dd1.withMillisOfDay(0).plusDays(7).isBeforeNow()) {
                 map.put("orderStatus", 0);////0-首页显示获取额度
-                map.put("url", "order/store_order_apply");
+                map.put("url", Constant.SERVER_H5_URL + "order/store_order_apply");
                 return new ResultMessage(ResponseEnum.M2000.getCode(), map);
             }
 
@@ -175,7 +179,7 @@ public class LoanOrderController {
             loanBeforeList.add(loanBefore2);
 
             map.put("orderStatus", 2);//2-审核失败图
-            map.put("url", "order/store_order_detail?orderId=" + order.getId());
+            map.put("url", Constant.SERVER_H5_URL + "order/store_order_detail?orderId=" + order.getId());
             map.put("loanBeforeList", loanBeforeList);
             return new ResultMessage(ResponseEnum.M2000, map);
         }
@@ -193,7 +197,7 @@ public class LoanOrderController {
                 map.put("remainDays", remainDays);
             }
             map.put("orderStatus", 3);//3-我要还款
-            map.put("url", "order/store_order_detail?orderId=" + order.getId());
+            map.put("url", Constant.SERVER_H5_URL + "order/store_order_detail?orderId=" + order.getId());
             return new ResultMessage(ResponseEnum.M2000, map);
         }
         if (33 == order.getStatus() || 34 == order.getStatus()) {//逾期或坏账
@@ -203,7 +207,7 @@ public class LoanOrderController {
                 map.put("remainDays", order.getOverdueDay());
             }
             map.put("orderStatus", 4);//4-逾期还款
-            map.put("url", "order/store_order_detail?orderId=" + order.getId());
+            map.put("url", Constant.SERVER_H5_URL + "order/store_order_detail?orderId=" + order.getId());
         }
         return new ResultMessage(ResponseEnum.M2000, map);
     }

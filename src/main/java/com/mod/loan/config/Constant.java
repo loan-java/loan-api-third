@@ -8,8 +8,10 @@ public class Constant {
 
     public final static String KUAI_QIAN_UID_PFX = "JSD";
 
-    public static  String FILE_VISIT_HOST;
-    public static  String FILE_SAVE_PATH;
+
+    public static String SERVER_H5_URL;
+    public static String FILE_VISIT_HOST;
+    public static String FILE_SAVE_PATH;
 
     public static String ENVIROMENT;
 
@@ -89,9 +91,15 @@ public class Constant {
     public void setCaoPanShouAppId(String caoPanShouAppId) {
         Constant.CAO_PAN_SHOU_APP_ID = caoPanShouAppId;
     }
+
     @Value("${cao.pan.shou.app.secret:}")
     public void setCaoPanShouAppSecret(String caoPanShouAppSecret) {
         Constant.CAO_PAN_SHOU_APP_SECRET = caoPanShouAppSecret;
+    }
+
+    @Value("${server.h5.url:}")
+    public void setServerH5Url(String serverH5Url) {
+        Constant.SERVER_H5_URL = serverH5Url;
     }
 
     @Value("${file.visit.host:}")
@@ -165,12 +173,12 @@ public class Constant {
         Constant.chanpayOrgPrivateKey = chanpayOrgPrivateKey;
     }
 
-    public  String getCompanyBengBengName() {
+    public String getCompanyBengBengName() {
         return companyBengBengName;
     }
 
     @Value("${company.bengbengname:}")
-    public  void setCompanyBengBengName(String companyBengBengName) {
+    public void setCompanyBengBengName(String companyBengBengName) {
         Constant.companyBengBengName = companyBengBengName;
     }
 
