@@ -64,8 +64,8 @@ public class LoanOrderController {
         map.put("descMid", "获取额度");
         map.put("descBottom", "目前已有50000+人在这里成功借款");
         map.put("amount", "2000-20000");
-        //todo 增加跳转前缀
-        map.put("url", "user/cert_center.html");
+        //增加跳转前缀
+        map.put("url", Constant.SERVER_H5_URL + "user/cert_center");
         if (StringUtils.isBlank(token)) {
             return new ResultMessage(ResponseEnum.M2000.getCode(), map);
         }
@@ -83,13 +83,13 @@ public class LoanOrderController {
             map.put("descMid", "去借钱");
             map.put("descTop", "");
             map.put("amount", money.intValue());
-            //todo 跳转前缀增加
+            //跳转前缀增加
             if (2 == userIdent.getBindbank()) {
                 map.put("status", 2);
-                map.put("url", "order/store_order_apply.html");
+                map.put("url", Constant.SERVER_H5_URL + "order/store_order_apply");
             } else {
                 map.put("status", 1);
-                map.put("url", "user/bank_card.html");
+                map.put("url", Constant.SERVER_H5_URL + "user/bank_card");
             }
         }
         return new ResultMessage(ResponseEnum.M2000.getCode(), map);
@@ -174,7 +174,7 @@ public class LoanOrderController {
             LoanBefore loanBefore2 = new LoanBefore();
             loanBefore2.setEvent("初审失败");
             loanBefore2.setEventTime(TimeUtils.parseTime(order.getAuditTime(), TimeUtils.dateformat0));
-            loanBefore2.setEventDescribe("请重新提交申请审核");
+            loanBefore2.setEventDescribe("请" + Days.daysBetween(new DateTime(new Date()), dd1).getDays() + 1 + "天之后重新提交申请审核");
             loanBeforeList.add(loanBefore);
             loanBeforeList.add(loanBefore2);
 
