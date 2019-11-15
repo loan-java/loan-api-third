@@ -81,7 +81,7 @@ public class LoanOrderController {
             MerchantRate merchantRate = merchantRateService.findByMerchantAndBorrowType(merchant, borrowType);
             BigDecimal money = merchantRate.getProductMoney();
             map.put("descMid", "去借钱");
-            map.put("descTop", "");
+            map.put("descTop", "花兔钱包");
             map.put("amount", money.intValue());
             //跳转前缀增加
             if (2 == userIdent.getBindbank()) {
