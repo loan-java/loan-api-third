@@ -172,7 +172,7 @@ public class LoanOrderController {
             loanBefore.setEventDescribe(String.format("申请周转资金%s元，周期%s天，服务费%s元，到账%s元", order.getBorrowMoney(), order.getBorrowDay(), order.getTotalFee(), order.getActualMoney()));
 
             LoanBefore loanBefore2 = new LoanBefore();
-            loanBefore2.setEvent("初审失败");
+            loanBefore2.setEvent("审核失败");
             loanBefore2.setEventTime(TimeUtils.parseTime(order.getAuditTime(), TimeUtils.dateformat0));
             loanBefore2.setEventDescribe("请" + Days.daysBetween(new DateTime(new Date()), dd1).getDays() + 1 + "天之后重新提交申请审核");
             loanBeforeList.add(loanBefore);
