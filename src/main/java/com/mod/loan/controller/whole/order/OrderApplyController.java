@@ -126,7 +126,7 @@ public class OrderApplyController {
         }
         UserIdent userIdent = userIdentService.selectByPrimaryKey(uid);
         if (2 != userIdent.getRealName() || 2 != userIdent.getUserDetails() || 2 != userIdent.getBindbank()
-                || 2 != userIdent.getMobile() || 2 != userIdent.getLiveness() || 2 != userIdent.getAlipay()) {
+                || 2 != userIdent.getMobile() || 2 != userIdent.getLiveness()) {
             // 提示认证未完成
             return new ResultMessage(ResponseEnum.M4000.getCode(), "认证未完成");
         }
